@@ -15,6 +15,12 @@ data class MoilExtraColors(
     val memberCyan: Color,
     val memberViolet: Color,
     val memberRose: Color,
+    val calendarEventBlue: Color,
+    val calendarEventGreen: Color,
+    val calendarEventYellow: Color,
+    val calendarMutedText: Color,
+    val scheduleDivider: Color,
+    val scheduleMutedText: Color,
 )
 
 val LocalMoilExtraColors = staticCompositionLocalOf<MoilExtraColors> {
@@ -74,6 +80,14 @@ private val darkOnErrorContainerColor = Color(0xFFBF6B60)
 private val memberCyanColor = Color(0xFF009690)
 private val memberVioletColor = Color(0xFF8C6EBD)
 private val memberRoseColor = Color(0xFFAF6297)
+private val calendarEventBlueColor = Color(0xFF3E9BE8)
+private val calendarEventGreenColor = Color(0xFF39A87B)
+private val calendarEventYellowColor = Color(0xFFE9AC18)
+private val calendarMutedTextColor = Color(0xFFB7B4B0)
+private val lightScheduleDividerColor = Color(0xFFE0DEDA)
+private val lightScheduleMutedTextColor = Color(0xFF97918C)
+private val darkScheduleDividerColor = Color(0xFF615D57)
+private val darkScheduleMutedTextColor = Color(0xFF9B9891)
 
 private val LightColorScheme = lightColorScheme(
     primary = lightPrimaryColor,
@@ -133,6 +147,24 @@ private val moilExtraColors = MoilExtraColors(
     memberCyan = memberCyanColor,
     memberViolet = memberVioletColor,
     memberRose = memberRoseColor,
+    calendarEventBlue = calendarEventBlueColor,
+    calendarEventGreen = calendarEventGreenColor,
+    calendarEventYellow = calendarEventYellowColor,
+    calendarMutedText = calendarMutedTextColor,
+    scheduleDivider = lightScheduleDividerColor,
+    scheduleMutedText = lightScheduleMutedTextColor,
+)
+
+private val darkMoilExtraColors = MoilExtraColors(
+    memberCyan = memberCyanColor,
+    memberViolet = memberVioletColor,
+    memberRose = memberRoseColor,
+    calendarEventBlue = calendarEventBlueColor,
+    calendarEventGreen = calendarEventGreenColor,
+    calendarEventYellow = calendarEventYellowColor,
+    calendarMutedText = calendarMutedTextColor,
+    scheduleDivider = darkScheduleDividerColor,
+    scheduleMutedText = darkScheduleMutedTextColor,
 )
 
 @Composable
@@ -145,9 +177,15 @@ fun MoilTheme(
     } else {
         LightColorScheme
     }
+    val extraColors = if (darkTheme) {
+        darkMoilExtraColors
+    } else {
+        moilExtraColors
+    }
 
     CompositionLocalProvider(
-        LocalMoilExtraColors provides moilExtraColors,
+        LocalMoilExtraColors provides extraColors,
+        LocalMoilExtraTypography provides MoilDefaultExtraTypography,
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
