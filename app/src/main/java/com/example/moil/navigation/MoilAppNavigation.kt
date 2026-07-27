@@ -9,7 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import com.example.moil.feature.auth.presentation.LoginRoute
 import com.example.moil.feature.auth.presentation.SignUpRoute
-import com.example.moil.feature.calendar.presentation.CalendarRoute
+import com.example.moil.core.model.GroupMemberRole
 
 private sealed interface MoilAppDestination {
     data object Login : MoilAppDestination
@@ -18,7 +18,12 @@ private sealed interface MoilAppDestination {
 }
 
 @Composable
-fun MoilAppNavigation() {
+fun MoilAppNavigation(
+    isDarkTheme: Boolean,
+    onDarkThemeChanged: (Boolean) -> Unit,
+    currentUserRole: GroupMemberRole,
+    onCurrentUserRoleChanged: (GroupMemberRole) -> Unit,
+) {
     val destinationBackStack = remember {
         mutableStateListOf<MoilAppDestination>(MoilAppDestination.Login)
     }
@@ -55,6 +60,11 @@ fun MoilAppNavigation() {
             )
         }
 
-        MoilAppDestination.Main -> CalendarRoute()
+        MoilAppDestination.Main -> MainTabRoute(
+            isDarkTheme = isDarkTheme,
+            onDarkThemeChanged = onDarkThemeChanged,
+            currentUserRole = currentUserRole,
+            onCurrentUserRoleChanged = onCurrentUserRoleChanged,
+        )
     }
 }
