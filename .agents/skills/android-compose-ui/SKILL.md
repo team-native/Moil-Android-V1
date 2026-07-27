@@ -99,6 +99,9 @@ fun ProjectRoute(
 ## Screen 규칙
 
 - 상태와 callback만 매개변수로 받는 stateless UI를 우선한다.
+- Screen은 feature UI Component를 조합하고 state와 event를 전달하는 역할만 담당한다.
+- Screen에서 `Scaffold`, `Column`, `Row`, `Box`, `Text`, `Image` 같은 layout·visual primitive를 직접 배치하지 않는다. 화면별 레이아웃과 표현은 feature Component로 분리한다.
+- Screen 전용 최상위 레이아웃이 필요하면 `FeatureScreenContent` 같은 Component로 만들고, Screen은 해당 Component에 `UiState`와 callback을 전달한다.
 - 최상위 컨테이너는 특별한 이유가 없으면 `Scaffold`를 사용한다.
 - `innerPadding`을 실제 content에 전달한다.
 - 시스템 바 inset을 `Scaffold`와 content에 중복 적용하지 않는다.
@@ -139,7 +142,7 @@ data class ProjectUiState(
 - Preview와 테스트가 유용한 단위
 
 한 줄 Text나 단순 Spacer까지 기계적으로 분리하지 않는다.
-기능 전용 component와 앱 전체 공용 component를 패키지로 구분한다.
+기능 전용 component는 해당 feature 패키지에 두고, 두 화면 이상에서 재사용 가능하거나 앱 전반의 UI 책임을 가진 component는 `core` 패키지에 둔다.
 
 ## Spacer 공백 규칙
 

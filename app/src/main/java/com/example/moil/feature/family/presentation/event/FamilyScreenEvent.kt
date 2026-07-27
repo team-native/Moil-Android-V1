@@ -1,0 +1,14 @@
+package com.example.moil.feature.family.presentation
+
+import com.example.moil.core.component.MoilNavigationDestination
+
+sealed interface FamilyScreenEvent {
+    data class DestinationClicked(val destination: MoilNavigationDestination) : FamilyScreenEvent
+    data class GroupClicked(val groupId: String) : FamilyScreenEvent
+    data class NotificationsChanged(val isEnabled: Boolean) : FamilyScreenEvent
+    data object BackClicked : FamilyScreenEvent
+    data object GroupNameChangeClicked : FamilyScreenEvent
+    data object MemberPermissionsClicked : FamilyScreenEvent
+    data object InviteLinkShareClicked : FamilyScreenEvent
+    data object AdministratorTransferClicked : FamilyScreenEvent
+}
