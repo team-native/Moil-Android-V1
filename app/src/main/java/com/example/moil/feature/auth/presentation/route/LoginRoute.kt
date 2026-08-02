@@ -1,10 +1,9 @@
 package com.example.moil.feature.auth.presentation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun LoginRoute(
@@ -12,26 +11,33 @@ fun LoginRoute(
     onNavigateToSignUp: () -> Unit,
     onLoginCompleted: () -> Unit,
 ) {
-    var loginUiState by remember(initialEmail) {
-        mutableStateOf(LoginUiState(email = initialEmail))
+    val viewModel: AuthViewModel = hiltViewModel()
+    val loginUiState = viewModel.loginUiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(initialEmail) {
+        viewModel.setLoginEmail(initialEmail)
     }
 
     LoginScreen(
-        uiState = loginUiState,
+        uiState = loginUiState.value,
         onEvent = { event ->
             when (event) {
-                is LoginScreenEvent.EmailChanged -> {
-                    loginUiState = loginUiState.copy(email = event.email)
-                }
-
-                is LoginScreenEvent.PasswordChanged -> {
-                    loginUiState = loginUiState.copy(password = event.password)
-                }
-
+                is LoginScreenEvent.EmailChanged,
+                is LoginScreenEvent.PasswordChanged,
                 LoginScreenEvent.ForgotPasswordClicked -> Unit
                 LoginScreenEvent.SignUpClicked -> onNavigateToSignUp()
-                LoginScreenEvent.LoginClicked -> onLoginCompleted()
+                LoginScreenEvent.LoginClicked -> viewModel.onLoginEvent(event)
+            }
+
+            if (event is LoginScreenEvent.EmailChanged || event is LoginScreenEvent.PasswordChanged) {
+                viewModel.onLoginEvent(event)
             }
         },
     )
+
+    LaunchedEffect(Unit) {
+        viewModel.effects.collect { effect ->
+            if (effect is AuthEffect.LoginCompleted) onLoginCompleted()
+        }
+    }
 }

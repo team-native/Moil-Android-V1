@@ -32,6 +32,8 @@ val LocalMoilExtraColors = staticCompositionLocalOf<MoilExtraColors> {
     error("MoilExtraColors is not provided.")
 }
 
+val LocalMoilIsDarkTheme = staticCompositionLocalOf { false }
+
 private val lightPrimaryColor = Color(0xFFBF6B60)
 private val lightOnPrimaryColor = Color(0xFFFFFFFF)
 private val lightPrimaryContainerColor = Color(0xFFF2F2F7)
@@ -215,6 +217,7 @@ fun MoilTheme(
 
     CompositionLocalProvider(
         LocalMoilExtraColors provides extraColors,
+        LocalMoilIsDarkTheme provides darkTheme,
         LocalMoilExtraTypography provides MoilDefaultExtraTypography,
     ) {
         MaterialTheme(

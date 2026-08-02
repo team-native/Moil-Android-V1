@@ -6,18 +6,25 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.moil.core.model.GroupMemberRole
 import com.example.moil.core.settings.MemberRolePreferencesRepository
 import com.example.moil.core.settings.ThemePreferencesRepository
-import com.example.moil.navigation.MoilAppNavigation
+import com.example.moil.core.network.SessionManager
+import com.example.moil.navigation.MoilAppRoute
 import com.example.moil.ui.theme.MoilTheme
 import kotlinx.coroutines.launch
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var sessionManager: SessionManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -28,17 +35,17 @@ class MainActivity : ComponentActivity() {
             val memberRolePreferencesRepository = remember {
                 MemberRolePreferencesRepository(applicationContext)
             }
-            val isDarkThemeEnabled by themePreferencesRepository.isDarkTheme.collectAsState(
-                initial = false,
+            val isDarkThemeEnabled by themePreferencesRepository.isDarkTheme.collectAsStateWithLifecycle(
+                initialValue = false,
             )
-            val currentUserRole by memberRolePreferencesRepository.currentUserRole.collectAsState(
-                initial = GroupMemberRole.Administrator,
+            val currentUserRole by memberRolePreferencesRepository.currentUserRole.collectAsStateWithLifecycle(
+                initialValue = GroupMemberRole.Administrator,
             )
             val preferencesUpdateScope = rememberCoroutineScope()
 
             MoilTheme(darkTheme = isDarkThemeEnabled) {
                 Surface(color = MaterialTheme.colorScheme.background) {
-                    MoilAppNavigation(
+                    MoilAppRoute(
                         isDarkTheme = isDarkThemeEnabled,
                         onDarkThemeChanged = { isEnabled ->
                             preferencesUpdateScope.launch {
@@ -51,6 +58,7 @@ class MainActivity : ComponentActivity() {
                                 memberRolePreferencesRepository.setCurrentUserRole(role)
                             }
                         },
+                        sessionManager = sessionManager,
                     )
                 }
             }

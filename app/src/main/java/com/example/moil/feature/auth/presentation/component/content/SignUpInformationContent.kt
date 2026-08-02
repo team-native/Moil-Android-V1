@@ -59,5 +59,9 @@ internal fun SignUpInformationContent(
         if (uiState.email.isNotBlank() && !uiState.emailRegexMatches()) {
             AuthErrorText(text = stringResource(R.string.auth_invalid_email))
         }
+
+        uiState.errorMessage?.let { errorMessage ->
+            AuthErrorText(text = errorMessage)
+        }
     }
 }

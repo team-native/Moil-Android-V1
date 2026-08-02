@@ -25,12 +25,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.moil.R
-import com.example.moil.core.component.MoilGroupAvatarStack
 import com.example.moil.core.component.MoilPrimaryButton
 import com.example.moil.core.component.MoilTextField
 import com.example.moil.ui.theme.MoilGroupCreateDimension
 import com.example.moil.ui.theme.MoilMemberDimension
-import com.example.moil.ui.theme.MoilSpacing
 import com.example.moil.ui.theme.MoilTheme
 import com.example.moil.ui.theme.LocalMoilExtraTypography
 
@@ -53,7 +51,10 @@ internal fun JoinGroupProfileSetupContent(
 
         Spacer(modifier = Modifier.height(MoilGroupCreateDimension.LabelTopPadding))
 
-        JoinedGroupSummary()
+        JoinedGroupSummary(
+            groupName = uiState.verifiedGroupName,
+            memberCount = uiState.verifiedMemberCount,
+        )
 
         Spacer(modifier = Modifier.height(MoilGroupCreateDimension.LabelTopPadding))
 
@@ -95,7 +96,10 @@ internal fun JoinGroupProfileSetupContent(
 }
 
 @Composable
-private fun JoinedGroupSummary() {
+private fun JoinedGroupSummary(
+    groupName: String,
+    memberCount: Int,
+) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
@@ -105,18 +109,14 @@ private fun JoinedGroupSummary() {
             modifier = Modifier.padding(MoilMemberDimension.ListItemHorizontalPadding),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            MoilGroupAvatarStack(groupMemberAvatarResources = joinedGroupMemberAvatarResources)
-
-            Spacer(modifier = Modifier.width(MoilSpacing.CalendarRow))
-
             Column {
                 Text(
-                    text = stringResource(R.string.calendar_family_name),
+                    text = groupName,
                     style = MaterialTheme.typography.bodyMedium,
                 )
 
                 Text(
-                    text = stringResource(R.string.group_join_member_count),
+                    text = stringResource(R.string.group_member_count_format, memberCount),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
                 )
@@ -184,13 +184,6 @@ private fun UsedProfileList() {
 private data class UsedProfile(
     val avatarRes: Int,
     val nameRes: Int,
-)
-
-private val joinedGroupMemberAvatarResources = listOf(
-    R.drawable.family_avatar_dad,
-    R.drawable.family_avatar_mom,
-    R.drawable.family_avatar_member_green,
-    R.drawable.family_avatar_sibling,
 )
 
 private val usedProfiles = listOf(

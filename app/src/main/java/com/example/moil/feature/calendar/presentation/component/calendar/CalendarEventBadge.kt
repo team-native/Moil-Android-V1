@@ -16,17 +16,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.moil.feature.calendar.presentation.CalendarEventUiColor
+import com.example.moil.feature.calendar.presentation.CalendarEventUiModel
 import com.example.moil.ui.theme.LocalMoilExtraColors
 
 @Composable
-internal fun CalendarEventBadge(calendarEvent: CalendarEvent) {
+internal fun CalendarEventBadge(calendarEvent: CalendarEventUiModel) {
     val extraColors = LocalMoilExtraColors.current
     val eventColor = when (calendarEvent.color) {
-        CalendarEventColor.Blue -> extraColors.calendarEventBlue
-        CalendarEventColor.Green -> extraColors.calendarEventGreen
-        CalendarEventColor.Yellow -> extraColors.calendarEventYellow
+        CalendarEventUiColor.Blue -> extraColors.calendarEventBlue
+        CalendarEventUiColor.Green -> extraColors.calendarEventGreen
+        CalendarEventUiColor.Yellow -> extraColors.calendarEventYellow
     }
 
     Row(
@@ -46,7 +47,7 @@ internal fun CalendarEventBadge(calendarEvent: CalendarEvent) {
         Spacer(modifier = Modifier.width(2.dp))
 
         Text(
-            text = stringResource(calendarEvent.titleRes),
+            text = calendarEvent.title,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             style = MaterialTheme.typography.labelSmall,

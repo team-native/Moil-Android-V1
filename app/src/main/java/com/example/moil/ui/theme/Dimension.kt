@@ -191,3 +191,14 @@ object MoilGroupCreateDimension {
 object MoilGroupJoinDimension {
     val BottomButtonSpacing = 45.dp
 }
+
+object MoilCalendarEmptyGroupDimension {
+    val HorizontalPadding = 12.dp
+    val MascotWidth = 110.dp
+    val MascotHeight = 128.dp
+    val MascotTitleSpacing = 12.dp
+    val TitleDescriptionSpacing = 8.dp
+    val DescriptionActionSpacing = 32.dp
+    val ActionHeight = 54.dp
+    val ActionSpacing = 10.dp
+}

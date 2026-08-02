@@ -11,4 +11,5 @@ data class CreateGroupUiState(
 
 enum class CreateGroupNameError {
     Duplicate,
+    MissingUserName,
 }

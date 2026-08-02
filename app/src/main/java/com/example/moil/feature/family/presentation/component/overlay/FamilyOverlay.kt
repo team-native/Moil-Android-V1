@@ -126,10 +126,10 @@ fun FamilyMemberPermissionsBottomSheet(
     members: List<FamilyMemberUiModel>,
     sheetState: SheetState,
     onDismissRequest: () -> Unit,
-    onConfirmClick: (Map<Int, Int>) -> Unit,
+    onConfirmClick: (Map<Long, Int>) -> Unit,
 ) {
     val memberRoles = remember(members) {
-        mutableStateOf(members.associate { member -> member.nameRes to member.roleRes })
+        mutableStateOf(members.associate { member -> member.id to member.roleRes })
     }
 
     FamilyModalBottomSheet(
@@ -144,13 +144,13 @@ fun FamilyMemberPermissionsBottomSheet(
         Spacer(modifier = Modifier.height(MoilOverlayDimension.SheetTitleBottomPadding))
 
         members.forEach { member ->
-            val selectedRoleRes = memberRoles.value.getValue(member.nameRes)
+            val selectedRoleRes = memberRoles.value.getValue(member.id)
 
             FamilyMemberRoleRow(
                 member = member,
                 selectedRoleRes = selectedRoleRes,
                 onRoleClick = { roleRes ->
-                    memberRoles.value = memberRoles.value + (member.nameRes to roleRes)
+                memberRoles.value = memberRoles.value + (member.id to roleRes)
                 },
             )
         }
@@ -216,10 +216,10 @@ fun FamilyAdministratorTransferDialog(
     onDismissRequest: () -> Unit,
     onConfirmClick: (FamilyMemberUiModel) -> Unit,
 ) {
-    var selectedMemberNameRes by rememberSaveable { mutableStateOf<Int?>(null) }
-    val transferCandidates = members.filter { member -> member.nameRes != R.string.family_member_me }
+    var selectedMemberId by rememberSaveable { mutableStateOf<Long?>(null) }
+    val transferCandidates = members.filterNot(FamilyMemberUiModel::isCurrentUser)
     val selectedMember = transferCandidates.firstOrNull { member ->
-        member.nameRes == selectedMemberNameRes
+        member.id == selectedMemberId
     }
 
     MoilOverlayDialog(onDismissRequest = onDismissRequest) {
@@ -247,8 +247,8 @@ fun FamilyAdministratorTransferDialog(
             transferCandidates.forEach { member ->
                 FamilyTransferCandidateRow(
                     member = member,
-                    isSelected = member.nameRes == selectedMemberNameRes,
-                    onClick = { selectedMemberNameRes = member.nameRes },
+                    isSelected = member.id == selectedMemberId,
+                    onClick = { selectedMemberId = member.id },
                 )
             }
 
@@ -359,7 +359,7 @@ private fun FamilyMemberRoleRow(
         Spacer(modifier = Modifier.width(10.dp))
 
         Text(
-            text = stringResource(member.nameRes),
+            text = member.name,
             modifier = Modifier.weight(1f),
             style = MaterialTheme.typography.bodyMedium,
         )
@@ -468,13 +468,13 @@ private fun FamilyTransferCandidateRow(
             modifier = Modifier
                 .size(MoilOverlayDimension.TransferCandidateAvatarSize)
                 .clip(CircleShape)
-                .background(transferCandidateColor(member.nameRes)),
+                .background(transferCandidateColor(member.id)),
         )
 
         Spacer(modifier = Modifier.width(10.dp))
 
         Text(
-            text = stringResource(member.nameRes),
+            text = member.name,
             modifier = Modifier.weight(1f),
             style = MaterialTheme.typography.bodyMedium.copy(
                 fontWeight = FontWeight.SemiBold,
@@ -517,8 +517,8 @@ private fun FamilyTransferRadioButton(isSelected: Boolean) {
 }
 
 @Composable
-private fun transferCandidateColor(@StringRes memberNameRes: Int) = when (memberNameRes) {
-    R.string.family_member_jimin -> LocalMoilExtraColors.current.memberViolet
-    R.string.family_member_seoyeon -> LocalMoilExtraColors.current.memberCyan
-    else -> MaterialTheme.colorScheme.secondary
+private fun transferCandidateColor(memberId: Long) = if (memberId % 2 == 0L) {
+    LocalMoilExtraColors.current.memberViolet
+} else {
+    LocalMoilExtraColors.current.memberCyan
 }

@@ -25,3 +25,14 @@ private fun MemberScreenPreview() {
         )
     }
 }
+
+@Preview(showBackground = true, heightDp = 844, widthDp = 390)
+@Composable
+private fun MemberScreenEmptyGroupPreview() {
+    MoilTheme(darkTheme = false) {
+        MemberScreen(
+            uiState = FamilyUiState(),
+            onEvent = {},
+        )
+    }
+}

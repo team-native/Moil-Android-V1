@@ -20,19 +20,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import com.example.moil.feature.calendar.presentation.CalendarMemberId
+import com.example.moil.feature.calendar.presentation.CalendarMemberUiModel
 import com.example.moil.ui.theme.LocalMoilExtraTypography
 import com.example.moil.ui.theme.MoilScheduleSheet
 
 @Composable
 internal fun SharedMemberSelector(
-    sharedMemberIds: Set<CalendarMemberId>,
-    onMemberClick: (CalendarMemberId) -> Unit,
+    members: List<CalendarMemberUiModel>,
+    sharedMemberIds: Set<Long>,
+    onMemberClick: (Long) -> Unit,
 ) {
     val selectedMemberRingColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
     val selectedMemberRingGapColor = androidx.compose.material3.MaterialTheme.colorScheme.surface
@@ -43,9 +43,9 @@ internal fun SharedMemberSelector(
             .padding(horizontal = MoilScheduleSheet.HorizontalPadding),
         horizontalArrangement = Arrangement.spacedBy(MoilScheduleSheet.SharedMemberSpacing),
     ) {
-        scheduleCalendarMembers.forEach { calendarMember ->
+        members.forEach { calendarMember ->
             val isSelected = calendarMember.id in sharedMemberIds
-            val memberName = stringResource(calendarMember.nameRes)
+            val memberName = calendarMember.name
             Column(
                 modifier = Modifier
                     .width(MoilScheduleSheet.SharedMemberAvatarSize)

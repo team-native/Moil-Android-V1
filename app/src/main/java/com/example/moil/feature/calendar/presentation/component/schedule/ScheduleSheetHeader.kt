@@ -18,7 +18,10 @@ import com.example.moil.R
 import com.example.moil.ui.theme.MoilScheduleSheet
 
 @Composable
-internal fun ScheduleSheetHeader(onDismiss: () -> Unit) {
+internal fun ScheduleSheetHeader(
+    onDismiss: () -> Unit,
+    onSave: () -> Unit,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -45,7 +48,7 @@ internal fun ScheduleSheetHeader(onDismiss: () -> Unit) {
             text = stringResource(R.string.schedule_save),
             modifier = Modifier.clickable(
                 role = Role.Button,
-                onClick = onDismiss,
+                onClick = onSave,
             ),
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.labelLarge,

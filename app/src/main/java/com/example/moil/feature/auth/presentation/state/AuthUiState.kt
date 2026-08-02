@@ -3,6 +3,8 @@ package com.example.moil.feature.auth.presentation
 data class LoginUiState(
     val email: String = "",
     val password: String = "",
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
 )
 
 data class SignUpUiState(
@@ -13,6 +15,10 @@ data class SignUpUiState(
     val isVerificationValidationShown: Boolean = false,
     val password: String = "",
     val passwordConfirmation: String = "",
+    val verifyId: String? = null,
+    val verifiedSessionId: String? = null,
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
 )
 
 enum class SignUpStep {

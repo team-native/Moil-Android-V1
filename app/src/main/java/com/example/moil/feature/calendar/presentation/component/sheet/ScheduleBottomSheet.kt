@@ -56,6 +56,7 @@ internal fun ScheduleBottomSheet(
 
             ScheduleSheetHeader(
                 onDismiss = { onEvent(CalendarScreenEvent.ScheduleSheetDismissed) },
+                onSave = { onEvent(CalendarScreenEvent.ScheduleSaveClicked) },
             )
 
             ScheduleTitleField(
@@ -110,6 +111,7 @@ internal fun ScheduleBottomSheet(
             Spacer(modifier = Modifier.height(MoilScheduleSheet.SharedHeadingGap))
 
             SharedMemberSelector(
+                members = uiState.members,
                 sharedMemberIds = uiState.sharedMemberIds,
                 onMemberClick = { onEvent(CalendarScreenEvent.SharedMemberClicked(it)) },
             )
@@ -127,7 +129,7 @@ private fun ScheduleBottomSheetPreview() {
                 displayedMonth = java.time.YearMonth.of(2026, 7),
                 selectedDate = java.time.LocalDate.of(2026, 7, 22),
                 isScheduleSheetVisible = true,
-                sharedMemberIds = setOf(CalendarMemberId.Mom),
+                sharedMemberIds = setOf(1L),
             ),
             sheetState = rememberModalBottomSheetState(),
             onEvent = {},

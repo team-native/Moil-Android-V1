@@ -67,5 +67,9 @@ internal fun SignUpPasswordContent(
         if (isPasswordConfirmationInvalid) {
             AuthErrorText(text = stringResource(R.string.auth_password_mismatch_error))
         }
+
+        uiState.errorMessage?.let { errorMessage ->
+            AuthErrorText(text = errorMessage)
+        }
     }
 }

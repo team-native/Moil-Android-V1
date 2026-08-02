@@ -29,6 +29,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.moil.R
+import com.example.moil.ui.theme.LocalMoilIsDarkTheme
 import com.example.moil.core.component.MoilNavigationDestination
 import com.example.moil.core.component.MoilSwitch
 import com.example.moil.core.component.MoilTabScaffold
@@ -86,7 +87,9 @@ internal fun ProfileScreenContent(
 
             Spacer(modifier = Modifier.height(MoilProfileDimension.LogoutTopPadding))
 
-            ProfileLogoutButton()
+            ProfileLogoutButton(
+                onClick = { onEvent(ProfileScreenEvent.LogoutClicked) },
+            )
         }
     }
 }
@@ -169,6 +172,12 @@ private fun ProfileGroupRow(
     showDivider: Boolean,
     onClick: () -> Unit,
 ) {
+    val groupChevronDrawableRes = if (LocalMoilIsDarkTheme.current) {
+        R.drawable.common_chevron_next_dark
+    } else {
+        R.drawable.common_chevron_next
+    }
+
     Column {
         Row(
             modifier = Modifier
@@ -194,7 +203,7 @@ private fun ProfileGroupRow(
             )
 
             Image(
-                painter = painterResource(R.drawable.common_chevron_next),
+                painter = painterResource(groupChevronDrawableRes),
                 contentDescription = null,
                 modifier = Modifier.size(
                     width = MoilProfileDimension.ChevronWidth,
@@ -248,7 +257,7 @@ private fun ProfileDarkThemeCard(
 }
 
 @Composable
-private fun ProfileLogoutButton() {
+private fun ProfileLogoutButton(onClick: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(MoilProfileDimension.CardCornerRadius),
@@ -258,7 +267,7 @@ private fun ProfileLogoutButton() {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(MoilProfileDimension.LogoutHeight)
-                .clickable(onClick = {})
+                .clickable(onClick = onClick)
                 .padding(horizontal = MoilProfileDimension.GroupRowHorizontalPadding),
             contentAlignment = Alignment.Center,
         ) {

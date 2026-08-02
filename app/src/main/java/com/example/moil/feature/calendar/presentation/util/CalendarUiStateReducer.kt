@@ -2,6 +2,15 @@ package com.example.moil.feature.calendar.presentation
 
 internal fun CalendarUiState.reduce(event: CalendarScreenEvent): CalendarUiState = when (event) {
     is CalendarScreenEvent.DestinationClicked -> this
+    is CalendarScreenEvent.GroupSelected -> copy(
+        selectedGroupId = event.groupId,
+        isGroupMenuVisible = false,
+        isScheduleSheetVisible = false,
+        sharedMemberIds = emptySet(),
+    )
+    CalendarScreenEvent.EmptyGroupJoinClicked,
+    CalendarScreenEvent.EmptyGroupCreateClicked,
+    CalendarScreenEvent.RetryGroupsClicked -> this
     CalendarScreenEvent.PreviousMonthClicked -> copy(displayedMonth = displayedMonth.minusMonths(1))
     CalendarScreenEvent.NextMonthClicked -> copy(displayedMonth = displayedMonth.plusMonths(1))
     CalendarScreenEvent.GroupMenuClicked -> copy(isGroupMenuVisible = !isGroupMenuVisible)
@@ -11,6 +20,7 @@ internal fun CalendarUiState.reduce(event: CalendarScreenEvent): CalendarUiState
         isScheduleSheetVisible = true,
     )
     CalendarScreenEvent.ScheduleSheetDismissed -> copy(isScheduleSheetVisible = false)
+    CalendarScreenEvent.ScheduleSaveClicked -> copy(isScheduleSheetVisible = false)
     is CalendarScreenEvent.ScheduleTitleChanged -> copy(scheduleTitle = event.title)
     CalendarScreenEvent.ScheduleDateClicked,
     CalendarScreenEvent.ScheduleTimeClicked,
@@ -24,5 +34,5 @@ internal fun CalendarUiState.reduce(event: CalendarScreenEvent): CalendarUiState
     )
 }
 
-private fun Set<CalendarMemberId>.toggle(memberId: CalendarMemberId): Set<CalendarMemberId> =
+private fun Set<Long>.toggle(memberId: Long): Set<Long> =
     if (memberId in this) this - memberId else this + memberId

@@ -16,6 +16,7 @@ fun MoilTabScaffold(
     selectedDestination: MoilNavigationDestination,
     onDestinationClick: (MoilNavigationDestination) -> Unit,
     contentHorizontalPadding: Dp = MoilSpacing.ScreenHorizontal,
+    contentVerticalPadding: Dp = MoilSpacing.HeaderTop,
     modifier: Modifier = Modifier,
     content: @Composable (Modifier) -> Unit,
 ) {
@@ -36,7 +37,7 @@ fun MoilTabScaffold(
                 .padding(innerPadding)
                 .padding(
                     horizontal = contentHorizontalPadding,
-                    vertical = MoilSpacing.HeaderTop,
+                    vertical = contentVerticalPadding,
                 ),
         )
     }

@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.moil.R
+import com.example.moil.ui.theme.LocalMoilIsDarkTheme
 import java.time.YearMonth
 
 @Composable
@@ -25,6 +26,17 @@ internal fun CalendarMonthHeader(
     modifier: Modifier = Modifier,
 ) {
     val labelAlpha = if (isCalendarContentDimmed) 0.3f else 1f
+    val isDarkTheme = LocalMoilIsDarkTheme.current
+    val previousMonthDrawableRes = if (isDarkTheme) {
+        R.drawable.calendar_previous_dark
+    } else {
+        R.drawable.common_chevron_previous
+    }
+    val nextMonthDrawableRes = if (isDarkTheme) {
+        R.drawable.calendar_next_dark
+    } else {
+        R.drawable.common_chevron_next
+    }
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -47,7 +59,7 @@ internal fun CalendarMonthHeader(
             Spacer(modifier = Modifier.weight(1f))
 
             CalendarMonthNavigationButton(
-                drawableRes = R.drawable.common_chevron_previous,
+                drawableRes = previousMonthDrawableRes,
                 contentDescription = stringResource(R.string.calendar_previous_month),
                 onClick = onPreviousMonthClick,
             )
@@ -55,7 +67,7 @@ internal fun CalendarMonthHeader(
             Spacer(modifier = Modifier.width(6.dp))
 
             CalendarMonthNavigationButton(
-                drawableRes = R.drawable.common_chevron_next,
+                drawableRes = nextMonthDrawableRes,
                 contentDescription = stringResource(R.string.calendar_next_month),
                 onClick = onNextMonthClick,
             )

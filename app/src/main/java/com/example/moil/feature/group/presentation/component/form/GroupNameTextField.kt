@@ -33,7 +33,12 @@ internal fun GroupNameTextField(
 
         if (groupNameError != null) {
             Text(
-                text = stringResource(R.string.group_name_duplicate_error),
+                text = stringResource(
+                    when (groupNameError) {
+                        CreateGroupNameError.Duplicate -> R.string.group_name_duplicate_error
+                        CreateGroupNameError.MissingUserName -> R.string.group_name_missing_user_name_error
+                    },
+                ),
                 modifier = Modifier.padding(top = MoilGroupCreateDimension.HeaderTitleSpacing),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall,

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -15,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,15 +26,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.moil.R
 import com.example.moil.core.component.MoilNavigationDestination
 import com.example.moil.core.component.MoilSwitch
 import com.example.moil.core.component.MoilTabScaffold
+import com.example.moil.core.component.content.MoilEmptyJoinedGroupContent
 import com.example.moil.core.model.GroupMemberRole
 import com.example.moil.core.model.GroupProfileColor
 import com.example.moil.ui.theme.LocalMoilExtraColors
 import com.example.moil.ui.theme.LocalMoilExtraTypography
 import com.example.moil.ui.theme.MoilMemberDimension
+import com.example.moil.ui.theme.MoilSpacing
 import com.example.moil.ui.theme.MoilTheme
 
 @Composable
@@ -40,100 +45,163 @@ internal fun MemberScreenContent(
     uiState: FamilyUiState,
     onEvent: (FamilyScreenEvent) -> Unit,
 ) {
+    val isEmptyGroupContentVisible = uiState.selectedGroup == null
+
     MoilTabScaffold(
         selectedDestination = MoilNavigationDestination.Family,
         onDestinationClick = { destination ->
             onEvent(FamilyScreenEvent.DestinationClicked(destination))
         },
-        contentHorizontalPadding = MoilMemberDimension.ScreenHorizontalPadding,
+        contentHorizontalPadding = if (isEmptyGroupContentVisible) {
+            MoilSpacing.ScreenHorizontal
+        } else {
+            MoilMemberDimension.ScreenHorizontalPadding
+        },
+        contentVerticalPadding = if (isEmptyGroupContentVisible) 0.dp else MoilSpacing.HeaderTop,
     ) { contentModifier ->
-        Column(
-            modifier = contentModifier.verticalScroll(rememberScrollState()),
-        ) {
-            Text(
-                text = stringResource(R.string.family_title),
-                style = LocalMoilExtraTypography.current.groupJoinTitle,
-            )
+        val selectedGroup = uiState.selectedGroup
 
-            Spacer(modifier = Modifier.height(MoilMemberDimension.HeaderSubtitleTopSpacing))
-
-            Text(
-                text = memberGroupDisplayName(uiState.selectedGroup),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall,
-            )
-
-            Spacer(modifier = Modifier.height(MoilMemberDimension.GroupTabTopSpacing))
-
-            FamilyGroupTabs(
-                groups = uiState.groups,
-                selectedGroupId = uiState.selectedGroupId,
-                onGroupClick = { groupId ->
-                    onEvent(FamilyScreenEvent.GroupClicked(groupId))
-                },
-            )
-
-            Spacer(modifier = Modifier.height(MoilMemberDimension.SectionHeaderTopSpacing))
-
-            FamilySectionLabel(text = stringResource(R.string.family_member_section))
-
-            Spacer(modifier = Modifier.height(MoilMemberDimension.SectionLabelBottomSpacing))
-
-            FamilyMemberCard(
-                members = uiState.selectedGroup.members,
-                memberRoleOverrides = uiState.memberRoleOverrides,
-                groupProfileColor = uiState.selectedGroup.profileColor,
-            )
-
-            Spacer(modifier = Modifier.height(MoilMemberDimension.SectionSpacing))
-
-            FamilyInviteCodeCard(
-                inviteCode = uiState.selectedGroup.customInviteCode
-                    ?: stringResource(requireNotNull(uiState.selectedGroup.inviteCodeRes)),
-            )
-
-            Spacer(modifier = Modifier.height(MoilMemberDimension.SectionSpacing))
-
-            FamilySectionLabel(
-                text = if (uiState.selectedGroupCurrentUserRole == GroupMemberRole.Administrator) {
-                    stringResource(R.string.family_group_settings_administrator)
-                } else {
-                    stringResource(R.string.family_group_settings)
-                },
-            )
-
-            Spacer(modifier = Modifier.height(MoilMemberDimension.SectionLabelBottomSpacing))
-
-            if (uiState.selectedGroupCurrentUserRole == GroupMemberRole.Administrator) {
-                FamilyAdministratorSettingsContent(
-                    notificationsEnabled = uiState.notificationsEnabled,
-                    onNotificationsChanged = { isEnabled ->
-                        onEvent(FamilyScreenEvent.NotificationsChanged(isEnabled))
-                    },
-                    onGroupNameChangeClick = {
-                        onEvent(FamilyScreenEvent.GroupNameChangeClicked)
-                    },
-                    onMemberPermissionsClick = {
-                        onEvent(FamilyScreenEvent.MemberPermissionsClicked)
-                    },
-                    onInviteLinkShareClick = {
-                        onEvent(FamilyScreenEvent.InviteLinkShareClicked)
-                    },
-                    onLeaveClick = {
-                        onEvent(FamilyScreenEvent.BackClicked)
-                    },
-                )
-            } else {
-                FamilyMemberSettingsContent(
-                    notificationsEnabled = uiState.notificationsEnabled,
-                    onNotificationsChanged = { isEnabled ->
-                        onEvent(FamilyScreenEvent.NotificationsChanged(isEnabled))
-                    },
-                    onLeaveClick = {
-                        onEvent(FamilyScreenEvent.BackClicked)
-                    },
+        when {
+            uiState.isGroupsLoading -> {
+                FamilyGroupLoadingContent(modifier = contentModifier)
+            }
+            uiState.hasGroupLoadError -> {
+                FamilyGroupErrorContent(modifier = contentModifier)
+            }
+            selectedGroup == null -> {
+                MoilEmptyJoinedGroupContent(
+                    onJoinGroupClick = { onEvent(FamilyScreenEvent.EmptyGroupJoinClicked) },
+                    onCreateGroupClick = { onEvent(FamilyScreenEvent.EmptyGroupCreateClicked) },
+                    modifier = contentModifier,
                 )
             }
+            else -> {
+                MemberGroupContent(
+                    selectedGroup = selectedGroup,
+                    uiState = uiState,
+                    onEvent = onEvent,
+                    modifier = contentModifier,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FamilyGroupLoadingContent(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+private fun FamilyGroupErrorContent(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = stringResource(R.string.calendar_load_error),
+            style = MaterialTheme.typography.titleMedium,
+        )
+    }
+}
+
+@Composable
+private fun MemberGroupContent(
+    selectedGroup: GroupUiModel,
+    uiState: FamilyUiState,
+    onEvent: (FamilyScreenEvent) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.verticalScroll(rememberScrollState()),
+    ) {
+        Text(
+            text = stringResource(R.string.family_title),
+            style = LocalMoilExtraTypography.current.groupJoinTitle,
+        )
+
+        Spacer(modifier = Modifier.height(MoilMemberDimension.HeaderSubtitleTopSpacing))
+
+        Text(
+            text = selectedGroup.name,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodySmall,
+        )
+
+        Spacer(modifier = Modifier.height(MoilMemberDimension.GroupTabTopSpacing))
+
+        FamilyGroupTabs(
+            groups = uiState.groups,
+            selectedGroupId = selectedGroup.id,
+            onGroupClick = { groupId ->
+                onEvent(FamilyScreenEvent.GroupClicked(groupId))
+            },
+        )
+
+        Spacer(modifier = Modifier.height(MoilMemberDimension.SectionHeaderTopSpacing))
+
+        FamilySectionLabel(text = stringResource(R.string.family_member_section))
+
+        Spacer(modifier = Modifier.height(MoilMemberDimension.SectionLabelBottomSpacing))
+
+        FamilyMemberCard(
+            members = selectedGroup.members,
+            memberRoleOverrides = uiState.memberRoleOverrides,
+            groupProfileColor = selectedGroup.profileColor,
+        )
+
+        Spacer(modifier = Modifier.height(MoilMemberDimension.SectionSpacing))
+
+        FamilyInviteCodeCard(
+            inviteCode = selectedGroup.inviteCode,
+        )
+
+        Spacer(modifier = Modifier.height(MoilMemberDimension.SectionSpacing))
+
+        FamilySectionLabel(
+            text = if (uiState.selectedGroupCurrentUserRole == GroupMemberRole.Administrator) {
+                stringResource(R.string.family_group_settings_administrator)
+            } else {
+                stringResource(R.string.family_group_settings)
+            },
+        )
+
+        Spacer(modifier = Modifier.height(MoilMemberDimension.SectionLabelBottomSpacing))
+
+        if (uiState.selectedGroupCurrentUserRole == GroupMemberRole.Administrator) {
+            FamilyAdministratorSettingsContent(
+                notificationsEnabled = uiState.notificationsEnabled,
+                onNotificationsChanged = { isEnabled ->
+                    onEvent(FamilyScreenEvent.NotificationsChanged(isEnabled))
+                },
+                onGroupNameChangeClick = {
+                    onEvent(FamilyScreenEvent.GroupNameChangeClicked)
+                },
+                onMemberPermissionsClick = {
+                    onEvent(FamilyScreenEvent.MemberPermissionsClicked)
+                },
+                onInviteLinkShareClick = {
+                    onEvent(FamilyScreenEvent.InviteLinkShareClicked)
+                },
+                onLeaveClick = {
+                    onEvent(FamilyScreenEvent.BackClicked)
+                },
+            )
+        } else {
+            FamilyMemberSettingsContent(
+                notificationsEnabled = uiState.notificationsEnabled,
+                onNotificationsChanged = { isEnabled ->
+                    onEvent(FamilyScreenEvent.NotificationsChanged(isEnabled))
+                },
+                onLeaveClick = {
+                    onEvent(FamilyScreenEvent.BackClicked)
+                },
+            )
         }
     }
 }
@@ -191,7 +259,7 @@ private fun FamilySectionLabel(text: String) {
 @Composable
 private fun FamilyMemberCard(
     members: List<FamilyMemberUiModel>,
-    memberRoleOverrides: Map<Int, Int>,
+    memberRoleOverrides: Map<Long, Int>,
     groupProfileColor: GroupProfileColor,
 ) {
     Surface(
@@ -202,10 +270,9 @@ private fun FamilyMemberCard(
         Column {
             members.forEachIndexed { index, member ->
                 FamilyMemberRow(
-                    nameRes = member.nameRes,
-                    avatarRes = member.avatarRes,
-                    roleRes = memberRoleOverrides[member.nameRes] ?: member.roleRes,
-                    customName = member.customName,
+                    name = member.name,
+                    roleRes = memberRoleOverrides[member.id] ?: member.roleRes,
+                    profileColor = member.profileColor,
                     presenceColor = memberPresenceColor(
                         memberIndex = index,
                         groupProfileColor = groupProfileColor,
@@ -345,8 +412,7 @@ private fun FamilySettingsCard(content: @Composable ColumnScope.() -> Unit) {
 }
 
 @Composable
-private fun memberGroupDisplayName(group: GroupUiModel): String = group.customName
-    ?: stringResource(requireNotNull(group.nameRes))
+private fun memberGroupDisplayName(group: GroupUiModel): String = group.name
 
 @Composable
 private fun FamilyNotificationSettingRow(

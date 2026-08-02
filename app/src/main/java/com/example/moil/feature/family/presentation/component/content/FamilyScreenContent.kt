@@ -36,6 +36,8 @@ internal fun FamilyScreenContent(
     uiState: FamilyUiState,
     onEvent: (FamilyScreenEvent) -> Unit,
 ) {
+    val selectedGroup = uiState.selectedGroup ?: return
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
@@ -51,7 +53,7 @@ internal fun FamilyScreenContent(
                 .verticalScroll(rememberScrollState()),
         ) {
             FamilyDetailHeader(
-                groupName = groupDisplayName(uiState.selectedGroup),
+                groupName = groupDisplayName(selectedGroup),
                 onBackClick = { onEvent(FamilyScreenEvent.BackClicked) },
             )
 
@@ -62,7 +64,7 @@ internal fun FamilyScreenContent(
             Spacer(modifier = Modifier.height(MoilGroupDetailDimension.SectionLabelBottomSpacing))
 
             FamilyMemberCard(
-                members = uiState.selectedGroup.members,
+                members = selectedGroup.members,
                 memberRoleOverrides = uiState.memberRoleOverrides,
             )
 
@@ -121,7 +123,7 @@ private fun FamilyDetailHeader(
 @Composable
 private fun FamilyMemberCard(
     members: List<FamilyMemberUiModel>,
-    memberRoleOverrides: Map<Int, Int>,
+    memberRoleOverrides: Map<Long, Int>,
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -131,10 +133,9 @@ private fun FamilyMemberCard(
         Column {
             members.forEachIndexed { index, member ->
                 FamilyMemberRow(
-                    nameRes = member.nameRes,
-                    avatarRes = member.avatarRes,
-                    roleRes = memberRoleOverrides[member.nameRes] ?: member.roleRes,
-                    customName = member.customName,
+                    name = member.name,
+                    roleRes = memberRoleOverrides[member.id] ?: member.roleRes,
+                    profileColor = member.profileColor,
                     rowHeight = MoilGroupDetailDimension.MemberRowHeight,
                     avatarSize = MoilGroupDetailDimension.MemberAvatarSize,
                     horizontalPadding = MoilGroupDetailDimension.MemberRowHorizontalPadding,
@@ -178,5 +179,4 @@ private fun FamilySectionTitle(text: String) {
 }
 
 @Composable
-private fun groupDisplayName(group: GroupUiModel): String = group.customName
-    ?: stringResource(requireNotNull(group.nameRes))
+private fun groupDisplayName(group: GroupUiModel): String = group.name

@@ -17,7 +17,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.moil.R
-import com.example.moil.core.component.MoilTextField
 import com.example.moil.ui.theme.MoilAuthDimension
 
 @Composable
@@ -42,26 +41,39 @@ internal fun LoginScreenContent(
 
             Spacer(modifier = Modifier.height(36.dp))
 
-            MoilTextField(
+            val isEmailInvalid = uiState.email.isNotBlank() && !emailRegex.matches(uiState.email)
+            val isPasswordTooShort = uiState.password.isNotBlank() && !passwordRegex.matches(uiState.password)
+
+            AuthTextField(
                 value = uiState.email,
                 onValueChange = { email ->
                     onEvent(LoginScreenEvent.EmailChanged(email))
                 },
                 placeholder = stringResource(R.string.auth_email),
+                isError = isEmailInvalid,
                 keyboardType = KeyboardType.Email,
             )
 
+            if (isEmailInvalid) {
+                AuthErrorText(text = stringResource(R.string.auth_invalid_email))
+            }
+
             Spacer(modifier = Modifier.height(MoilAuthDimension.FieldSpacing))
 
-            MoilTextField(
+            AuthTextField(
                 value = uiState.password,
                 onValueChange = { password ->
                     onEvent(LoginScreenEvent.PasswordChanged(password))
                 },
                 placeholder = stringResource(R.string.auth_password),
+                isError = isPasswordTooShort,
                 keyboardType = KeyboardType.Password,
                 isPassword = true,
             )
+
+            if (isPasswordTooShort) {
+                AuthErrorText(text = stringResource(R.string.auth_password_length_error))
+            }
 
             TextButton(
                 onClick = { onEvent(LoginScreenEvent.ForgotPasswordClicked) },
@@ -73,11 +85,15 @@ internal fun LoginScreenContent(
                 )
             }
 
+            uiState.errorMessage?.let { errorMessage ->
+                AuthErrorText(text = errorMessage)
+            }
+
             Spacer(modifier = Modifier.weight(1f))
 
             AuthPrimaryButton(
                 text = stringResource(R.string.auth_login),
-                enabled = uiState.email.isNotBlank() && uiState.password.isNotBlank(),
+                enabled = uiState.canLogin(),
                 onClick = { onEvent(LoginScreenEvent.LoginClicked) },
             )
 

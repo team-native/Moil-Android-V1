@@ -61,6 +61,10 @@ internal fun SignUpVerificationContent(
             AuthErrorText(text = stringResource(R.string.auth_verification_code_invalid))
         }
 
+        uiState.errorMessage?.let { errorMessage ->
+            AuthErrorText(text = errorMessage)
+        }
+
         Spacer(modifier = Modifier.height(14.dp))
 
         Text(

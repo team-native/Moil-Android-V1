@@ -36,13 +36,13 @@ class CalendarUiStateReducerTest {
     @Test
     fun sharedMemberClicked_togglesMemberSelection() {
         val selectedUiState = initialUiState.reduce(
-            CalendarScreenEvent.SharedMemberClicked(CalendarMemberId.Mom),
+            CalendarScreenEvent.SharedMemberClicked(2L),
         )
         val deselectedUiState = selectedUiState.reduce(
-            CalendarScreenEvent.SharedMemberClicked(CalendarMemberId.Mom),
+            CalendarScreenEvent.SharedMemberClicked(2L),
         )
 
-        assertTrue(CalendarMemberId.Mom in selectedUiState.sharedMemberIds)
-        assertFalse(CalendarMemberId.Mom in deselectedUiState.sharedMemberIds)
+        assertTrue(2L in selectedUiState.sharedMemberIds)
+        assertFalse(2L in deselectedUiState.sharedMemberIds)
     }
 }

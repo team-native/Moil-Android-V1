@@ -21,6 +21,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.moil.R
+import com.example.moil.feature.calendar.presentation.CalendarEventUiModel
 import com.example.moil.ui.theme.LocalMoilExtraColors
 import com.example.moil.ui.theme.MoilRadius
 import java.time.LocalDate
@@ -30,15 +31,15 @@ internal fun CalendarDayCell(
     date: LocalDate,
     isDisplayedMonth: Boolean,
     isSelected: Boolean,
+    events: List<CalendarEventUiModel>,
     modifier: Modifier,
     onClick: () -> Unit,
 ) {
     val selectedDateDescription = stringResource(
-        R.string.calendar_selected_date,
+        R.string.calendar_date_content_description,
         date.monthValue,
         date.dayOfMonth,
     )
-    val dayEvents = calendarEventsFor(date)
 
     Column(
         modifier = modifier
@@ -75,7 +76,7 @@ internal fun CalendarDayCell(
             )
         }
 
-        dayEvents.take(2).forEach { calendarEvent ->
+        events.take(2).forEach { calendarEvent ->
             CalendarEventBadge(calendarEvent)
         }
     }

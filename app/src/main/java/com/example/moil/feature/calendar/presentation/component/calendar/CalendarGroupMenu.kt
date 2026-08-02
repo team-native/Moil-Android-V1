@@ -18,25 +18,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.moil.R
+import androidx.compose.foundation.clickable
+import com.example.moil.feature.calendar.presentation.CalendarGroupUiModel
 import com.example.moil.ui.theme.LocalMoilExtraColors
 
 @Composable
-internal fun CalendarGroupMenu(modifier: Modifier = Modifier) {
+internal fun CalendarGroupMenu(
+    groups: List<CalendarGroupUiModel>,
+    selectedGroupId: Long?,
+    onGroupClick: (Long) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier = modifier
             .width(116.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surface),
     ) {
-        calendarGroups.forEachIndexed { groupIndex, calendarGroup ->
+        groups.forEachIndexed { groupIndex, calendarGroup ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(30.dp)
+                    .clickable { onGroupClick(calendarGroup.id) }
                     .padding(horizontal = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -45,7 +51,7 @@ internal fun CalendarGroupMenu(modifier: Modifier = Modifier) {
                         .size(5.dp)
                         .clip(CircleShape)
                         .background(
-                            if (groupIndex == 0) {
+                            if (calendarGroup.id == selectedGroupId) {
                                 LocalMoilExtraColors.current.calendarEventBlue
                             } else {
                                 LocalMoilExtraColors.current.calendarEventGreen
@@ -56,7 +62,7 @@ internal fun CalendarGroupMenu(modifier: Modifier = Modifier) {
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
-                    text = stringResource(calendarGroup.nameRes),
+                    text = calendarGroup.name,
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                 )

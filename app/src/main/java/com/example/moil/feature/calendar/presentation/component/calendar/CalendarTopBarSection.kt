@@ -8,20 +8,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.example.moil.R
 import com.example.moil.core.component.MoilTopBar
+import com.example.moil.feature.calendar.presentation.CalendarGroupUiModel
 import com.example.moil.ui.theme.MoilComponentSize
 import com.example.moil.ui.theme.MoilSpacing
 
 @Composable
 internal fun CalendarTopBarSection(
+    selectedGroupName: String,
+    memberAvatarResources: List<Int>,
+    groups: List<CalendarGroupUiModel>,
+    selectedGroupId: Long?,
     isGroupMenuVisible: Boolean,
     isScheduleSheetVisible: Boolean,
     onGroupClick: () -> Unit,
+    onGroupSelected: (Long) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
         MoilTopBar(
-            groupName = stringResource(R.string.calendar_family_name),
+            groupName = selectedGroupName,
             groupMenuContentDescription = stringResource(R.string.calendar_group_menu),
-            groupMemberAvatarResources = calendarFamilyMemberAvatarResources,
+            groupMemberAvatarResources = memberAvatarResources,
             isGroupIndicatorExpanded = isGroupMenuVisible || isScheduleSheetVisible,
             searchContentDescription = stringResource(R.string.calendar_search),
             onGroupClick = onGroupClick,
@@ -31,6 +37,9 @@ internal fun CalendarTopBarSection(
 
         if (isGroupMenuVisible) {
             CalendarGroupMenu(
+                groups = groups,
+                selectedGroupId = selectedGroupId,
+                onGroupClick = onGroupSelected,
                 modifier = Modifier.padding(
                     top = MoilSpacing.HeaderTop + MoilComponentSize.TopBarItem,
                 ),

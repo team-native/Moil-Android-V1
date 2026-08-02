@@ -1,9 +1,8 @@
 package com.example.moil.feature.family.presentation
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,21 +19,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.example.moil.R
+import com.example.moil.core.model.GroupProfileColor
+import com.example.moil.ui.theme.LocalMoilExtraColors
 import com.example.moil.ui.theme.MoilMemberDimension
 import com.example.moil.ui.theme.MoilTheme
 
 @Composable
 internal fun FamilyMemberRow(
-    @StringRes nameRes: Int,
-    @DrawableRes avatarRes: Int,
+    name: String,
     @StringRes roleRes: Int,
-    customName: String?,
+    profileColor: GroupProfileColor,
     presenceColor: Color? = null,
     rowHeight: Dp = MoilMemberDimension.MemberRowHeight,
     avatarSize: Dp = MoilMemberDimension.MemberAvatarSize,
@@ -49,20 +47,25 @@ internal fun FamilyMemberRow(
             .height(rowHeight),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Image(
-            painter = painterResource(avatarRes),
-            contentDescription = customName ?: stringResource(nameRes),
+        Box(
             modifier = Modifier
                 .size(avatarSize)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop,
-        )
+                .clip(CircleShape)
+                .background(memberAvatarColor(profileColor)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = name.take(1),
+                color = MaterialTheme.colorScheme.onPrimary,
+                style = MaterialTheme.typography.labelLarge,
+            )
+        }
 
         Spacer(modifier = Modifier.width(contentSpacing))
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = customName ?: stringResource(nameRes),
+                text = name,
                 style = MaterialTheme.typography.titleSmall,
             )
 
@@ -89,11 +92,17 @@ internal fun FamilyMemberRow(
 private fun FamilyMemberRowPreview() {
     MoilTheme(darkTheme = false) {
         FamilyMemberRow(
-            nameRes = R.string.family_member_me,
-            avatarRes = R.drawable.family_avatar_mine,
+            name = "나",
             roleRes = R.string.family_member_role,
-            customName = null,
+            profileColor = GroupProfileColor.Cyan,
             presenceColor = MaterialTheme.colorScheme.secondary,
         )
     }
+}
+
+@Composable
+private fun memberAvatarColor(profileColor: GroupProfileColor): Color = when (profileColor) {
+    GroupProfileColor.Cyan -> LocalMoilExtraColors.current.memberCyan
+    GroupProfileColor.Violet -> LocalMoilExtraColors.current.memberViolet
+    GroupProfileColor.Rose -> LocalMoilExtraColors.current.memberRose
 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
@@ -16,6 +17,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import com.example.moil.ui.theme.LocalMoilIsDarkTheme
 
 @Composable
 internal fun CalendarMonthNavigationButton(
@@ -23,6 +25,13 @@ internal fun CalendarMonthNavigationButton(
     contentDescription: String,
     onClick: () -> Unit,
 ) {
+    val isDarkTheme = LocalMoilIsDarkTheme.current
+    val navigationImageModifier = if (isDarkTheme) {
+        Modifier.fillMaxSize()
+    } else {
+        Modifier.size(12.dp)
+    }
+
     Box(
         modifier = Modifier
             .size(30.dp)
@@ -37,7 +46,7 @@ internal fun CalendarMonthNavigationButton(
         Image(
             painter = painterResource(drawableRes),
             contentDescription = contentDescription,
-            modifier = Modifier.size(12.dp),
+            modifier = navigationImageModifier,
             contentScale = ContentScale.Fit,
         )
     }
