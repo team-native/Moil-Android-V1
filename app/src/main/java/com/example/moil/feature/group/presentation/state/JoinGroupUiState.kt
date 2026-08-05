@@ -1,7 +1,6 @@
 package com.example.moil.feature.group.presentation
 
-import androidx.annotation.DrawableRes
-import com.example.moil.R
+import com.example.moil.feature.group.domain.GroupColor
 
 data class JoinGroupUiState(
     val inviteCode: String = "",
@@ -9,7 +8,15 @@ data class JoinGroupUiState(
     val verifiedGroupName: String = "",
     val verifiedMemberCount: Int = 0,
     val profileName: String = "",
-    @param:DrawableRes val selectedProfileAvatarRes: Int = R.drawable.family_avatar_mine,
+    val usedProfiles: List<JoinGroupUsedProfileUiModel> = emptyList(),
+    val availableProfileColors: List<GroupColor> = emptyList(),
+    val selectedProfileColor: GroupColor? = null,
+)
+
+data class JoinGroupUsedProfileUiModel(
+    val nickname: String,
+    val color: GroupColor,
+    val isUsed: Boolean = true,
 )
 
 enum class JoinGroupStep {

@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -31,6 +32,9 @@ import com.example.moil.ui.theme.MoilGroupCreateDimension
 import com.example.moil.ui.theme.MoilMemberDimension
 import com.example.moil.ui.theme.MoilTheme
 import com.example.moil.ui.theme.LocalMoilExtraTypography
+import com.example.moil.feature.group.presentation.avatarResourceForGroupColor
+import com.example.moil.feature.group.presentation.groupColorForAvatar
+import com.example.moil.feature.group.domain.GroupColor
 
 @Composable
 internal fun JoinGroupProfileSetupContent(
@@ -67,17 +71,19 @@ internal fun JoinGroupProfileSetupContent(
 
         Spacer(modifier = Modifier.height(MoilGroupCreateDimension.LabelTopPadding))
 
-        UsedProfileList()
+        UsedProfileList(profiles = uiState.usedProfiles)
 
         Spacer(modifier = Modifier.height(MoilGroupCreateDimension.LabelTopPadding))
 
         ProfileAvatarSelector(
             labelRes = R.string.group_join_profile_color_label,
-            selectedProfileAvatarRes = uiState.selectedProfileAvatarRes,
+            selectedProfileAvatarRes = uiState.selectedProfileColor
+                ?.let(::avatarResourceForGroupColor)
+                ?: R.drawable.family_avatar_mine,
             onProfileAvatarSelected = { avatarRes ->
-                onEvent(JoinGroupScreenEvent.ProfileAvatarSelected(avatarRes))
+                onEvent(JoinGroupScreenEvent.ProfileColorSelected(groupColorForAvatar(avatarRes)))
             },
-            avatarResources = profileColorAvatarResources,
+            avatarResources = uiState.availableProfileColors.map(::avatarResourceForGroupColor),
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -88,7 +94,7 @@ internal fun JoinGroupProfileSetupContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(MoilGroupCreateDimension.BottomButtonHeight),
-            enabled = uiState.profileName.isNotBlank(),
+            enabled = uiState.profileName.isNotBlank() && uiState.selectedProfileColor != null,
         )
 
         Spacer(modifier = Modifier.height(MoilGroupCreateDimension.BottomButtonPadding))
@@ -147,7 +153,7 @@ private fun ProfileNameField(
 }
 
 @Composable
-private fun UsedProfileList() {
+private fun UsedProfileList(profiles: List<JoinGroupUsedProfileUiModel>) {
     Column {
         Text(
             text = stringResource(R.string.group_join_used_profiles_label),
@@ -159,11 +165,14 @@ private fun UsedProfileList() {
             modifier = Modifier.padding(top = MoilGroupCreateDimension.HeaderTitleSpacing),
             horizontalArrangement = Arrangement.spacedBy(MoilGroupCreateDimension.ColorOptionSpacing),
         ) {
-            usedProfiles.forEach { profile ->
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            profiles.forEach { profile ->
+                Column(
+                    modifier = Modifier.alpha(if (profile.isUsed) 0.35f else 1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
                     Image(
-                        painter = painterResource(profile.avatarRes),
-                        contentDescription = stringResource(profile.nameRes),
+                        painter = painterResource(avatarResourceForGroupColor(profile.color)),
+                        contentDescription = profile.nickname,
                         modifier = Modifier
                             .size(MoilGroupCreateDimension.ProfileAvatarImageSize)
                             .clip(CircleShape),
@@ -171,7 +180,7 @@ private fun UsedProfileList() {
                     )
 
                     Text(
-                        text = stringResource(profile.nameRes),
+                        text = profile.nickname,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.labelSmall,
                     )
@@ -181,24 +190,6 @@ private fun UsedProfileList() {
     }
 }
 
-private data class UsedProfile(
-    val avatarRes: Int,
-    val nameRes: Int,
-)
-
-private val usedProfiles = listOf(
-    UsedProfile(R.drawable.family_avatar_dad, R.string.family_member_dad),
-    UsedProfile(R.drawable.family_avatar_mom, R.string.family_member_mom),
-    UsedProfile(R.drawable.family_avatar_member_green, R.string.family_member_me),
-    UsedProfile(R.drawable.family_avatar_sibling, R.string.family_member_sister),
-)
-
-private val profileColorAvatarResources = listOf(
-    R.drawable.family_avatar_mine,
-    R.drawable.family_avatar_member_teal,
-    R.drawable.family_avatar_mom,
-)
-
 @Preview(showBackground = true, widthDp = 402, heightDp = 874)
 @Composable
 private fun JoinGroupProfileSetupContentPreview() {
@@ -206,6 +197,18 @@ private fun JoinGroupProfileSetupContentPreview() {
         JoinGroupProfileSetupContent(
             uiState = JoinGroupUiState(
                 step = JoinGroupStep.ProfileSetup,
+                usedProfiles = listOf(
+                    JoinGroupUsedProfileUiModel(
+                        nickname = "모일",
+                        color = GroupColor.Red,
+                    ),
+                ),
+                availableProfileColors = listOf(
+                    GroupColor.Sky,
+                    GroupColor.Green,
+                    GroupColor.Yellow,
+                ),
+                selectedProfileColor = GroupColor.Sky,
             ),
             onEvent = {},
         )

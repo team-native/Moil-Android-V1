@@ -36,6 +36,7 @@ data class GroupUiState(
     val selectedGroupDetail: GroupDetail? = null,
     val members: List<GroupMember> = emptyList(),
     val inviteVerification: InviteVerification? = null,
+    val joinGroupMembers: List<GroupMember> = emptyList(),
     val isCurrentUserNameMissing: Boolean = false,
     val error: MoilError? = null,
 ) {
@@ -130,10 +131,34 @@ class GroupViewModel @Inject constructor(
         }
     }
 
+    // 초대 코드 확인 이벤트에서 그룹 정보를 검증한 뒤 실제 구성원 프로필까지 함께 불러옵니다.
+    // 두 요청이 모두 성공한 경우에만 가입 프로필 설정 화면으로 이동할 수 있는 상태를 공개합니다.
     fun verifyInvite(inviteCode: String) = viewModelScope.launch {
+        mutableUiState.value = mutableUiState.value.copy(
+            inviteVerification = null,
+            joinGroupMembers = emptyList(),
+            error = null,
+        )
+
         when (val result = verifyInviteUseCase(inviteCode)) {
-            is MoilResult.Success -> mutableUiState.value = mutableUiState.value.copy(inviteVerification = result.value, error = null)
-            is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(inviteVerification = null, error = result.error)
+            is MoilResult.Success -> loadJoinGroupProfile(result.value)
+            is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(
+                error = result.error,
+            )
+        }
+    }
+
+    // 초대 검증 성공 뒤 호출되어 그룹 상세의 실제 구성원 목록을 가입 프로필 UI 상태로 제공합니다.
+    private suspend fun loadJoinGroupProfile(inviteVerification: InviteVerification) {
+        when (val result = getGroupUseCase(inviteVerification.groupId)) {
+            is MoilResult.Success -> mutableUiState.value = mutableUiState.value.copy(
+                inviteVerification = inviteVerification,
+                joinGroupMembers = result.value.members,
+                error = null,
+            )
+            is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(
+                error = result.error,
+            )
         }
     }
 

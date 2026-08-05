@@ -50,6 +50,7 @@ import com.example.moil.feature.group.presentation.JoinGroupStep
 import com.example.moil.feature.group.presentation.JoinGroupUiState
 import com.example.moil.feature.group.presentation.GroupViewModel
 import com.example.moil.feature.group.presentation.groupColorForAvatar
+import com.example.moil.feature.group.presentation.toJoinGroupProfileOptions
 import com.example.moil.feature.group.domain.GroupColor
 import com.example.moil.feature.profile.presentation.ProfileScreen
 import com.example.moil.feature.profile.presentation.ProfileScreenEvent
@@ -146,10 +147,15 @@ fun MainTabRoute(
         val inviteVerification = groupUiState.inviteVerification
 
         if (inviteVerification != null && selectedDestination == MoilNavigationDestination.JoinGroup) {
+            val profileOptions = groupUiState.joinGroupMembers.toJoinGroupProfileOptions()
+
             joinGroupUiState = joinGroupUiState.copy(
                 step = JoinGroupStep.ProfileSetup,
                 verifiedGroupName = inviteVerification.groupName,
                 verifiedMemberCount = inviteVerification.memberCount,
+                usedProfiles = profileOptions.usedProfiles,
+                availableProfileColors = profileOptions.availableColors,
+                selectedProfileColor = profileOptions.availableColors.firstOrNull(),
             )
         }
     }
@@ -432,18 +438,22 @@ fun MainTabRoute(
                                 profileName = event.profileName,
                             )
                         }
-                        is JoinGroupScreenEvent.ProfileAvatarSelected -> {
+                        is JoinGroupScreenEvent.ProfileColorSelected -> {
                             joinGroupUiState = joinGroupUiState.copy(
-                                selectedProfileAvatarRes = event.avatarRes,
+                                selectedProfileColor = event.color,
                             )
                         }
                         JoinGroupScreenEvent.JoinGroupConfirmed -> {
-                            shouldOpenServerGroup = true
-                            groupViewModel.joinGroup(
-                                inviteCode = joinGroupUiState.inviteCode.trim(),
-                                nickname = joinGroupUiState.profileName.trim(),
-                                color = groupColorForAvatar(joinGroupUiState.selectedProfileAvatarRes),
-                            )
+                            val selectedProfileColor = joinGroupUiState.selectedProfileColor
+
+                            if (selectedProfileColor != null) {
+                                shouldOpenServerGroup = true
+                                groupViewModel.joinGroup(
+                                    inviteCode = joinGroupUiState.inviteCode.trim(),
+                                    nickname = joinGroupUiState.profileName.trim(),
+                                    color = selectedProfileColor,
+                                )
+                            }
                         }
                     }
                 },

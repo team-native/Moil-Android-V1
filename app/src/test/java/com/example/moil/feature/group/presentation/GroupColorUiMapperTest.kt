@@ -2,6 +2,8 @@ package com.example.moil.feature.group.presentation
 
 import com.example.moil.R
 import com.example.moil.feature.group.domain.GroupColor
+import com.example.moil.feature.group.domain.GroupMember
+import com.example.moil.feature.group.domain.GroupRole
 import com.example.moil.feature.group.domain.toWireValue
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -38,5 +40,48 @@ class GroupColorUiMapperTest {
         assertEquals(R.drawable.family_avatar_member_blue, avatarResourceForGroupColor(GroupColor.Sky))
         assertEquals(R.drawable.family_avatar_dad, avatarResourceForGroupColor(GroupColor.Violet))
         assertEquals(R.drawable.family_avatar_sibling, avatarResourceForGroupColor(GroupColor.Magenta))
+    }
+
+    @Test
+    fun `가입 프로필 옵션은 서버 구성원의 이름과 사용하지 않은 색상만 제공한다`() {
+        val profileOptions = listOf(
+            groupMember(nickname = "지수", color = GroupColor.Red),
+            groupMember(nickname = "민수", color = GroupColor.Teal),
+        ).toJoinGroupProfileOptions()
+
+        assertEquals(listOf("지수", "민수"), profileOptions.usedProfiles.map { profile -> profile.nickname })
+        assertEquals(listOf(GroupColor.Red, GroupColor.Teal), profileOptions.usedProfiles.map { profile -> profile.color })
+        assertEquals(listOf(true, true), profileOptions.usedProfiles.map { profile -> profile.isUsed })
+        assertEquals(
+            listOf(
+                GroupColor.Sky,
+                GroupColor.Green,
+                GroupColor.Yellow,
+                GroupColor.Violet,
+                GroupColor.Magenta,
+            ),
+            profileOptions.availableColors,
+        )
+    }
+
+    @Test
+    fun `모든 지원 색상이 사용 중이면 가입 프로필 색상 선택지가 비어 있다`() {
+        val profileOptions = GroupColor.entries
+            .filter { color -> color != GroupColor.Unknown }
+            .map { color -> groupMember(nickname = color.name, color = color) }
+            .toJoinGroupProfileOptions()
+
+        assertEquals(emptyList<GroupColor>(), profileOptions.availableColors)
+    }
+
+    private fun groupMember(nickname: String, color: GroupColor): GroupMember {
+        return GroupMember(
+            userId = 1L,
+            nickname = nickname,
+            email = null,
+            role = GroupRole.Member,
+            color = color,
+            isMe = false,
+        )
     }
 }

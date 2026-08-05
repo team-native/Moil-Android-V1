@@ -2,7 +2,40 @@ package com.example.moil.feature.group.presentation
 
 import androidx.annotation.DrawableRes
 import com.example.moil.R
+import com.example.moil.feature.group.domain.GroupMember
 import com.example.moil.feature.group.domain.GroupColor
+
+private val selectableGroupColors = listOf(
+    GroupColor.Sky,
+    GroupColor.Red,
+    GroupColor.Green,
+    GroupColor.Yellow,
+    GroupColor.Teal,
+    GroupColor.Violet,
+    GroupColor.Magenta,
+)
+
+data class JoinGroupProfileOptions(
+    val usedProfiles: List<JoinGroupUsedProfileUiModel>,
+    val availableColors: List<GroupColor>,
+)
+
+fun GroupMember.toJoinGroupUsedProfileUiModel(): JoinGroupUsedProfileUiModel =
+    JoinGroupUsedProfileUiModel(
+        nickname = nickname,
+        color = color,
+    )
+
+fun List<GroupMember>.toJoinGroupProfileOptions(): JoinGroupProfileOptions {
+    val usedProfiles = map(GroupMember::toJoinGroupUsedProfileUiModel)
+    val usedColors = usedProfiles.map(JoinGroupUsedProfileUiModel::color).toSet()
+    val availableColors = selectableGroupColors.filterNot(usedColors::contains)
+
+    return JoinGroupProfileOptions(
+        usedProfiles = usedProfiles,
+        availableColors = availableColors,
+    )
+}
 
 fun groupColorForAvatar(@DrawableRes avatarRes: Int): GroupColor = when (avatarRes) {
     R.drawable.family_avatar_mom -> GroupColor.Red
