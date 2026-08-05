@@ -1,6 +1,7 @@
 package com.example.moil.feature.calendar.presentation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.moil.feature.calendar.presentation.component.CalendarScreenContent
 import com.example.moil.ui.theme.MoilTheme
@@ -11,10 +12,12 @@ import java.time.YearMonth
 fun CalendarScreen(
     uiState: CalendarUiState,
     onEvent: (CalendarScreenEvent) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     CalendarScreenContent(
         uiState = uiState,
         onEvent = onEvent,
+        modifier = modifier,
     )
 }
 

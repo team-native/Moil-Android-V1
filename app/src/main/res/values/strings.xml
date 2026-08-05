@@ -24,6 +24,9 @@
     <string name="calendar_weekday_saturday">토</string>
     <string name="calendar_selected_date">선택한 날짜: %1$d월 %2$d일</string>
     <string name="calendar_date_content_description">%1$d월 %2$d일</string>
+    <string name="calendar_date_events_content_description">%1$d월 %2$d일, 일정 %3$d건</string>
+    <string name="calendar_more_events">+%1$d</string>
+    <string name="calendar_more_events_content_description">일정 %1$d건 더 보기</string>
     <string name="calendar_empty_group_title">아직 속한 그룹이 없어요</string>
     <string name="calendar_empty_group_description">초대 코드로 그룹에 참여하거나\n새 그룹을 만들어보세요</string>
     <string name="calendar_empty_group_join">그룹 참여하기</string>
@@ -44,9 +47,12 @@
     <string name="schedule_all_day">하루 종일</string>
     <string name="schedule_time">시간</string>
     <string name="schedule_time_value">오전 9:00 – 10:00</string>
-    <string name="schedule_time_range">%1$s – %2$s</string>
     <string name="schedule_time_am">오전 %1$d:%2$02d</string>
     <string name="schedule_time_pm">오후 %1$d:%2$02d</string>
+    <string name="schedule_time_am_short">AM</string>
+    <string name="schedule_time_pm_short">PM</string>
+    <string name="schedule_time_hour_picker">시간 선택</string>
+    <string name="schedule_time_minute_picker">분 선택</string>
     <string name="schedule_location">위치</string>
     <string name="schedule_add">추가</string>
     <string name="schedule_location_dialog_title">위치 추가</string>
@@ -65,7 +71,7 @@
     <string name="family_member_section">구성원</string>
     <string name="family_member_administrator">관리자</string>
     <string name="family_month_schedule_section">이번 달 일정</string>
-    <string name="family_month_schedule_count">7월 일정 5건</string>
+    <string name="family_month_schedule_count">%1$d월 일정 %2$d건</string>
     <string name="family_administrator_section">관리</string>
     <string name="family_group_invite_code_label">초대 코드</string>
     <string name="family_group_invite_code">FAM-7X2Q</string>

@@ -18,9 +18,10 @@ import com.example.moil.ui.theme.MoilSpacing
 internal fun CalendarScreenContent(
     uiState: CalendarUiState,
     onEvent: (CalendarScreenEvent) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets.statusBars,
         bottomBar = {

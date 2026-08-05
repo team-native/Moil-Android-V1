@@ -24,13 +24,13 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "BASE_URL", "\"https://moil.soyuo.kr/\"")
+            buildConfigField("String", "BASE_URL", "\"https://moil.team-native.kr/\"")
             buildConfigField("boolean", "ENABLE_LOG", "true")
             buildConfigField("int", "CONNECT_TIMEOUT_SECONDS", "15")
         }
         release {
             isMinifyEnabled = false
-            buildConfigField("String", "BASE_URL", "\"https://moil.soyuo.kr/\"")
+            buildConfigField("String", "BASE_URL", "\"https://moil.team-native.kr/\"")
             buildConfigField("boolean", "ENABLE_LOG", "false")
             buildConfigField("int", "CONNECT_TIMEOUT_SECONDS", "15")
             proguardFiles(
@@ -62,6 +62,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.security.crypto)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
@@ -70,6 +72,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofit.kotlinx.serialization)
     ksp(libs.hilt.compiler)
+    ksp(libs.androidx.room.compiler)
     testImplementation(libs.junit)
     testImplementation(libs.mockwebserver)
     androidTestImplementation(platform(libs.androidx.compose.bom))

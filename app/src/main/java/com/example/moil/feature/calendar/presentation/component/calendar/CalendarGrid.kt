@@ -13,11 +13,12 @@ import com.example.moil.feature.calendar.presentation.CalendarEventUiModel
 @Composable
 internal fun CalendarGrid(
     displayedMonth: YearMonth,
-    selectedDate: LocalDate,
     eventsByDate: Map<LocalDate, List<CalendarEventUiModel>>,
     modifier: Modifier,
     onDateClick: (LocalDate) -> Unit,
 ) {
+    val todayDate = LocalDate.now()
+
     Column(modifier = modifier.fillMaxWidth()) {
         CalendarWeekdayHeader()
 
@@ -39,7 +40,7 @@ internal fun CalendarGrid(
                     CalendarDayCell(
                         date = date,
                         isDisplayedMonth = date.month == displayedMonth.month,
-                        isSelected = date == selectedDate,
+                        isToday = date == todayDate,
                         events = eventsByDate[date].orEmpty(),
                         modifier = Modifier
                             .weight(1f)

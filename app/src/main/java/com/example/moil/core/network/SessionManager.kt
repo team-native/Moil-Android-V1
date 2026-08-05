@@ -59,6 +59,12 @@ class DefaultSessionManager @Inject constructor(
     private val mutableSessionState = MutableStateFlow(mutableTokens.value.toSessionState())
     private val mutableSessionEvents = MutableSharedFlow<SessionEvent>(extraBufferCapacity = 1)
 
+    init {
+        if (mutableTokens.value != null && currentUserName() == null) {
+            expireSession()
+        }
+    }
+
     override val sessionState: StateFlow<SessionState> = mutableSessionState.asStateFlow()
     override val sessionEvents: SharedFlow<SessionEvent> = mutableSessionEvents.asSharedFlow()
 

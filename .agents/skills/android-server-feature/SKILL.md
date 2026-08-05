@@ -144,6 +144,101 @@ RepositoryImpl
 - DTO와 Domain은 별도 타입으로 만들고 명시적인 mapper로 변환한다.
 - 한 줄 변환 함수에 불필요하게 긴 주석을 붙이지 않는다.
 
+### 서버 고정 코드값과 enum
+
+- 필드명이 `id`인지 여부로 enum 사용 여부를 판단하지 않는다. **허용 값의 집합이 유한하고 서버 계약으로 고정됐는지**를 기준으로 판단한다.
+- 사용자·게시글·주문처럼 서버가 동적으로 생성하는 리소스 식별자(`userId`, UUID, DB PK 등)는 `String` 또는 `Long`으로 모델링하며 `enum class`로 만들지 않는다.
+- 색상 코드 ID처럼 `SKY`, `RED`, `GREEN`, `YELLOW`, `TEAL`, `VIOLET`, `MAGENTA`만 허용하는 서버/클라이언트 코드 ID는 `enum class`로 모델링한다. 코드의 표시 이름은 별도 UI 자원 또는 UI Model에서 관리하고, Domain enum에 화면 문구를 넣지 않는다.
+- 상태·유형·역할처럼 허용 값의 집합이 서버 계약으로 고정된 응답 필드는 Response DTO에서 원본 `String` 또는 숫자 타입으로 수신하고, mapper에서 Domain `enum class`로 변환한다. Domain enum에는 `Unknown`을 둬 서버의 신규 값으로 응답 역직렬화가 실패하지 않게 한다.
+- 문자열 코드 → Domain enum 변환은 `when`으로 명시하고, 알려지지 않은 값은 `Unknown`으로 수렴시킨다. 원본 값은 진단 로그 또는 분석 이벤트가 필요한 경우에만 보존한다.
+- 권한·결제·보안 판단에 영향을 주는 알 수 없는 값은 `Unknown`을 정상 동작의 기본값으로 사용하지 않는다. 해당 요청을 명시적 오류로 처리하고 권한 부여·결제 진행 등 위험한 동작을 중단한다.
+- Request DTO에서 앱이 전송할 값의 집합이 고정되어 있고 서버 계약이 확정된 경우에만 전송 전용 enum을 사용한다. 서버 전송값과 Kotlin enum 항목명이 다르거나 전송 계약을 명시해야 하면 각 enum 항목에 `@SerialName`을 붙인다.
+- Response DTO의 enum 직접 역직렬화는 서버가 신규 값을 추가하지 않으며 호환성 보장이 문서화된 경우에만 사용한다. 그렇지 않으면 DTO 원본 값 → Domain enum mapper 방식을 기본으로 한다.
+
+```kotlin
+@Serializable
+data class UserResponseDto(
+    @SerialName("role")
+    val role: String,
+)
+
+enum class UserRole {
+    Admin,
+    Member,
+    Unknown,
+}
+
+fun String.toUserRole(): UserRole = when (this) {
+    "ADMIN" -> UserRole.Admin
+    "MEMBER" -> UserRole.Member
+    else -> UserRole.Unknown
+}
+
+enum class ColorCode {
+    Sky,
+    Red,
+    Green,
+    Yellow,
+    Teal,
+    Violet,
+    Magenta,
+    Unknown,
+}
+
+fun String.toColorCode(): ColorCode = when (this) {
+    "SKY" -> ColorCode.Sky
+    "RED" -> ColorCode.Red
+    "GREEN" -> ColorCode.Green
+    "YELLOW" -> ColorCode.Yellow
+    "TEAL" -> ColorCode.Teal
+    "VIOLET" -> ColorCode.Violet
+    "MAGENTA" -> ColorCode.Magenta
+    else -> ColorCode.Unknown
+}
+
+@Serializable
+enum class UpdateUserRoleRequest {
+    @SerialName("ADMIN")
+    Admin,
+
+    @SerialName("MEMBER")
+    Member,
+}
+```
+
+### 서버 에러 코드
+
+- 서버 API가 명시적인 에러 코드를 반환하면, Data 계층에 서버 응답 코드와 일대일로 대응하는 `enum class`를 만든다. 예: `LoginServerErrorCode`.
+- 서버 에러 코드 `enum class`는 JSON의 code 값 해석과 앱 오류로의 변환에만 사용한다. Domain·Presentation 계층에 노출하지 않는다.
+- 앱에서 처리할 오류는 기능 단위 `sealed interface`로 정의하고, 상태가 없는 각 오류는 `data object`로 만든다. 예: `sealed interface LoginError { data object InvalidCredentials : LoginError }`.
+- 서버 코드 → 앱 오류 매핑은 Repository 또는 프로젝트의 공통 오류 변환 지점 한 곳에서 명시적으로 수행한다. ViewModel·Route·Screen에서 문자열 코드나 서버 enum을 직접 분기하지 않는다.
+- 변환 로직은 `ServerErrorCode.toAppError()`처럼 명명된 전용 함수 또는 mapper로 구현하고, 모든 서버 오류 응답이 이 경로를 거치게 한다. 예:
+
+```kotlin
+enum class LoginServerErrorCode {
+    INVALID_CREDENTIALS,
+    ACCOUNT_LOCKED,
+    UNKNOWN,
+}
+
+sealed interface LoginError {
+    data object InvalidCredentials : LoginError
+    data object AccountLocked : LoginError
+    data object Network : LoginError
+    data object Unknown : LoginError
+}
+
+fun LoginServerErrorCode.toAppError(): LoginError = when (this) {
+    LoginServerErrorCode.INVALID_CREDENTIALS -> LoginError.InvalidCredentials
+    LoginServerErrorCode.ACCOUNT_LOCKED -> LoginError.AccountLocked
+    LoginServerErrorCode.UNKNOWN -> LoginError.Unknown
+}
+```
+
+- 서버 응답의 문자열 또는 숫자 코드 파싱은 DTO/DataSource 경계에서 안전하게 `ServerErrorCode` enum으로 변환하고, 실패 시 `UNKNOWN`으로 처리한다. 이후 Repository 또는 공통 오류 변환 지점에서 반드시 `toAppError()`를 호출해 앱 오류 타입만 반환한다.
+- 서버에 없는 통신·직렬화·알 수 없는 코드도 앱 오류 타입으로 수렴시킨다. 서버가 새 코드를 추가해도 앱이 예외로 종료되지 않도록 `Unknown` 또는 공통 네트워크 오류 `data object`를 둔다.
+- UI 문구와 재시도 가능 여부는 앱 오류 `sealed interface`를 기준으로 결정하고, 서버 원본 코드는 진단 로그가 필요한 경우에만 별도로 보존한다.
+
 ### ApiService
 
 - HTTP method, endpoint, `@Path`, `@Query`, `@Body`, Header 형식만 정의한다.

@@ -59,7 +59,8 @@ class GroupAndEventApiServiceContractTest {
         assertRequest("POST", "/groups/join", "\"inviteCode\":\"FAM-1\"")
 
         enqueue(groupDetailJson)
-        groupApiService.getGroup(1)
+        val groupDetailResponse = groupApiService.getGroup(1)
+        assertEquals("RED", groupDetailResponse.body()?.data?.members?.single()?.colorId)
         assertRequest("GET", "/groups/1")
 
         enqueue("null")
@@ -124,7 +125,7 @@ class GroupAndEventApiServiceContractTest {
     private companion object {
         const val groupSummaryJson = "{\"groupId\":1,\"name\":\"우리 가족\",\"inviteCode\":\"FAM-1\",\"myRole\":\"admin\"}"
         const val groupJoinJson = "{\"groupId\":1,\"name\":\"우리 가족\",\"myRole\":\"member\",\"myNickname\":\"모일\",\"myColor\":\"SKY\"}"
-        const val groupDetailJson = "{\"groupId\":1,\"name\":\"우리 가족\",\"inviteCode\":\"FAM-1\",\"memberCount\":1,\"monthlyEventCount\":0,\"myRole\":\"admin\",\"members\":[]}"
+        const val groupDetailJson = "{\"groupId\":1,\"name\":\"우리 가족\",\"inviteCode\":\"FAM-1\",\"memberCount\":1,\"monthlyEventCount\":0,\"myRole\":\"admin\",\"members\":[{\"userId\":1,\"nickname\":\"모일\",\"role\":\"admin\",\"color\":\"RED\"}]}"
         const val eventJson = "{\"eventId\":5,\"title\":\"식사\",\"date\":\"2026-07-22\",\"isAllDay\":false,\"startTime\":\"18:00\",\"endTime\":\"20:00\",\"location\":\"서울\",\"members\":[]}"
     }
 }

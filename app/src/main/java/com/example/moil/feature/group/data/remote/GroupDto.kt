@@ -89,7 +89,7 @@ data class GroupDetailMemberResponseDto(
     @SerialName("userId") val userId: Long,
     @SerialName("nickname") val nickname: String,
     @SerialName("role") val role: String,
-    @SerialName("colorId") val colorId: String,
+    @SerialName("color") val colorId: String,
 )
 
 @Serializable

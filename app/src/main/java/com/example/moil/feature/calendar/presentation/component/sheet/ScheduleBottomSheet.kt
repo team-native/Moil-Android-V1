@@ -82,7 +82,7 @@ internal fun ScheduleBottomSheet(
 
             ScheduleInfoRow(
                 labelRes = R.string.schedule_time,
-                value = uiState.scheduleTime.toScheduleDisplayRange(),
+                value = uiState.scheduleTime.toScheduleDisplayTime(),
                 onClick = { onEvent(CalendarScreenEvent.ScheduleTimeClicked) },
             )
             ScheduleInfoRow(

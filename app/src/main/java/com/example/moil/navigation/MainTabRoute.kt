@@ -10,8 +10,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.example.moil.R
+import com.example.moil.core.component.applyDialogBackdropBlur
 import com.example.moil.core.component.MoilNavigationDestination
 import com.example.moil.feature.calendar.presentation.CalendarScreen
 import com.example.moil.feature.calendar.presentation.CalendarScreenEvent
@@ -22,10 +24,12 @@ import com.example.moil.feature.calendar.presentation.toCalendarEventsByDate
 import com.example.moil.feature.calendar.presentation.toCalendarGroups
 import com.example.moil.feature.calendar.presentation.toCalendarMembers
 import com.example.moil.feature.calendar.presentation.CalendarViewModel
+import com.example.moil.feature.event.domain.EventMember
 import com.example.moil.feature.event.domain.GroupEvent
 import com.example.moil.feature.calendar.presentation.component.dialog.ScheduleDatePickerDialog
 import com.example.moil.feature.calendar.presentation.component.dialog.ScheduleLocationDialog
 import com.example.moil.feature.calendar.presentation.component.dialog.ScheduleTimePickerDialog
+import com.example.moil.ui.theme.MoilTimePickerDimension
 import com.example.moil.feature.family.presentation.FamilyScreen
 import com.example.moil.feature.family.presentation.MemberScreen
 import com.example.moil.feature.family.presentation.FamilyScreenEvent
@@ -46,6 +50,7 @@ import com.example.moil.feature.group.presentation.JoinGroupStep
 import com.example.moil.feature.group.presentation.JoinGroupUiState
 import com.example.moil.feature.group.presentation.GroupViewModel
 import com.example.moil.feature.group.presentation.groupColorForAvatar
+import com.example.moil.feature.group.domain.GroupColor
 import com.example.moil.feature.profile.presentation.ProfileScreen
 import com.example.moil.feature.profile.presentation.ProfileScreenEvent
 import com.example.moil.feature.profile.presentation.ProfileUiState
@@ -113,15 +118,27 @@ fun MainTabRoute(
         )
     }
 
-    LaunchedEffect(groupUiState.selectedGroupId, calendarUiState.displayedMonth) {
+    LaunchedEffect(groupUiState.selectedGroupId) {
         groupUiState.selectedGroupId?.let { selectedGroupId ->
             calendarViewModel.selectGroup(selectedGroupId)
         }
     }
 
-    LaunchedEffect(calendarRemoteUiState.events) {
+    LaunchedEffect(
+        calendarRemoteUiState.events,
+        groupUiState.selectedGroup?.myColor,
+    ) {
         calendarUiState = calendarUiState.copy(
-            eventsByDate = calendarRemoteUiState.events.toCalendarEventsByDate(),
+            eventsByDate = calendarRemoteUiState.events.toCalendarEventsByDate(
+                fallbackProfileColor = groupUiState.selectedGroup?.myColor
+                    ?: GroupColor.Unknown,
+            ),
+        )
+    }
+
+    LaunchedEffect(calendarRemoteUiState.currentMonthEventCount) {
+        familyUiState = familyUiState.copy(
+            currentMonthEventCount = calendarRemoteUiState.currentMonthEventCount,
         )
     }
 
@@ -190,6 +207,20 @@ fun MainTabRoute(
                 if (selectedGroupId != null && calendarUiState.scheduleTitle.isNotBlank()) {
                     val scheduleStartTime = calendarUiState.scheduleTime.toString()
                     val scheduleEndTime = calendarUiState.scheduleTime.plusHours(1).toString()
+                    val selectedSharedMembers = calendarUiState.members
+                        .filter { member -> member.id in calendarUiState.sharedMemberIds }
+                    val sharedMembers = selectedSharedMembers.ifEmpty {
+                        calendarUiState.members.filter { member -> member.isCurrentUser }
+                    }
+                    val sharedMemberIds = sharedMembers.map { member -> member.id }
+                    val eventMembers = sharedMembers
+                        .map { member ->
+                            EventMember(
+                                userId = member.id,
+                                nickname = member.name,
+                                color = member.color,
+                            )
+                        }
 
                     calendarViewModel.createEvent(
                         event = GroupEvent(
@@ -200,9 +231,9 @@ fun MainTabRoute(
                             startTime = if (calendarUiState.isAllDay) null else scheduleStartTime,
                             endTime = if (calendarUiState.isAllDay) null else scheduleEndTime,
                             location = calendarUiState.scheduleLocation.ifBlank { null },
-                            members = emptyList(),
+                            members = eventMembers,
                         ),
-                        sharedMemberIds = calendarUiState.sharedMemberIds.toList(),
+                        sharedMemberIds = sharedMemberIds,
                     )
                 }
 
@@ -212,9 +243,7 @@ fun MainTabRoute(
             CalendarScreenEvent.PreviousMonthClicked,
             CalendarScreenEvent.NextMonthClicked -> {
                 calendarUiState = calendarUiState.reduce(event)
-                calendarUiState.selectedGroupId?.let { selectedGroupId ->
-                    calendarViewModel.selectGroup(selectedGroupId)
-                }
+                calendarViewModel.selectMonth(calendarUiState.displayedMonth)
             }
             else -> calendarUiState = calendarUiState.reduce(event)
         }
@@ -237,9 +266,19 @@ fun MainTabRoute(
                 }
             }
 
-            CalendarScreen(uiState = calendarUiState, onEvent = onCalendarEvent)
+            val isTimePickerVisible = calendarOverlay == CalendarOverlay.TimePicker
+            val calendarBackdropModifier = Modifier.applyDialogBackdropBlur(
+                shouldBlur = isTimePickerVisible,
+                blurRadius = MoilTimePickerDimension.BackgroundBlur,
+            )
 
-            if (isScheduleSheetRendered) {
+            CalendarScreen(
+                uiState = calendarUiState,
+                onEvent = onCalendarEvent,
+                modifier = calendarBackdropModifier,
+            )
+
+            if (isScheduleSheetRendered && !isTimePickerVisible) {
                 ScheduleBottomSheet(
                     uiState = calendarUiState,
                     sheetState = scheduleSheetState,

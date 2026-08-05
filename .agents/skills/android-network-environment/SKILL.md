@@ -66,9 +66,22 @@ feature 코드에 주소와 환경 값을 직접 작성하지 않는다.
 
 - access token 부착은 공통 Interceptor에서 처리한다.
 - access token 재발급은 Authenticator 또는 프로젝트가 선택한 한 가지 정책으로 처리한다.
+- 인증 세션의 저장·조회·갱신·종료와 세션 상태 공개 책임은 `SessionManager` 한 곳에 둔다. 토큰 저장소를 기능별로 별도 생성하거나 UI가 `SharedPreferences`를 직접 관찰하지 않는다.
+- 세션 변경 흐름은 아래와 같이 고정한다.
+
+```text
+Authenticator ─┐
+Repository ─────┼──> SessionManager ──> 앱 최상위 Route ──> 로그인 화면
+ViewModel ──────┘
+```
+
+- Authenticator는 refresh 실패 또는 재시도 한도 초과 시 `SessionManager.expireSession()`으로 세션을 종료한다. `expireSession()`은 토큰을 삭제하고 `SessionEvent.Expired`를 발생시킨다.
+- Repository는 로그인·가입 성공 시 `SessionManager`에 토큰을 저장하고, 화면과 무관한 탈퇴 같은 세션 종료 정책을 처리한다.
+- ViewModel은 사용자 로그아웃처럼 화면 의도가 세션 종료를 확정하는 경우 `SessionManager.expireSession()`을 한 번만 호출한다. Route·Screen은 Repository나 저장소를 직접 호출하지 않는다.
+- 앱 최상위 Route는 `SessionManager`가 공개한 `StateFlow<SessionState>`와 세션 종료 이벤트를 lifecycle-aware 방식으로 수집한다. `Unauthenticated` 상태 또는 `SessionEvent.Expired`를 받으면 back stack을 로그인 화면으로 교체한다.
 - Interceptor에서 `runBlocking`으로 DataStore·Repository·UseCase를 직접 호출하지 않는다.
-- 토큰의 저장·조회·갱신 책임은 `TokenManager` 등 별도 클래스로 모으고, Interceptor와 Authenticator는 그 클래스만 사용한다.
-- `TokenManager`는 Interceptor가 즉시 읽을 수 있는 안전한 access token 조회 경로와, Authenticator가 단일 정책으로 갱신·저장할 수 있는 API를 제공한다.
+- Interceptor와 Authenticator는 `SessionManager`만 사용한다.
+- `SessionManager`는 Interceptor가 즉시 읽을 수 있는 안전한 access token 조회 경로와, Authenticator가 단일 정책으로 갱신·저장할 수 있는 API를 제공한다.
 - 토큰 갱신에 네트워크 호출이 필요하면 Authenticator의 동기 실행 제약과 기존 동시성 제어 정책을 고려해 구현하며, UI·Repository 계층의 suspend 흐름을 Interceptor에 끌어오지 않는다.
 - Repository별로 401 재시도 코드를 복제하지 않는다.
 - 동시 401에서 중복 refresh가 발생하지 않도록 기존 동기화 정책을 확인한다.

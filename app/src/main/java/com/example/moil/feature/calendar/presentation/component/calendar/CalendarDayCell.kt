@@ -30,15 +30,16 @@ import java.time.LocalDate
 internal fun CalendarDayCell(
     date: LocalDate,
     isDisplayedMonth: Boolean,
-    isSelected: Boolean,
+    isToday: Boolean,
     events: List<CalendarEventUiModel>,
     modifier: Modifier,
     onClick: () -> Unit,
 ) {
-    val selectedDateDescription = stringResource(
-        R.string.calendar_date_content_description,
+    val dateDescription = stringResource(
+        R.string.calendar_date_events_content_description,
         date.monthValue,
         date.dayOfMonth,
+        events.size,
     )
 
     Column(
@@ -48,7 +49,7 @@ internal fun CalendarDayCell(
                 role = Role.Button,
                 onClick = onClick,
             )
-            .semantics { contentDescription = selectedDateDescription },
+            .semantics { contentDescription = dateDescription },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(
@@ -57,7 +58,7 @@ internal fun CalendarDayCell(
                 .size(28.dp)
                 .clip(CircleShape)
                 .background(
-                    color = if (isSelected) {
+                    color = if (isToday) {
                         MaterialTheme.colorScheme.primary
                     } else {
                         Color.Transparent
@@ -68,7 +69,7 @@ internal fun CalendarDayCell(
             Text(
                 text = date.dayOfMonth.toString(),
                 color = when {
-                    isSelected -> MaterialTheme.colorScheme.onPrimary
+                    isToday -> MaterialTheme.colorScheme.onPrimary
                     isDisplayedMonth -> MaterialTheme.colorScheme.onSurface
                     else -> LocalMoilExtraColors.current.calendarMutedText
                 },
@@ -76,8 +77,16 @@ internal fun CalendarDayCell(
             )
         }
 
-        events.take(2).forEach { calendarEvent ->
+        events.take(MaxVisibleEvents).forEach { calendarEvent ->
             CalendarEventBadge(calendarEvent)
+        }
+
+        val hiddenEventCount = events.size - MaxVisibleEvents
+
+        if (hiddenEventCount > 0) {
+            CalendarEventOverflowBadge(hiddenEventCount)
         }
     }
 }
+
+private const val MaxVisibleEvents = 2

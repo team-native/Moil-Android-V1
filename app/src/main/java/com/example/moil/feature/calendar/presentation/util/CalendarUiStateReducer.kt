@@ -18,6 +18,12 @@ internal fun CalendarUiState.reduce(event: CalendarScreenEvent): CalendarUiState
         selectedDate = event.date,
         isGroupMenuVisible = false,
         isScheduleSheetVisible = true,
+        sharedMemberIds = sharedMemberIds.ifEmpty {
+            members
+                .firstOrNull { member -> member.isCurrentUser }
+                ?.let { member -> setOf(member.id) }
+                .orEmpty()
+        },
     )
     CalendarScreenEvent.ScheduleSheetDismissed -> copy(isScheduleSheetVisible = false)
     CalendarScreenEvent.ScheduleSaveClicked -> copy(isScheduleSheetVisible = false)

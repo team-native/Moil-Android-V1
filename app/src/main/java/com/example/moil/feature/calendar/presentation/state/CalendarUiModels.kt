@@ -1,6 +1,7 @@
 package com.example.moil.feature.calendar.presentation
 
 import androidx.annotation.DrawableRes
+import com.example.moil.feature.group.domain.GroupColor
 
 data class CalendarGroupUiModel(
     val id: Long,
@@ -10,16 +11,12 @@ data class CalendarGroupUiModel(
 data class CalendarMemberUiModel(
     val id: Long,
     val name: String,
+    val color: GroupColor,
+    val isCurrentUser: Boolean,
     @param:DrawableRes val avatarRes: Int,
 )
 
 data class CalendarEventUiModel(
     val title: String,
-    val color: CalendarEventUiColor,
+    val participantColors: List<GroupColor>,
 )
-
-enum class CalendarEventUiColor {
-    Blue,
-    Green,
-    Yellow,
-}

@@ -61,6 +61,15 @@ object MoilScheduleSheet {
     val BottomPadding = 24.dp
 }
 
+object MoilTimePickerDimension {
+    val TimeValueWidth = 74.dp
+    val TimeValueHeight = 72.dp
+    val SeparatorWidth = 24.dp
+    val MeridiemWidth = 68.dp
+    val ScrollStep = 28.dp
+    val BackgroundBlur = 20.dp
+}
+
 object MoilAuthDimension {
     val ScreenHorizontalPadding = 24.dp
     val FieldHeight = 53.dp

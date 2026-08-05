@@ -3,6 +3,8 @@ package com.example.moil.core.di
 import com.example.moil.feature.auth.data.AuthRepositoryImpl
 import com.example.moil.feature.auth.domain.AuthRepository
 import com.example.moil.feature.event.data.EventRepositoryImpl
+import com.example.moil.feature.event.data.local.EventLocalDataSource
+import com.example.moil.feature.event.data.local.EventLocalDataSourceImpl
 import com.example.moil.feature.event.domain.EventRepository
 import com.example.moil.feature.group.data.GroupRepositoryImpl
 import com.example.moil.feature.group.domain.GroupRepository
@@ -22,4 +24,9 @@ abstract class RepositoryBindingModule {
 
     @Binds
     abstract fun bindEventRepository(implementation: EventRepositoryImpl): EventRepository
+
+    @Binds
+    abstract fun bindEventLocalDataSource(
+        implementation: EventLocalDataSourceImpl,
+    ): EventLocalDataSource
 }

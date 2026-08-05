@@ -2,6 +2,8 @@ package com.example.moil.feature.calendar.presentation
 
 import java.time.LocalDate
 import java.time.YearMonth
+import com.example.moil.R
+import com.example.moil.feature.group.domain.GroupColor
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -23,6 +25,24 @@ class CalendarUiStateReducerTest {
         assertEquals(selectedDate, updatedUiState.selectedDate)
         assertFalse(updatedUiState.isGroupMenuVisible)
         assertTrue(updatedUiState.isScheduleSheetVisible)
+    }
+
+    @Test
+    fun dateClicked_기본으로_현재_사용자를_공유_구성원으로_선택한다() {
+        val currentMemberId = 7L
+        val updatedUiState = initialUiState.copy(
+            members = listOf(
+                CalendarMemberUiModel(
+                    id = currentMemberId,
+                    name = "나",
+                    color = GroupColor.Green,
+                    isCurrentUser = true,
+                    avatarRes = R.drawable.family_avatar_member_green,
+                ),
+            ),
+        ).reduce(CalendarScreenEvent.DateClicked(LocalDate.of(2026, 7, 25)))
+
+        assertEquals(setOf(currentMemberId), updatedUiState.sharedMemberIds)
     }
 
     @Test

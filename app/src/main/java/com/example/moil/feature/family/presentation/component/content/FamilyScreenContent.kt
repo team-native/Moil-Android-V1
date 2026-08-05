@@ -74,7 +74,10 @@ internal fun FamilyScreenContent(
 
             Spacer(modifier = Modifier.height(MoilGroupDetailDimension.SectionLabelBottomSpacing))
 
-            FamilyScheduleCard()
+            FamilyScheduleCard(
+                month = uiState.currentMonth,
+                eventCount = uiState.currentMonthEventCount,
+            )
 
             Spacer(modifier = Modifier.height(MoilGroupDetailDimension.LeaveActionTopSpacing))
 
@@ -151,14 +154,21 @@ private fun FamilyMemberCard(
 }
 
 @Composable
-private fun FamilyScheduleCard() {
+private fun FamilyScheduleCard(
+    month: java.time.YearMonth,
+    eventCount: Int,
+) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(MoilGroupDetailDimension.CardCornerRadius),
         color = LocalMoilExtraColors.current.overlaySurface,
     ) {
         Text(
-            text = stringResource(R.string.family_month_schedule_count),
+            text = stringResource(
+                R.string.family_month_schedule_count,
+                month.monthValue,
+                eventCount,
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = MoilGroupDetailDimension.ScheduleCardVerticalPadding),

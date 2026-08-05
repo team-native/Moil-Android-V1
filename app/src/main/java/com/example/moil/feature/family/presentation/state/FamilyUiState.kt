@@ -3,6 +3,7 @@ package com.example.moil.feature.family.presentation
 import androidx.annotation.StringRes
 import com.example.moil.core.model.GroupMemberRole
 import com.example.moil.core.model.GroupProfileColor
+import java.time.YearMonth
 
 data class FamilyUiState(
     val groups: List<GroupUiModel> = emptyList(),
@@ -12,6 +13,8 @@ data class FamilyUiState(
     val isGroupsLoading: Boolean = false,
     val hasGroupLoadError: Boolean = false,
     val currentUserRole: GroupMemberRole = GroupMemberRole.Member,
+    val currentMonth: YearMonth = YearMonth.now(),
+    val currentMonthEventCount: Int = 0,
 ) {
     val selectedGroup: GroupUiModel?
         get() = groups.firstOrNull { group -> group.id == selectedGroupId }
