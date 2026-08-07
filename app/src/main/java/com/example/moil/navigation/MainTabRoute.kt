@@ -1,5 +1,8 @@
 package com.example.moil.navigation
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -11,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.example.moil.R
 import com.example.moil.core.component.applyDialogBackdropBlur
@@ -79,6 +83,8 @@ fun MainTabRoute(
     val groupUiState by groupViewModel.uiState.collectAsStateWithLifecycle()
     val calendarViewModel: CalendarViewModel = hiltViewModel()
     val calendarRemoteUiState by calendarViewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val inviteCodeLabel = stringResource(R.string.family_group_invite_code_label)
     var selectedDestination by remember { mutableStateOf(MoilNavigationDestination.Calendar) }
     var calendarUiState by remember {
         mutableStateOf(
@@ -389,6 +395,17 @@ fun MainTabRoute(
                         is FamilyScreenEvent.NotificationsChanged -> familyUiState = familyUiState.copy(notificationsEnabled = event.isEnabled)
                         FamilyScreenEvent.GroupNameChangeClicked -> familyOverlay = FamilyOverlay.GroupName
                         FamilyScreenEvent.MemberPermissionsClicked -> familyOverlay = FamilyOverlay.MemberPermissions
+                        FamilyScreenEvent.InviteCodeCopyClicked -> {
+                            familyUiState.selectedGroup?.let { selectedGroup ->
+                                val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                clipboardManager.setPrimaryClip(
+                                    ClipData.newPlainText(
+                                        inviteCodeLabel,
+                                        selectedGroup.inviteCode,
+                                    ),
+                                )
+                            }
+                        }
                         FamilyScreenEvent.InviteLinkShareClicked -> familyOverlay = FamilyOverlay.InviteShare
                         FamilyScreenEvent.AdministratorTransferClicked -> familyOverlay = FamilyOverlay.AdministratorTransfer
                     }

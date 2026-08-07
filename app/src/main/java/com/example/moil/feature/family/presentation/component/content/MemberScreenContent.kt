@@ -125,6 +125,9 @@ private fun MemberGroupContent(
 
         FamilyInviteCodeCard(
             inviteCode = selectedGroup.inviteCode,
+            onCopyClick = {
+                onEvent(FamilyScreenEvent.InviteCodeCopyClicked)
+            },
         )
 
         Spacer(modifier = Modifier.height(MoilMemberDimension.SectionSpacing))
@@ -173,7 +176,10 @@ private fun MemberGroupContent(
 }
 
 @Composable
-private fun FamilyInviteCodeCard(inviteCode: String) {
+private fun FamilyInviteCodeCard(
+    inviteCode: String,
+    onCopyClick: () -> Unit,
+) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(MoilMemberDimension.CardCornerRadius),
@@ -203,10 +209,12 @@ private fun FamilyInviteCodeCard(inviteCode: String) {
             }
 
             Surface(
-                modifier = Modifier.size(
-                    width = MoilMemberDimension.InviteCodeActionWidth,
-                    height = MoilMemberDimension.InviteCodeActionHeight,
-                ),
+                modifier = Modifier
+                    .size(
+                        width = MoilMemberDimension.InviteCodeActionWidth,
+                        height = MoilMemberDimension.InviteCodeActionHeight,
+                    )
+                    .clickable(onClick = onCopyClick),
                 shape = RoundedCornerShape(percent = 50),
                 color = MaterialTheme.colorScheme.primary,
             ) {
