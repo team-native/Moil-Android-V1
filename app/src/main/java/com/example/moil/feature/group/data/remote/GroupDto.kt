@@ -30,6 +30,20 @@ data class JoinGroupRequestDto(
 )
 
 @Serializable
+data class UpdateMyGroupProfileRequestDto(
+    @SerialName("nickname") val nickname: String,
+    @SerialName("colorId") val colorId: String,
+)
+
+@Serializable
+data class GroupMemberProfileResponseDto(
+    @SerialName("groupId") val groupId: Long,
+    @SerialName("userId") val userId: Long,
+    @SerialName("nickname") val nickname: String,
+    @SerialName("colorId") val colorId: String,
+)
+
+@Serializable
 data class NotificationRequestDto(
     @SerialName("enabled") val enabled: Boolean,
 )

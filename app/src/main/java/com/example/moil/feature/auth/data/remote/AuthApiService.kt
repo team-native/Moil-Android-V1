@@ -4,6 +4,7 @@ import com.example.moil.core.network.ApiEnvelopeDto
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 
 interface PublicAuthApiService {
@@ -24,6 +25,9 @@ interface PublicAuthApiService {
 }
 
 interface AuthenticatedAuthApiService {
+    @PATCH("auth/profile")
+    suspend fun updateProfile(@Body request: UpdateProfileRequestDto): Response<ApiEnvelopeDto<UserProfileResponseDto>>
+
     @POST("auth/change-password")
     suspend fun changePassword(@Body request: ChangePasswordRequestDto): Response<ApiEnvelopeDto<Unit>>
 

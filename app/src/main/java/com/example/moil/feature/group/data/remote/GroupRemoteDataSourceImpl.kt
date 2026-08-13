@@ -32,6 +32,13 @@ class GroupRemoteDataSourceImpl @Inject constructor(
         groupApiService.leaveGroup(groupId)
     }
 
+    override suspend fun updateMyGroupProfile(
+        groupId: Long,
+        request: UpdateMyGroupProfileRequestDto,
+    ): NetworkResult<GroupMemberProfileResponseDto> = apiExecutor.execute {
+        groupApiService.updateMyGroupProfile(groupId, request)
+    }
+
     override suspend fun getMembers(groupId: Long): NetworkResult<List<GroupMemberResponseDto>> = apiExecutor.execute {
         groupApiService.getMembers(groupId)
     }

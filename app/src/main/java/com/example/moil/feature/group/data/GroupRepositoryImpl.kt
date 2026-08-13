@@ -4,6 +4,7 @@ import com.example.moil.core.domain.MoilResult
 import com.example.moil.core.domain.mapToDomain
 import com.example.moil.feature.group.data.remote.CreateGroupRequestDto
 import com.example.moil.feature.group.data.remote.GroupMemberResponseDto
+import com.example.moil.feature.group.data.remote.GroupMemberProfileResponseDto
 import com.example.moil.feature.group.data.remote.GroupDetailResponseDto
 import com.example.moil.feature.group.data.remote.GroupRemoteDataSource
 import com.example.moil.feature.group.data.remote.GroupSummaryResponseDto
@@ -13,10 +14,12 @@ import com.example.moil.feature.group.data.remote.MemberRoleRequestDto
 import com.example.moil.feature.group.data.remote.NotificationRequestDto
 import com.example.moil.feature.group.data.remote.RenameGroupRequestDto
 import com.example.moil.feature.group.data.remote.TransferAdminRequestDto
+import com.example.moil.feature.group.data.remote.UpdateMyGroupProfileRequestDto
 import com.example.moil.feature.group.data.remote.UpdateMemberRolesRequestDto
 import com.example.moil.feature.group.data.remote.VerifyInviteRequestDto
 import com.example.moil.feature.group.domain.GroupColor
 import com.example.moil.feature.group.domain.GroupMember
+import com.example.moil.feature.group.domain.GroupMemberProfile
 import com.example.moil.feature.group.domain.GroupDetail
 import com.example.moil.feature.group.domain.GroupRepository
 import com.example.moil.feature.group.domain.GroupRole
@@ -58,6 +61,21 @@ class GroupRepositoryImpl @Inject constructor(
         .leaveGroup(groupId)
         .mapToDomain { Unit }
 
+    // 그룹 내 프로필 편집 화면의 저장 요청에 사용할 내 멤버 프로필을 갱신합니다.
+    override suspend fun updateMyGroupProfile(
+        groupId: Long,
+        nickname: String,
+        color: GroupColor,
+    ): MoilResult<GroupMemberProfile> = groupRemoteDataSource
+        .updateMyGroupProfile(
+            groupId = groupId,
+            request = UpdateMyGroupProfileRequestDto(
+                nickname = nickname,
+                colorId = color.toWireValue(),
+            ),
+        )
+        .mapToDomain { response -> response.toDomain() }
+
     override suspend fun updateNotification(groupId: Long, enabled: Boolean): MoilResult<Unit> = groupRemoteDataSource
         .updateNotification(groupId, NotificationRequestDto(enabled))
         .mapToDomain { Unit }
@@ -96,6 +114,13 @@ private fun GroupMemberResponseDto.toDomain(): GroupMember = GroupMember(
     role = role.toGroupRole(),
     color = colorId.toGroupColor(),
     isMe = isMe,
+)
+
+private fun GroupMemberProfileResponseDto.toDomain(): GroupMemberProfile = GroupMemberProfile(
+    groupId = groupId,
+    userId = userId,
+    nickname = nickname,
+    color = colorId.toGroupColor(),
 )
 
 private fun GroupDetailResponseDto.toDomain(): GroupDetail = GroupDetail(

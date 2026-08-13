@@ -10,6 +10,7 @@ interface GroupRepository {
     suspend fun getGroup(groupId: Long): MoilResult<GroupDetail>
     suspend fun getMembers(groupId: Long): MoilResult<List<GroupMember>>
     suspend fun leaveGroup(groupId: Long): MoilResult<Unit>
+    suspend fun updateMyGroupProfile(groupId: Long, nickname: String, color: GroupColor): MoilResult<GroupMemberProfile>
     suspend fun updateNotification(groupId: Long, enabled: Boolean): MoilResult<Unit>
     suspend fun renameGroup(groupId: Long, name: String): MoilResult<Unit>
     suspend fun updateMemberRoles(groupId: Long, roles: Map<Long, GroupRole>): MoilResult<Unit>

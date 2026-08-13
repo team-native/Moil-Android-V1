@@ -9,6 +9,7 @@ interface GroupRemoteDataSource {
     suspend fun joinGroup(request: JoinGroupRequestDto): NetworkResult<GroupSummaryResponseDto>
     suspend fun getGroup(groupId: Long): NetworkResult<GroupDetailResponseDto>
     suspend fun leaveGroup(groupId: Long): NetworkResult<Unit>
+    suspend fun updateMyGroupProfile(groupId: Long, request: UpdateMyGroupProfileRequestDto): NetworkResult<GroupMemberProfileResponseDto>
     suspend fun getMembers(groupId: Long): NetworkResult<List<GroupMemberResponseDto>>
     suspend fun updateNotification(groupId: Long, request: NotificationRequestDto): NetworkResult<Unit>
     suspend fun renameGroup(groupId: Long, request: RenameGroupRequestDto): NetworkResult<Unit>

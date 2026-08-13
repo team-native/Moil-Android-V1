@@ -28,6 +28,12 @@ interface GroupApiService {
     @DELETE("groups/{groupId}/members/me")
     suspend fun leaveGroup(@Path("groupId") groupId: Long): Response<ApiEnvelopeDto<Unit>>
 
+    @PATCH("groups/{groupId}/members/me")
+    suspend fun updateMyGroupProfile(
+        @Path("groupId") groupId: Long,
+        @Body request: UpdateMyGroupProfileRequestDto,
+    ): Response<ApiEnvelopeDto<GroupMemberProfileResponseDto>>
+
     @GET("groups/{groupId}/members")
     suspend fun getMembers(@Path("groupId") groupId: Long): Response<ApiEnvelopeDto<List<GroupMemberResponseDto>>>
 

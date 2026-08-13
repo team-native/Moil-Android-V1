@@ -10,6 +10,8 @@ import com.example.moil.feature.auth.data.remote.DeleteAccountRequestDto
 import com.example.moil.feature.auth.data.remote.LoginRequestDto
 import com.example.moil.feature.auth.data.remote.PasswordSessionRequestDto
 import com.example.moil.feature.auth.data.remote.SendCodeRequestDto
+import com.example.moil.feature.auth.data.remote.UpdateProfileRequestDto
+import com.example.moil.feature.auth.data.remote.UserProfileResponseDto
 import com.example.moil.feature.auth.data.remote.VerificationStepDto
 import com.example.moil.feature.auth.data.remote.VerifyCodeRequestDto
 import com.example.moil.feature.auth.domain.AuthRepository
@@ -17,12 +19,18 @@ import com.example.moil.feature.auth.domain.AuthSession
 import com.example.moil.feature.auth.domain.Verification
 import com.example.moil.feature.auth.domain.VerificationStep
 import com.example.moil.feature.auth.domain.VerifiedSession
+import com.example.moil.feature.auth.domain.UserProfile
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val authRemoteDataSource: AuthRemoteDataSource,
     private val sessionManager: SessionManager,
 ) : AuthRepository {
+    // 마이페이지 프로필 저장 이벤트에서 서버 이름 변경 결과를 Domain 모델로 변환합니다.
+    override suspend fun updateProfileName(name: String): MoilResult<UserProfile> = authRemoteDataSource
+        .updateProfile(UpdateProfileRequestDto(name = name))
+        .mapToDomain { response -> response.toDomain() }
+
     override suspend fun sendCode(name: String?, email: String, step: VerificationStep): MoilResult<Verification> = authRemoteDataSource
         .sendCode(SendCodeRequestDto(name = name, email = email, step = step.toDto()))
         .mapToDomain { Verification(verifyId = it.verifyId) }
@@ -78,9 +86,15 @@ class AuthRepositoryImpl @Inject constructor(
                 userName = result.value.userName,
             )
         }
-    }
+}
 
-    private fun VerificationStep.toDto(): VerificationStepDto = when (this) {
+private fun UserProfileResponseDto.toDomain(): UserProfile = UserProfile(
+    userId = userId,
+    name = name,
+    email = email,
+)
+
+private fun VerificationStep.toDto(): VerificationStepDto = when (this) {
         VerificationStep.SignUp -> VerificationStepDto.SignUp
         VerificationStep.Reset -> VerificationStepDto.Reset
     }

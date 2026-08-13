@@ -9,3 +9,9 @@ data class AuthSession(
     val refreshToken: String,
     val userName: String? = null,
 )
+
+data class UserProfile(
+    val userId: Long,
+    val name: String,
+    val email: String,
+)

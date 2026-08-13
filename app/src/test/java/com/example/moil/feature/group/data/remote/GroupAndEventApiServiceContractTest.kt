@@ -67,6 +67,14 @@ class GroupAndEventApiServiceContractTest {
         groupApiService.leaveGroup(1)
         assertRequest("DELETE", "/groups/1/members/me")
 
+        enqueue("{\"groupId\":1,\"userId\":2,\"nickname\":\"모일\",\"colorId\":\"SKY\"}")
+        val profileResponse = groupApiService.updateMyGroupProfile(
+            groupId = 1,
+            request = UpdateMyGroupProfileRequestDto("모일", "SKY"),
+        )
+        assertEquals("SKY", profileResponse.body()?.data?.colorId)
+        assertRequest("PATCH", "/groups/1/members/me", "\"colorId\":\"SKY\"")
+
         enqueue("[]")
         groupApiService.getMembers(1)
         assertRequest("GET", "/groups/1/members")

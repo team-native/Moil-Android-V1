@@ -71,6 +71,11 @@ class AuthApiServiceContractTest {
 
     @Test
     fun `인증 사용자 인증 endpoint는 명세의 path와 body를 사용한다`() = runBlocking {
+        enqueueEnvelope("{\"userId\":1,\"name\":\"네이티브\",\"email\":\"native@example.com\"}")
+        val profileResponse = authenticatedAuthApiService.updateProfile(UpdateProfileRequestDto("네이티브"))
+        assertEquals("네이티브", profileResponse.body()?.data?.name)
+        assertAuthenticatedRequest("PATCH", "/auth/profile", "\"name\":\"네이티브\"")
+
         enqueueEnvelope("null")
         authenticatedAuthApiService.changePassword(ChangePasswordRequestDto("old-password", "new-password", "new-password"))
         assertAuthenticatedRequest("POST", "/auth/change-password", "\"newpwd\":\"new-password\"")

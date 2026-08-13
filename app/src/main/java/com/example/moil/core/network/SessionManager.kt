@@ -37,6 +37,8 @@ interface SessionManager {
 
     fun save(tokens: SessionTokens, userName: String? = null)
 
+    fun updateUserName(userName: String)
+
     fun expireSession()
 }
 
@@ -89,6 +91,18 @@ class DefaultSessionManager @Inject constructor(
         sessionEditor.apply()
         mutableTokens.value = tokens
         mutableSessionState.value = SessionState.Authenticated
+    }
+
+    override fun updateUserName(userName: String) {
+        val normalizedUserName = userName.trim()
+
+        if (normalizedUserName.isBlank()) {
+            return
+        }
+
+        encryptedPreferences.edit()
+            .putString(USER_NAME_KEY, normalizedUserName)
+            .apply()
     }
 
     override fun expireSession() {

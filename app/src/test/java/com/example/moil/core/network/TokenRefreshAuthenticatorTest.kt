@@ -153,6 +153,8 @@ class TokenRefreshAuthenticatorTest {
             mutableSessionState.value = SessionState.Authenticated
         }
 
+        override fun updateUserName(userName: String) = Unit
+
         override fun expireSession() {
             tokens = null
             mutableSessionState.value = SessionState.Unauthenticated
