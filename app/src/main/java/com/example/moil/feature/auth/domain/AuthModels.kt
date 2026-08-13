@@ -7,7 +7,7 @@ data class VerifiedSession(val sessionId: String)
 data class AuthSession(
     val accessToken: String,
     val refreshToken: String,
-    val userName: String? = null,
+    val profile: UserProfile? = null,
 )
 
 data class UserProfile(

@@ -146,14 +146,10 @@ class TokenRefreshAuthenticatorTest {
 
         override fun currentTokens(): SessionTokens? = tokens
 
-        override fun currentUserName(): String? = null
-
-        override fun save(tokens: SessionTokens, userName: String?) {
+        override fun save(tokens: SessionTokens) {
             this.tokens = tokens
             mutableSessionState.value = SessionState.Authenticated
         }
-
-        override fun updateUserName(userName: String) = Unit
 
         override fun expireSession() {
             tokens = null

@@ -17,6 +17,7 @@ import com.example.moil.core.network.SessionEvent
 import com.example.moil.core.network.SessionState
 import com.example.moil.feature.auth.presentation.LoginRoute
 import com.example.moil.feature.auth.presentation.SignUpRoute
+import com.example.moil.feature.auth.domain.CurrentUserProfileStore
 import com.example.moil.core.model.GroupMemberRole
 
 private sealed interface MoilAppDestination {
@@ -32,10 +33,17 @@ fun MoilAppRoute(
     currentUserRole: GroupMemberRole,
     onCurrentUserRoleChanged: (GroupMemberRole) -> Unit,
     sessionManager: SessionManager,
+    currentUserProfileStore: CurrentUserProfileStore,
 ) {
     val sessionState by sessionManager.sessionState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
     var sessionExpirationCount by remember { mutableStateOf(0) }
+
+    LaunchedEffect(sessionState) {
+        if (sessionState is SessionState.Unauthenticated) {
+            currentUserProfileStore.clear()
+        }
+    }
 
     LaunchedEffect(sessionManager, lifecycleOwner) {
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {

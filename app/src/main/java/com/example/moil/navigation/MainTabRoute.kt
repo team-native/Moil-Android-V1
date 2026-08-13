@@ -74,6 +74,7 @@ fun MainTabRoute(
 ) {
     val viewModel: MainTabViewModel = hiltViewModel()
     val profileUpdateUiState by viewModel.profileUpdateUiState.collectAsStateWithLifecycle()
+    val currentUserProfile by viewModel.currentUserProfile.collectAsStateWithLifecycle()
     val groupViewModel: GroupViewModel = hiltViewModel()
     val groupUiState by groupViewModel.uiState.collectAsStateWithLifecycle()
     val calendarViewModel: CalendarViewModel = hiltViewModel()
@@ -108,12 +109,18 @@ fun MainTabRoute(
         )
     }
 
+    LaunchedEffect(currentUserProfile) {
+        currentUserProfile?.let { profile ->
+            profileUiState = profileUiState.copy(profileName = profile.name)
+        }
+    }
+
     LaunchedEffect(Unit) {
         viewModel.profileUpdateEffects.collect { effect ->
             when (effect) {
                 is ProfileUpdateEffect.Saved -> {
                     profileUiState = profileEditUiState
-                        .copy(profileName = effect.name)
+                        .copy(profileName = effect.profile.name)
                         .toUpdatedProfileUiState(profileUiState)
                     selectedDestination = MoilNavigationDestination.Profile
                 }

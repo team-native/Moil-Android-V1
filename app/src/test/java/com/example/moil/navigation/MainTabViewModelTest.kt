@@ -2,13 +2,9 @@ package com.example.moil.navigation
 
 import com.example.moil.core.domain.MoilError
 import com.example.moil.core.domain.MoilResult
-import com.example.moil.core.network.SessionEvent
-import com.example.moil.core.network.SessionManager
-import com.example.moil.core.network.SessionState
-import com.example.moil.core.network.SessionTokens
 import com.example.moil.feature.auth.domain.AuthRepository
 import com.example.moil.feature.auth.domain.AuthSession
-import com.example.moil.feature.auth.domain.ChangePasswordUseCase
+import com.example.moil.feature.auth.domain.CurrentUserProfileStore
 import com.example.moil.feature.auth.domain.LogoutUseCase
 import com.example.moil.feature.auth.domain.UpdateProfileNameUseCase
 import com.example.moil.feature.auth.domain.UserProfile
@@ -19,11 +15,9 @@ import com.example.moil.feature.profile.presentation.ProfileEditSaveError
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -49,15 +43,14 @@ class MainTabViewModelTest {
     }
 
     @Test
-    fun `프로필 저장 성공은 세션 이름을 갱신하고 저장 효과를 발행한다`() = runTest {
-        val sessionManager = FakeSessionManager()
+    fun `프로필 저장 성공은 전체 프로필을 담은 저장 효과를 발행한다`() = runTest {
         val profileRepository = FakeAuthRepository(
             updateProfileResult = MoilResult.Success(UserProfile(1L, "네이티브", "native@example.com")),
         )
         val viewModel = MainTabViewModel(
             logoutUseCase = LogoutUseCase(profileRepository),
             updateProfileNameUseCase = UpdateProfileNameUseCase(profileRepository),
-            sessionManager = sessionManager,
+            currentUserProfileStore = FakeCurrentUserProfileStore(),
         )
         val savedEffect = async(start = CoroutineStart.UNDISPATCHED) {
             viewModel.profileUpdateEffects.first()
@@ -66,9 +59,11 @@ class MainTabViewModelTest {
         viewModel.updateProfileName("네이티브")
         advanceUntilIdle()
 
-        assertEquals("네이티브", sessionManager.currentUserName())
         assertEquals(ProfileUpdateUiState(), viewModel.profileUpdateUiState.value)
-        assertEquals(ProfileUpdateEffect.Saved("네이티브"), savedEffect.await())
+        assertEquals(
+            ProfileUpdateEffect.Saved(UserProfile(1L, "네이티브", "native@example.com")),
+            savedEffect.await(),
+        )
     }
 
     @Test
@@ -79,7 +74,7 @@ class MainTabViewModelTest {
         val viewModel = MainTabViewModel(
             logoutUseCase = LogoutUseCase(profileRepository),
             updateProfileNameUseCase = UpdateProfileNameUseCase(profileRepository),
-            sessionManager = FakeSessionManager(),
+            currentUserProfileStore = FakeCurrentUserProfileStore(),
         )
 
         viewModel.updateProfileName("네이티브")
@@ -89,6 +84,20 @@ class MainTabViewModelTest {
             ProfileUpdateUiState(saveError = ProfileEditSaveError.SaveFailed),
             viewModel.profileUpdateUiState.value,
         )
+    }
+}
+
+private class FakeCurrentUserProfileStore : CurrentUserProfileStore {
+    private val mutableProfile = MutableStateFlow<UserProfile?>(null)
+
+    override val profile: StateFlow<UserProfile?> = mutableProfile
+
+    override fun save(profile: UserProfile) {
+        mutableProfile.value = profile
+    }
+
+    override fun clear() {
+        mutableProfile.value = null
     }
 }
 
@@ -106,21 +115,4 @@ private class FakeAuthRepository(
     override suspend fun deleteAccount(email: String, password: String, leaveData: Boolean): MoilResult<Unit> = unused()
 
     private fun <T> unused(): MoilResult<T> = MoilResult.Failure(MoilError.Network)
-}
-
-private class FakeSessionManager : SessionManager {
-    private var userName: String? = null
-    private val mutableSessionState = MutableStateFlow<SessionState>(SessionState.Unauthenticated)
-    private val mutableSessionEvents = MutableSharedFlow<SessionEvent>()
-
-    override val sessionState: StateFlow<SessionState> = mutableSessionState
-    override val sessionEvents: SharedFlow<SessionEvent> = mutableSessionEvents
-
-    override fun currentTokens(): SessionTokens? = null
-    override fun currentUserName(): String? = userName
-    override fun save(tokens: SessionTokens, userName: String?) = Unit
-    override fun updateUserName(userName: String) {
-        this.userName = userName
-    }
-    override fun expireSession() = Unit
 }

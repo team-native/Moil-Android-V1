@@ -3,9 +3,10 @@ package com.example.moil.navigation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moil.core.domain.MoilResult
-import com.example.moil.core.network.SessionManager
 import com.example.moil.feature.auth.domain.LogoutUseCase
+import com.example.moil.feature.auth.domain.CurrentUserProfileStore
 import com.example.moil.feature.auth.domain.UpdateProfileNameUseCase
+import com.example.moil.feature.auth.domain.UserProfile
 import com.example.moil.feature.profile.presentation.ProfileEditSaveError
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -23,25 +24,26 @@ data class ProfileUpdateUiState(
 )
 
 sealed interface ProfileUpdateEffect {
-    data class Saved(val name: String) : ProfileUpdateEffect
+    data class Saved(val profile: UserProfile) : ProfileUpdateEffect
 }
 
 @HiltViewModel
 class MainTabViewModel @Inject constructor(
     private val logoutUseCase: LogoutUseCase,
     private val updateProfileNameUseCase: UpdateProfileNameUseCase,
-    private val sessionManager: SessionManager,
+    private val currentUserProfileStore: CurrentUserProfileStore,
 ) : ViewModel() {
     private val mutableProfileUpdateUiState = MutableStateFlow(ProfileUpdateUiState())
     private val mutableProfileUpdateEffects = MutableSharedFlow<ProfileUpdateEffect>()
 
     val profileUpdateUiState: StateFlow<ProfileUpdateUiState> = mutableProfileUpdateUiState.asStateFlow()
     val profileUpdateEffects: SharedFlow<ProfileUpdateEffect> = mutableProfileUpdateEffects.asSharedFlow()
+    val currentUserProfile: StateFlow<UserProfile?> = currentUserProfileStore.profile
 
-    /** 프로필 로그아웃 이벤트에서 호출되어 서버 세션 종료 후 로컬 세션을 종료합니다. */
+    /** 프로필 로그아웃 이벤트에서 서버 로그아웃 UseCase를 호출합니다. */
     fun logout() = viewModelScope.launch {
         when (logoutUseCase()) {
-            is MoilResult.Success -> sessionManager.expireSession()
+            is MoilResult.Success -> Unit
             is MoilResult.Failure -> Unit
         }
     }
@@ -57,9 +59,8 @@ class MainTabViewModel @Inject constructor(
 
         when (val result = updateProfileNameUseCase(name)) {
             is MoilResult.Success -> {
-                sessionManager.updateUserName(result.value.name)
                 mutableProfileUpdateUiState.value = ProfileUpdateUiState()
-                mutableProfileUpdateEffects.emit(ProfileUpdateEffect.Saved(result.value.name))
+                mutableProfileUpdateEffects.emit(ProfileUpdateEffect.Saved(result.value))
             }
 
             is MoilResult.Failure -> {

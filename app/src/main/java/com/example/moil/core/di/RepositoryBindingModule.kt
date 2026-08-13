@@ -1,7 +1,9 @@
 package com.example.moil.core.di
 
 import com.example.moil.feature.auth.data.AuthRepositoryImpl
+import com.example.moil.feature.auth.data.local.DefaultCurrentUserProfileStore
 import com.example.moil.feature.auth.domain.AuthRepository
+import com.example.moil.feature.auth.domain.CurrentUserProfileStore
 import com.example.moil.feature.event.data.EventRepositoryImpl
 import com.example.moil.feature.event.data.local.EventLocalDataSource
 import com.example.moil.feature.event.data.local.EventLocalDataSourceImpl
@@ -18,6 +20,11 @@ import dagger.hilt.components.SingletonComponent
 abstract class RepositoryBindingModule {
     @Binds
     abstract fun bindAuthRepository(implementation: AuthRepositoryImpl): AuthRepository
+
+    @Binds
+    abstract fun bindCurrentUserProfileStore(
+        implementation: DefaultCurrentUserProfileStore,
+    ): CurrentUserProfileStore
 
     @Binds
     abstract fun bindGroupRepository(implementation: GroupRepositoryImpl): GroupRepository

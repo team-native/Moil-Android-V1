@@ -33,11 +33,7 @@ interface SessionManager {
 
     fun currentTokens(): SessionTokens?
 
-    fun currentUserName(): String?
-
-    fun save(tokens: SessionTokens, userName: String? = null)
-
-    fun updateUserName(userName: String)
+    fun save(tokens: SessionTokens)
 
     fun expireSession()
 }
@@ -61,48 +57,18 @@ class DefaultSessionManager @Inject constructor(
     private val mutableSessionState = MutableStateFlow(mutableTokens.value.toSessionState())
     private val mutableSessionEvents = MutableSharedFlow<SessionEvent>(extraBufferCapacity = 1)
 
-    init {
-        if (mutableTokens.value != null && currentUserName() == null) {
-            expireSession()
-        }
-    }
-
     override val sessionState: StateFlow<SessionState> = mutableSessionState.asStateFlow()
     override val sessionEvents: SharedFlow<SessionEvent> = mutableSessionEvents.asSharedFlow()
 
     override fun currentTokens(): SessionTokens? = mutableTokens.value
 
-    override fun currentUserName(): String? = encryptedPreferences
-        .getString(USER_NAME_KEY, null)
-        ?.takeIf(String::isNotBlank)
-
-    override fun save(tokens: SessionTokens, userName: String?) {
-        val sessionEditor = encryptedPreferences.edit()
+    override fun save(tokens: SessionTokens) {
+        encryptedPreferences.edit()
             .putString(ACCESS_TOKEN_KEY, tokens.accessToken)
             .putString(REFRESH_TOKEN_KEY, tokens.refreshToken)
-
-        userName
-            ?.trim()
-            ?.takeIf(String::isNotBlank)
-            ?.let { normalizedUserName ->
-                sessionEditor.putString(USER_NAME_KEY, normalizedUserName)
-            }
-
-        sessionEditor.apply()
+            .apply()
         mutableTokens.value = tokens
         mutableSessionState.value = SessionState.Authenticated
-    }
-
-    override fun updateUserName(userName: String) {
-        val normalizedUserName = userName.trim()
-
-        if (normalizedUserName.isBlank()) {
-            return
-        }
-
-        encryptedPreferences.edit()
-            .putString(USER_NAME_KEY, normalizedUserName)
-            .apply()
     }
 
     override fun expireSession() {
@@ -136,6 +102,5 @@ class DefaultSessionManager @Inject constructor(
         const val PREFERENCES_NAME = "moil_auth_tokens"
         const val ACCESS_TOKEN_KEY = "access_token"
         const val REFRESH_TOKEN_KEY = "refresh_token"
-        const val USER_NAME_KEY = "user_name"
     }
 }

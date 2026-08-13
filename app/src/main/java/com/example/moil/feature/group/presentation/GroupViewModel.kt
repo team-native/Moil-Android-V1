@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moil.core.domain.MoilError
 import com.example.moil.core.domain.MoilResult
-import com.example.moil.core.network.SessionManager
+import com.example.moil.feature.auth.domain.CurrentUserProfileStore
 import com.example.moil.feature.group.domain.GetGroupMembersUseCase
 import com.example.moil.feature.group.domain.GetGroupUseCase
 import com.example.moil.feature.group.domain.GetMyGroupsUseCase
@@ -57,7 +57,7 @@ class GroupViewModel @Inject constructor(
     private val updateMemberRolesUseCase: UpdateMemberRolesUseCase,
     private val transferAdminUseCase: TransferAdminUseCase,
     private val leaveGroupUseCase: LeaveGroupUseCase,
-    private val sessionManager: SessionManager,
+    private val currentUserProfileStore: CurrentUserProfileStore,
 ) : ViewModel() {
     private val mutableUiState = MutableStateFlow(GroupUiState())
     val uiState: StateFlow<GroupUiState> = mutableUiState.asStateFlow()
@@ -115,7 +115,7 @@ class GroupViewModel @Inject constructor(
 
     /** 그룹 생성 화면에서 가입 때 저장한 이름을 닉네임으로 사용해 서버에 그룹을 생성합니다. */
     fun createGroup(name: String, color: GroupColor) = viewModelScope.launch {
-        val nickname = sessionManager.currentUserName()
+        val nickname = currentUserProfileStore.profile.value?.name
 
         if (nickname == null) {
             mutableUiState.value = mutableUiState.value.copy(
