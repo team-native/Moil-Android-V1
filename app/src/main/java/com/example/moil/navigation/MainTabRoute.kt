@@ -54,7 +54,12 @@ import com.example.moil.feature.group.presentation.toJoinGroupProfileOptions
 import com.example.moil.feature.group.domain.GroupColor
 import com.example.moil.feature.profile.presentation.ProfileScreen
 import com.example.moil.feature.profile.presentation.ProfileScreenEvent
+import com.example.moil.feature.profile.presentation.ProfileEditScreen
+import com.example.moil.feature.profile.presentation.ProfileEditScreenEvent
+import com.example.moil.feature.profile.presentation.ProfileEditUiState
 import com.example.moil.feature.profile.presentation.ProfileUiState
+import com.example.moil.feature.profile.presentation.toProfileEditUiState
+import com.example.moil.feature.profile.presentation.toUpdatedProfileUiState
 import com.example.moil.core.model.GroupMemberRole
 import java.time.LocalDate
 import java.time.YearMonth
@@ -83,6 +88,7 @@ fun MainTabRoute(
     }
     var familyUiState by remember { mutableStateOf(FamilyUiState()) }
     var profileUiState by remember { mutableStateOf(ProfileUiState(isDarkTheme = isDarkTheme)) }
+    var profileEditUiState by remember { mutableStateOf(ProfileEditUiState()) }
 
     LaunchedEffect(isDarkTheme) {
         profileUiState = profileUiState.copy(isDarkTheme = isDarkTheme)
@@ -505,45 +511,78 @@ fun MainTabRoute(
             )
         }
 
-        MoilNavigationDestination.Profile -> ProfileScreen(
-            uiState = profileUiState,
-            groups = familyUiState.groups.mapIndexed { index, group ->
-                com.example.moil.feature.profile.presentation.ProfileGroupUiModel(
-                    id = group.id,
-                    name = group.name,
-                    indicator = if (index == 0) {
-                        com.example.moil.feature.profile.presentation.ProfileGroupIndicator.Primary
-                    } else {
-                        com.example.moil.feature.profile.presentation.ProfileGroupIndicator.Secondary
-                    },
-                )
-            },
-            onEvent = { event ->
-                when (event) {
-                    is ProfileScreenEvent.DestinationClicked -> {
-                        if (event.destination == MoilNavigationDestination.JoinGroup) {
-                            previousDestination = selectedDestination
-                            selectedDestination = MoilNavigationDestination.JoinGroup
+        MoilNavigationDestination.Profile -> {
+            ProfileScreen(
+                uiState = profileUiState,
+                groups = familyUiState.groups.mapIndexed { index, group ->
+                    com.example.moil.feature.profile.presentation.ProfileGroupUiModel(
+                        id = group.id,
+                        name = group.name,
+                        indicator = if (index == 0) {
+                            com.example.moil.feature.profile.presentation.ProfileGroupIndicator.Primary
                         } else {
-                            selectedDestination = event.destination
+                            com.example.moil.feature.profile.presentation.ProfileGroupIndicator.Secondary
+                        },
+                    )
+                },
+                onEvent = { event ->
+                    when (event) {
+                        is ProfileScreenEvent.DestinationClicked -> {
+                            if (event.destination == MoilNavigationDestination.JoinGroup) {
+                                previousDestination = selectedDestination
+                                selectedDestination = MoilNavigationDestination.JoinGroup
+                            } else {
+                                selectedDestination = event.destination
+                            }
+                        }
+                        is ProfileScreenEvent.GroupClicked -> {
+                            groupViewModel.selectGroup(event.groupId.toLong())
+                            selectedDestination = MoilNavigationDestination.GroupDetail
+                        }
+                        is ProfileScreenEvent.DarkThemeChanged -> {
+                            profileUiState = profileUiState.copy(isDarkTheme = event.isDarkTheme)
+                            onDarkThemeChanged(event.isDarkTheme)
+                        }
+                        ProfileScreenEvent.CreateGroupClicked -> {
+                            previousDestination = selectedDestination
+                            selectedDestination = MoilNavigationDestination.CreateGroup
+                        }
+                        ProfileScreenEvent.ProfileImageClicked -> {
+                            profileEditUiState = profileUiState.toProfileEditUiState()
+                            selectedDestination = MoilNavigationDestination.ProfileEdit
+                        }
+                        ProfileScreenEvent.LogoutClicked -> viewModel.logout()
+                    }
+                },
+            )
+        }
+
+        MoilNavigationDestination.ProfileEdit -> {
+            ProfileEditScreen(
+                uiState = profileEditUiState,
+                onEvent = { event ->
+                    when (event) {
+                        ProfileEditScreenEvent.BackClicked -> {
+                            selectedDestination = MoilNavigationDestination.Profile
+                        }
+                        is ProfileEditScreenEvent.NameChanged -> {
+                            profileEditUiState = profileEditUiState.copy(profileName = event.profileName)
+                        }
+                        is ProfileEditScreenEvent.ProfileAvatarSelected -> {
+                            profileEditUiState = profileEditUiState.copy(
+                                selectedProfileAvatarRes = event.avatarRes,
+                            )
+                        }
+                        ProfileEditScreenEvent.SaveClicked -> {
+                            if (profileEditUiState.canSave) {
+                                profileUiState = profileEditUiState.toUpdatedProfileUiState(profileUiState)
+                                selectedDestination = MoilNavigationDestination.Profile
+                            }
                         }
                     }
-                    is ProfileScreenEvent.GroupClicked -> {
-                        groupViewModel.selectGroup(event.groupId.toLong())
-                        selectedDestination = MoilNavigationDestination.GroupDetail
-                    }
-                    is ProfileScreenEvent.DarkThemeChanged -> {
-                        profileUiState = profileUiState.copy(isDarkTheme = event.isDarkTheme)
-                        onDarkThemeChanged(event.isDarkTheme)
-                    }
-                    ProfileScreenEvent.CreateGroupClicked -> {
-                        previousDestination = selectedDestination
-                        selectedDestination = MoilNavigationDestination.CreateGroup
-                    }
-                    ProfileScreenEvent.LogoutClicked -> viewModel.logout()
-                }
-            },
-        )
+                },
+            )
+        }
     }
 }
 

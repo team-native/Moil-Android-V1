@@ -54,7 +54,13 @@ internal fun ProfileScreenContent(
         ) {
             Spacer(modifier = Modifier.height(MoilProfileDimension.HeaderTopPadding))
 
-            ProfileHeader()
+            ProfileAccountHeader(
+                profileName = uiState.profileName,
+                profileAvatarRes = uiState.profileAvatarRes,
+                onProfileImageClick = {
+                    onEvent(ProfileScreenEvent.ProfileImageClicked)
+                },
+            )
 
             Spacer(modifier = Modifier.height(MoilProfileDimension.SectionLabelTopPadding))
 

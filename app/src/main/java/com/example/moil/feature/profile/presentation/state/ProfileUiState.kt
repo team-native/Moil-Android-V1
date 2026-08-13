@@ -1,7 +1,12 @@
 package com.example.moil.feature.profile.presentation
 
+import androidx.annotation.DrawableRes
+import com.example.moil.R
+
 data class ProfileUiState(
     val isDarkTheme: Boolean = false,
+    val profileName: String = "나",
+    @param:DrawableRes val profileAvatarRes: Int = R.drawable.family_avatar_member_green,
 )
 
 data class ProfileGroupUiModel(

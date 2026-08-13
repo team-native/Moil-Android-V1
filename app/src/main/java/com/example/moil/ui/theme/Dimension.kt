@@ -149,6 +149,22 @@ object MoilProfileDimension {
     val ChevronHeight = 12.dp
 }
 
+object MoilProfileEditDimension {
+    val ScreenHorizontalPadding = 24.dp
+    val HeaderTopPadding = 20.dp
+    val HeaderHeight = 40.dp
+    val HeaderIconTouchTarget = 48.dp
+    val HeaderIconWidth = 6.dp
+    val HeaderIconHeight = 11.dp
+    val HeaderTitleSpacing = 10.dp
+    val AvatarSize = 120.dp
+    val AvatarTopPadding = 32.dp
+    val NameLabelTopPadding = 32.dp
+    val AvatarSelectorTopPadding = 24.dp
+    val SaveButtonHeight = 54.dp
+    val SaveButtonBottomPadding = 30.dp
+}
+
 object MoilOverlayDimension {
     val DialogHorizontalPadding = 24.dp
     val DialogMaxWidth = 324.dp

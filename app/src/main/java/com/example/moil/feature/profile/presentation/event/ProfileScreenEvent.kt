@@ -7,5 +7,6 @@ sealed interface ProfileScreenEvent {
     data class GroupClicked(val groupId: String) : ProfileScreenEvent
     data class DarkThemeChanged(val isDarkTheme: Boolean) : ProfileScreenEvent
     data object CreateGroupClicked : ProfileScreenEvent
+    data object ProfileImageClicked : ProfileScreenEvent
     data object LogoutClicked : ProfileScreenEvent
 }

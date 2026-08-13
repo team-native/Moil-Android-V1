@@ -122,7 +122,7 @@ private fun AddProfileAvatarOption() {
     )
 }
 
-private val profileAvatarResources = listOf(
+internal val profileAvatarResources = listOf(
     R.drawable.family_avatar_sibling,
     R.drawable.family_avatar_dad,
     R.drawable.family_avatar_member_blue,

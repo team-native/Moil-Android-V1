@@ -107,6 +107,14 @@
     <string name="add_schedule_complete">일정 만들기</string>
     <string name="profile_title">내 정보</string>
     <string name="profile_name">나</string>
+    <string name="profile_edit_title">프로필 변경</string>
+    <string name="profile_edit_name_label">이름</string>
+    <string name="profile_edit_name_placeholder">이름을 입력하세요</string>
+    <string name="profile_edit_avatar_label">내 프로필 색 선택</string>
+    <string name="profile_edit_save">저장</string>
+    <string name="profile_edit_back">마이페이지로 돌아가기</string>
+    <string name="profile_edit_avatar_content_description">프로필 이미지 변경</string>
+    <string name="profile_edit_avatar_preview">선택한 프로필 이미지</string>
     <string name="profile_account">프로필 수정</string>
     <string name="profile_notifications">일정 알림</string>
     <string name="profile_notifications_description">새로운 일정과 변경 사항을 알려드려요</string>

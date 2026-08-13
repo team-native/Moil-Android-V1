@@ -49,6 +49,12 @@ enum class MoilNavigationDestination(
         selectedIconRes = R.drawable.profile_tab_selected,
         unselectedIconRes = R.drawable.profile_tab_unselected,
     ),
+    ProfileEdit(
+        labelRes = R.string.profile_account,
+        selectedIconRes = R.drawable.profile_tab_selected,
+        unselectedIconRes = R.drawable.profile_tab_unselected,
+        isBottomNavigationItem = false,
+    ),
     CreateGroup(
         labelRes = R.string.group_create,
         selectedIconRes = R.drawable.common_add_selected,
