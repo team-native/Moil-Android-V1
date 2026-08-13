@@ -7,11 +7,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -23,7 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,9 +35,8 @@ import com.example.moil.core.component.MoilSwitch
 import com.example.moil.core.component.MoilTabScaffold
 import com.example.moil.core.component.content.MoilEmptyJoinedGroupContent
 import com.example.moil.core.model.GroupMemberRole
-import com.example.moil.core.model.GroupProfileColor
+import com.example.moil.feature.family.presentation.FamilyMemberHeader
 import com.example.moil.ui.theme.LocalMoilExtraColors
-import com.example.moil.ui.theme.LocalMoilExtraTypography
 import com.example.moil.ui.theme.MoilMemberDimension
 import com.example.moil.ui.theme.MoilSpacing
 import com.example.moil.ui.theme.MoilTheme
@@ -88,29 +89,6 @@ internal fun MemberScreenContent(
 }
 
 @Composable
-private fun FamilyGroupLoadingContent(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        CircularProgressIndicator()
-    }
-}
-
-@Composable
-private fun FamilyGroupErrorContent(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = stringResource(R.string.calendar_load_error),
-            style = MaterialTheme.typography.titleMedium,
-        )
-    }
-}
-
-@Composable
 private fun MemberGroupContent(
     selectedGroup: GroupUiModel,
     uiState: FamilyUiState,
@@ -120,18 +98,7 @@ private fun MemberGroupContent(
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()),
     ) {
-        Text(
-            text = stringResource(R.string.family_title),
-            style = LocalMoilExtraTypography.current.groupJoinTitle,
-        )
-
-        Spacer(modifier = Modifier.height(MoilMemberDimension.HeaderSubtitleTopSpacing))
-
-        Text(
-            text = selectedGroup.name,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall,
-        )
+        FamilyMemberHeader()
 
         Spacer(modifier = Modifier.height(MoilMemberDimension.GroupTabTopSpacing))
 
@@ -152,7 +119,6 @@ private fun MemberGroupContent(
         FamilyMemberCard(
             members = selectedGroup.members,
             memberRoleOverrides = uiState.memberRoleOverrides,
-            groupProfileColor = selectedGroup.profileColor,
         )
 
         Spacer(modifier = Modifier.height(MoilMemberDimension.SectionSpacing))
@@ -202,87 +168,6 @@ private fun MemberGroupContent(
                     onEvent(FamilyScreenEvent.BackClicked)
                 },
             )
-        }
-    }
-}
-
-@Composable
-private fun FamilyGroupTabs(
-    groups: List<GroupUiModel>,
-    selectedGroupId: String,
-    onGroupClick: (String) -> Unit,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(MoilMemberDimension.GroupTabSpacing),
-    ) {
-        groups.forEach { group ->
-            val isSelected = group.id == selectedGroupId
-
-            Surface(
-                modifier = Modifier
-                    .height(MoilMemberDimension.GroupTabHeight)
-                    .weight(1f)
-                    .clickable { onGroupClick(group.id) },
-                shape = RoundedCornerShape(percent = 50),
-                color = if (isSelected) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.surface
-                },
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Text(
-                        text = memberGroupDisplayName(group),
-                        color = if (isSelected) {
-                            MaterialTheme.colorScheme.onPrimary
-                        } else {
-                            MaterialTheme.colorScheme.onSurface
-                        },
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun FamilySectionLabel(text: String) {
-    Text(
-        text = text,
-        color = LocalMoilExtraColors.current.scheduleMutedText,
-        style = MaterialTheme.typography.labelMedium,
-    )
-}
-
-@Composable
-private fun FamilyMemberCard(
-    members: List<FamilyMemberUiModel>,
-    memberRoleOverrides: Map<Long, Int>,
-    groupProfileColor: GroupProfileColor,
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(MoilMemberDimension.CardCornerRadius),
-        color = LocalMoilExtraColors.current.overlaySurface,
-    ) {
-        Column {
-            members.forEachIndexed { index, member ->
-                FamilyMemberRow(
-                    name = member.name,
-                    roleRes = memberRoleOverrides[member.id] ?: member.roleRes,
-                    profileColor = member.profileColor,
-                    presenceColor = memberPresenceColor(
-                        memberIndex = index,
-                        groupProfileColor = groupProfileColor,
-                    ),
-                )
-
-                if (index < members.lastIndex) {
-                    HorizontalDivider(color = LocalMoilExtraColors.current.scheduleDivider)
-                }
-            }
         }
     }
 }
@@ -489,24 +374,6 @@ private fun FamilySettingDivider() {
     HorizontalDivider(
         color = LocalMoilExtraColors.current.scheduleDivider,
     )
-}
-
-@Composable
-private fun memberPresenceColor(
-    memberIndex: Int,
-    groupProfileColor: GroupProfileColor,
-): Color = when (memberIndex) {
-    0 -> profileColor(groupProfileColor)
-    1 -> LocalMoilExtraColors.current.memberRose
-    2 -> LocalMoilExtraColors.current.calendarEventGreen
-    else -> LocalMoilExtraColors.current.calendarEventYellow
-}
-
-@Composable
-private fun profileColor(profileColor: GroupProfileColor): Color = when (profileColor) {
-    GroupProfileColor.Cyan -> LocalMoilExtraColors.current.calendarEventBlue
-    GroupProfileColor.Violet -> LocalMoilExtraColors.current.memberViolet
-    GroupProfileColor.Rose -> LocalMoilExtraColors.current.memberRose
 }
 
 @Preview(showBackground = true)

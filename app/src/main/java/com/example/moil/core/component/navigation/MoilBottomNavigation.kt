@@ -3,12 +3,11 @@ package com.example.moil.core.component
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -71,15 +70,14 @@ fun MoilBottomNavigation(
     val bottomNavigationDividerColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
 
     Surface(color = MaterialTheme.colorScheme.background) {
-        Column {
-            HorizontalDivider(color = bottomNavigationDividerColor)
-
+        Box {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .statusBarsPadding()
-                    .padding(top = MoilSpacing.BottomNavigationTop)
-                    .padding(bottom = MoilSpacing.BottomNavigationBottom)
+                    .padding(
+                        top = MoilSpacing.BottomNavigationTop,
+                        bottom = MoilSpacing.BottomNavigationBottom,
+                    )
                     .navigationBarsPadding(),
                 horizontalArrangement = Arrangement.SpaceAround,
             ) {
@@ -98,6 +96,11 @@ fun MoilBottomNavigation(
                     )
                 }
             }
+
+            HorizontalDivider(
+                color = bottomNavigationDividerColor,
+                modifier = Modifier.padding(top = MoilSpacing.BottomNavigationTop),
+            )
         }
     }
 }

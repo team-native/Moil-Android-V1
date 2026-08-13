@@ -14,10 +14,23 @@ interface EventLocalDataSource {
         month: YearMonth,
     ): Flow<Int>
 
+    suspend fun getEventsInMonth(
+        groupId: Long,
+        month: YearMonth,
+    ): List<EventWithParticipants>
+
     suspend fun replaceEventsInMonth(
         groupId: Long,
         month: YearMonth,
         events: List<EventWithParticipants>,
+        cacheStartMonth: YearMonth,
+        cacheEndMonthExclusive: YearMonth,
+    )
+
+    suspend fun pruneEventsOutsideCacheWindow(
+        groupId: Long,
+        cacheStartMonth: YearMonth,
+        cacheEndMonthExclusive: YearMonth,
     )
 
     suspend fun upsertEvent(event: EventWithParticipants)

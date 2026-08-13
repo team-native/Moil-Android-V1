@@ -18,5 +18,6 @@ data class CalendarMemberUiModel(
 
 data class CalendarEventUiModel(
     val title: String,
-    val participantColors: List<GroupColor>,
+    val displayColor: GroupColor,
+    val lineIndex: Int,
 )

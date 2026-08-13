@@ -9,7 +9,7 @@ import org.junit.Test
 class CalendarServerUiMapperTest {
 
     @Test
-    fun `참여자 프로필 색을 중복 없이 캘린더 일정에 표시한다`() {
+    fun `첫 참여자 프로필 색을 캘린더 일정 박스 색으로 사용한다`() {
         val event = GroupEvent(
             id = 1L,
             title = "가족 모임",
@@ -30,10 +30,7 @@ class CalendarServerUiMapperTest {
             .getValue(java.time.LocalDate.of(2026, 8, 3))
             .single()
 
-        assertEquals(
-            listOf(GroupColor.Green, GroupColor.Violet),
-            eventUiModel.participantColors,
-        )
+        assertEquals(GroupColor.Green, eventUiModel.displayColor)
     }
 
     @Test
@@ -54,6 +51,32 @@ class CalendarServerUiMapperTest {
             .getValue(java.time.LocalDate.of(2026, 8, 3))
             .single()
 
-        assertEquals(listOf(GroupColor.Green), eventUiModel.participantColors)
+        assertEquals(GroupColor.Green, eventUiModel.displayColor)
     }
+
+    @Test
+    fun `같은 날짜 일정에 중복 없는 라인을 순서대로 배정한다`() {
+        val events = listOf(
+            event(id = 1L, title = "아침 일정"),
+            event(id = 2L, title = "점심 일정"),
+            event(id = 3L, title = "저녁 일정"),
+        )
+
+        val calendarEvents = events
+            .toCalendarEventsByDate(GroupColor.Green)
+            .getValue(java.time.LocalDate.of(2026, 8, 3))
+
+        assertEquals(listOf(0, 1, 2), calendarEvents.map { event -> event.lineIndex })
+    }
+
+    private fun event(id: Long, title: String): GroupEvent = GroupEvent(
+        id = id,
+        title = title,
+        date = "2026-08-03",
+        isAllDay = true,
+        startTime = null,
+        endTime = null,
+        location = null,
+        members = emptyList(),
+    )
 }

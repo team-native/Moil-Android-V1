@@ -2,7 +2,7 @@ package com.example.moil.feature.family.presentation
 
 import androidx.annotation.StringRes
 import com.example.moil.core.model.GroupMemberRole
-import com.example.moil.core.model.GroupProfileColor
+import com.example.moil.feature.group.domain.GroupColor
 import java.time.YearMonth
 
 data class FamilyUiState(
@@ -27,7 +27,7 @@ data class GroupUiModel(
     val id: String,
     val name: String,
     val inviteCode: String,
-    val profileColor: GroupProfileColor,
+    val profileColor: GroupColor,
     val members: List<FamilyMemberUiModel>,
 )
 
@@ -35,6 +35,6 @@ data class FamilyMemberUiModel(
     val id: Long,
     @param:StringRes val roleRes: Int,
     val name: String,
-    val profileColor: GroupProfileColor,
+    val profileColor: GroupColor,
     val isCurrentUser: Boolean,
 )

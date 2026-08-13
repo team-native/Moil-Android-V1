@@ -46,7 +46,7 @@ internal fun CalendarMonthHeader(
             Text(
                 text = stringResource(R.string.calendar_month_format, displayedMonth.monthValue),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = labelAlpha),
-                style = MaterialTheme.typography.displaySmall,
+                style = MaterialTheme.typography.displayLarge,
             )
             Text(
                 text = stringResource(R.string.calendar_year_format, displayedMonth.year),

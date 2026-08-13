@@ -63,7 +63,7 @@ internal fun FamilyScreenContent(
 
             Spacer(modifier = Modifier.height(MoilGroupDetailDimension.SectionLabelBottomSpacing))
 
-            FamilyMemberCard(
+            FamilyDetailMemberCard(
                 members = selectedGroup.members,
                 memberRoleOverrides = uiState.memberRoleOverrides,
             )
@@ -96,35 +96,7 @@ internal fun FamilyScreenContent(
 }
 
 @Composable
-private fun FamilyDetailHeader(
-    groupName: String,
-    onBackClick: () -> Unit,
-) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Image(
-            painter = painterResource(R.drawable.common_chevron_back),
-            contentDescription = stringResource(R.string.common_back),
-            modifier = Modifier
-                .size(MoilGroupDetailDimension.HeaderIconTouchTarget)
-                .clickable(onClick = onBackClick)
-                .padding(
-                    horizontal = (MoilGroupDetailDimension.HeaderIconTouchTarget - MoilGroupDetailDimension.HeaderIconWidth) / 2,
-                    vertical = (MoilGroupDetailDimension.HeaderIconTouchTarget - MoilGroupDetailDimension.HeaderIconHeight) / 2,
-                ),
-            contentScale = ContentScale.Fit,
-        )
-
-        Spacer(modifier = Modifier.width(MoilGroupDetailDimension.HeaderContentSpacing))
-
-        Text(
-            text = groupName,
-            style = MaterialTheme.typography.headlineMedium,
-        )
-    }
-}
-
-@Composable
-private fun FamilyMemberCard(
+private fun FamilyDetailMemberCard(
     members: List<FamilyMemberUiModel>,
     memberRoleOverrides: Map<Long, Int>,
 ) {
@@ -151,41 +123,6 @@ private fun FamilyMemberCard(
             }
         }
     }
-}
-
-@Composable
-private fun FamilyScheduleCard(
-    month: java.time.YearMonth,
-    eventCount: Int,
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(MoilGroupDetailDimension.CardCornerRadius),
-        color = LocalMoilExtraColors.current.overlaySurface,
-    ) {
-        Text(
-            text = stringResource(
-                R.string.family_month_schedule_count,
-                month.monthValue,
-                eventCount,
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = MoilGroupDetailDimension.ScheduleCardVerticalPadding),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-        )
-    }
-}
-
-@Composable
-private fun FamilySectionTitle(text: String) {
-    Text(
-        text = text,
-        color = LocalMoilExtraColors.current.scheduleMutedText,
-        style = MaterialTheme.typography.labelMedium,
-    )
 }
 
 @Composable

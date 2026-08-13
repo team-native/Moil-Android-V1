@@ -26,6 +26,22 @@ abstract class EventDao {
         endDateExclusive: String,
     ): Flow<List<EventWithParticipants>>
 
+    @Transaction
+    @Query(
+        """
+        SELECT * FROM events
+        WHERE group_id = :groupId
+          AND date >= :startDate
+          AND date < :endDateExclusive
+        ORDER BY date ASC, start_time ASC
+        """,
+    )
+    abstract suspend fun getEventsInMonth(
+        groupId: Long,
+        startDate: String,
+        endDateExclusive: String,
+    ): List<EventWithParticipants>
+
     @Query(
         """
         SELECT COUNT(*) FROM events
@@ -66,6 +82,19 @@ abstract class EventDao {
         endDateExclusive: String,
     )
 
+    @Query(
+        """
+        DELETE FROM events
+        WHERE group_id = :groupId
+          AND (date < :cacheStartDate OR date >= :cacheEndDateExclusive)
+        """,
+    )
+    protected abstract suspend fun deleteEventsOutsideCacheWindow(
+        groupId: Long,
+        cacheStartDate: String,
+        cacheEndDateExclusive: String,
+    )
+
     @Query("SELECT group_id FROM events WHERE event_id = :eventId LIMIT 1")
     abstract suspend fun findGroupId(eventId: Long): Long?
 
@@ -75,10 +104,24 @@ abstract class EventDao {
         startDate: String,
         endDateExclusive: String,
         events: List<EventWithParticipants>,
+        cacheStartDate: String,
+        cacheEndDateExclusive: String,
     ) {
         deleteEventsInMonth(groupId, startDate, endDateExclusive)
         insertEvents(events.map(EventWithParticipants::event))
         insertParticipants(events.flatMap(EventWithParticipants::participants))
+        // 월별 동기화가 끝난 뒤 선택 월 전후 한 달만 로컬 캐시로 유지합니다.
+        deleteEventsOutsideCacheWindow(groupId, cacheStartDate, cacheEndDateExclusive)
+    }
+
+    /** 선택한 3개월 보관 범위 밖의 같은 그룹 일정만 삭제합니다. */
+    @Transaction
+    open suspend fun pruneEventsOutsideCacheWindow(
+        groupId: Long,
+        cacheStartDate: String,
+        cacheEndDateExclusive: String,
+    ) {
+        deleteEventsOutsideCacheWindow(groupId, cacheStartDate, cacheEndDateExclusive)
     }
 
     @Transaction

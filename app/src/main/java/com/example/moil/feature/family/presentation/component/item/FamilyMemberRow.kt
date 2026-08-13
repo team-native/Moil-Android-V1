@@ -1,8 +1,8 @@
 package com.example.moil.feature.family.presentation
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,11 +19,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.example.moil.R
-import com.example.moil.core.model.GroupProfileColor
+import com.example.moil.feature.group.domain.GroupColor
+import com.example.moil.feature.group.presentation.avatarResourceForGroupColor
 import com.example.moil.ui.theme.LocalMoilExtraColors
 import com.example.moil.ui.theme.MoilMemberDimension
 import com.example.moil.ui.theme.MoilTheme
@@ -32,13 +35,11 @@ import com.example.moil.ui.theme.MoilTheme
 internal fun FamilyMemberRow(
     name: String,
     @StringRes roleRes: Int,
-    profileColor: GroupProfileColor,
-    presenceColor: Color? = null,
+    profileColor: GroupColor,
     rowHeight: Dp = MoilMemberDimension.MemberRowHeight,
     avatarSize: Dp = MoilMemberDimension.MemberAvatarSize,
     horizontalPadding: Dp = MoilMemberDimension.ListItemHorizontalPadding,
     contentSpacing: Dp = MoilMemberDimension.ListItemContentSpacing,
-    presenceIndicatorSize: Dp = MoilMemberDimension.GroupColorIndicatorSize,
 ) {
     Row(
         modifier = Modifier
@@ -47,19 +48,14 @@ internal fun FamilyMemberRow(
             .height(rowHeight),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
+        Image(
+            painter = painterResource(avatarResourceForGroupColor(profileColor)),
+            contentDescription = null,
             modifier = Modifier
                 .size(avatarSize)
-                .clip(CircleShape)
-                .background(memberAvatarColor(profileColor)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = name.take(1),
-                color = MaterialTheme.colorScheme.onPrimary,
-                style = MaterialTheme.typography.labelLarge,
-            )
-        }
+                .clip(CircleShape),
+            contentScale = ContentScale.Crop,
+        )
 
         Spacer(modifier = Modifier.width(contentSpacing))
 
@@ -76,14 +72,12 @@ internal fun FamilyMemberRow(
             )
         }
 
-        if (presenceColor != null) {
-            Spacer(
-                modifier = Modifier
-                    .size(presenceIndicatorSize)
-                    .clip(CircleShape)
-                    .background(presenceColor),
-            )
-        }
+        Spacer(
+            modifier = Modifier
+                .size(MoilMemberDimension.GroupColorIndicatorSize)
+                .clip(CircleShape)
+                .background(memberPresenceColor(profileColor)),
+        )
     }
 }
 
@@ -94,15 +88,23 @@ private fun FamilyMemberRowPreview() {
         FamilyMemberRow(
             name = "나",
             roleRes = R.string.family_member_role,
-            profileColor = GroupProfileColor.Cyan,
-            presenceColor = MaterialTheme.colorScheme.secondary,
+            profileColor = GroupColor.Teal,
         )
     }
 }
 
 @Composable
-private fun memberAvatarColor(profileColor: GroupProfileColor): Color = when (profileColor) {
-    GroupProfileColor.Cyan -> LocalMoilExtraColors.current.memberCyan
-    GroupProfileColor.Violet -> LocalMoilExtraColors.current.memberViolet
-    GroupProfileColor.Rose -> LocalMoilExtraColors.current.memberRose
+private fun memberPresenceColor(profileColor: GroupColor): Color {
+    val extraColors = LocalMoilExtraColors.current
+
+    return when (profileColor) {
+        GroupColor.Sky -> extraColors.profileSky
+        GroupColor.Red -> extraColors.profileRed
+        GroupColor.Green -> extraColors.profileGreen
+        GroupColor.Yellow -> extraColors.profileYellow
+        GroupColor.Teal -> extraColors.profileTeal
+        GroupColor.Violet -> extraColors.profileViolet
+        GroupColor.Magenta -> extraColors.profileMagenta
+        GroupColor.Unknown -> extraColors.calendarMutedText
+    }
 }

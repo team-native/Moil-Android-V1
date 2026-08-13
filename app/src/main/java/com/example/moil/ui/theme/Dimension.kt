@@ -16,6 +16,13 @@ object MoilIconSize {
     val HeaderAction = 20.dp
 }
 
+object MoilCalendarDimension {
+    val MonthHeaderVerticalSpacing = 20.dp
+    val EventBadgeOuterHorizontalPadding = 2.dp
+    val EventBadgeHorizontalPadding = 6.dp
+    val EventBadgeVerticalPadding = 4.dp
+}
+
 object MoilComponentSize {
     val TopBarItem = 48.dp
     val SwitchWidth = 42.dp
@@ -89,6 +96,8 @@ object MoilMemberDimension {
     val ScreenHorizontalPadding = 16.dp
     val HeaderSubtitleTopSpacing = 4.dp
     val GroupTabTopSpacing = 20.dp
+    val GroupTabMinWidth = 100.dp
+    val GroupTabHorizontalPadding = 16.dp
     val GroupTabHeight = 37.44.dp
     val GroupTabSpacing = 10.dp
     val SectionHeaderTopSpacing = 20.dp

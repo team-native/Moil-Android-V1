@@ -47,6 +47,27 @@ class EventRepositoryImplTest {
     }
 
     @Test
+    fun `서버 월별 조회 결과가 Room과 같으면 월 캐시를 교체하지 않는다`() = runBlocking {
+        val localDataSource = FakeEventLocalDataSource().apply {
+            upsertEvent(localEvent(2L, 10L, "2026-08-03", "서버 일정"))
+        }
+        val repository = EventRepositoryImpl(
+            FakeEventRemoteDataSource(
+                groupEventsResult = NetworkResult.Success(
+                    listOf(eventResponse(2L, "서버 일정", "2026-08-03")),
+                ),
+            ),
+            localDataSource,
+        )
+
+        val result = repository.refreshGroupEvents(10L, YearMonth.of(2026, 8))
+
+        assertEquals(MoilResult.Success(Unit), result)
+        assertEquals(0, localDataSource.replaceEventsInMonthCallCount)
+        assertEquals(1, localDataSource.pruneEventsOutsideCacheWindowCallCount)
+    }
+
+    @Test
     fun `서버 조회 실패는 기존 Room 캐시를 유지한다`() = runBlocking {
         val localDataSource = FakeEventLocalDataSource().apply {
             upsertEvent(localEvent(1L, 10L, "2026-08-01", "기존 일정"))
@@ -132,6 +153,10 @@ class EventRepositoryImplTest {
 
 private class FakeEventLocalDataSource : EventLocalDataSource {
     private val events = MutableStateFlow<List<EventWithParticipants>>(emptyList())
+    var replaceEventsInMonthCallCount = 0
+        private set
+    var pruneEventsOutsideCacheWindowCallCount = 0
+        private set
 
     override fun observeEventsInMonth(
         groupId: Long,
@@ -151,15 +176,48 @@ private class FakeEventLocalDataSource : EventLocalDataSource {
             },
         )
 
+    override suspend fun getEventsInMonth(
+        groupId: Long,
+        month: YearMonth,
+    ): List<EventWithParticipants> = events.value.filter { eventWithParticipants ->
+        eventWithParticipants.event.groupId == groupId &&
+            eventWithParticipants.event.date.startsWith(month.toString())
+    }
+
     override suspend fun replaceEventsInMonth(
         groupId: Long,
         month: YearMonth,
         events: List<EventWithParticipants>,
+        cacheStartMonth: YearMonth,
+        cacheEndMonthExclusive: YearMonth,
     ) {
-        this.events.value = this.events.value.filterNot { eventWithParticipants ->
+        replaceEventsInMonthCallCount++
+        val replacedEvents = this.events.value.filterNot { eventWithParticipants ->
             eventWithParticipants.event.groupId == groupId &&
                 eventWithParticipants.event.date.startsWith(month.toString())
         } + events
+        this.events.value = replacedEvents.filter { eventWithParticipants ->
+            eventWithParticipants.event.groupId != groupId ||
+                (
+                    eventWithParticipants.event.date >= cacheStartMonth.atDay(1).toString() &&
+                        eventWithParticipants.event.date < cacheEndMonthExclusive.atDay(1).toString()
+                    )
+        }
+    }
+
+    override suspend fun pruneEventsOutsideCacheWindow(
+        groupId: Long,
+        cacheStartMonth: YearMonth,
+        cacheEndMonthExclusive: YearMonth,
+    ) {
+        pruneEventsOutsideCacheWindowCallCount++
+        events.value = events.value.filter { eventWithParticipants ->
+            eventWithParticipants.event.groupId != groupId ||
+                (
+                    eventWithParticipants.event.date >= cacheStartMonth.atDay(1).toString() &&
+                        eventWithParticipants.event.date < cacheEndMonthExclusive.atDay(1).toString()
+                    )
+        }
     }
 
     override suspend fun upsertEvent(event: EventWithParticipants) {

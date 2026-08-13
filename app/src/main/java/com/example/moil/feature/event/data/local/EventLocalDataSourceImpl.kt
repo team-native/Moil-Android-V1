@@ -26,16 +26,41 @@ class EventLocalDataSourceImpl @Inject constructor(
         endDateExclusive = month.plusMonths(1).atDay(1).toString(),
     )
 
+    override suspend fun getEventsInMonth(
+        groupId: Long,
+        month: YearMonth,
+    ): List<EventWithParticipants> = eventDao.getEventsInMonth(
+        groupId = groupId,
+        startDate = month.atDay(1).toString(),
+        endDateExclusive = month.plusMonths(1).atDay(1).toString(),
+    )
+
     override suspend fun replaceEventsInMonth(
         groupId: Long,
         month: YearMonth,
         events: List<EventWithParticipants>,
+        cacheStartMonth: YearMonth,
+        cacheEndMonthExclusive: YearMonth,
     ) {
         eventDao.replaceEventsInMonth(
             groupId = groupId,
             startDate = month.atDay(1).toString(),
             endDateExclusive = month.plusMonths(1).atDay(1).toString(),
             events = events,
+            cacheStartDate = cacheStartMonth.atDay(1).toString(),
+            cacheEndDateExclusive = cacheEndMonthExclusive.atDay(1).toString(),
+        )
+    }
+
+    override suspend fun pruneEventsOutsideCacheWindow(
+        groupId: Long,
+        cacheStartMonth: YearMonth,
+        cacheEndMonthExclusive: YearMonth,
+    ) {
+        eventDao.pruneEventsOutsideCacheWindow(
+            groupId = groupId,
+            cacheStartDate = cacheStartMonth.atDay(1).toString(),
+            cacheEndDateExclusive = cacheEndMonthExclusive.atDay(1).toString(),
         )
     }
 

@@ -1,0 +1,15 @@
+package com.example.moil.feature.family.presentation
+
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import com.example.moil.ui.theme.LocalMoilExtraColors
+
+@Composable
+internal fun FamilySectionLabel(text: String) {
+    Text(
+        text = text,
+        color = LocalMoilExtraColors.current.scheduleMutedText,
+        style = MaterialTheme.typography.labelMedium,
+    )
+}

@@ -5,8 +5,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -15,7 +15,6 @@ import com.example.moil.R
 import com.example.moil.core.component.MoilNavigationDestination
 import com.example.moil.core.component.MoilPrimaryButton
 import com.example.moil.core.component.MoilTabScaffold
-import com.example.moil.core.component.MoilTextField
 import com.example.moil.ui.theme.MoilGroupCreateDimension
 import com.example.moil.ui.theme.MoilGroupJoinDimension
 import com.example.moil.ui.theme.LocalMoilExtraTypography
@@ -67,27 +66,6 @@ internal fun JoinGroupScreenContent(
 
             Spacer(modifier = Modifier.height(MoilGroupJoinDimension.BottomButtonSpacing))
         }
-    }
-}
-
-@Composable
-private fun JoinGroupInviteCodeField(
-    inviteCode: String,
-    onInviteCodeChanged: (String) -> Unit,
-) {
-    Column(modifier = Modifier.padding(top = MoilSpacing.ContentTop)) {
-        Text(
-            text = stringResource(R.string.group_join_invite_code_label),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelMedium,
-        )
-
-        MoilTextField(
-            value = inviteCode,
-            onValueChange = onInviteCodeChanged,
-            placeholder = stringResource(R.string.group_join_invite_code_placeholder),
-            modifier = Modifier.padding(top = MoilGroupCreateDimension.HeaderTitleSpacing),
-        )
     }
 }
 
