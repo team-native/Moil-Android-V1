@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.moil.R
+import com.example.moil.feature.family.presentation.FamilyDetailHeader
 import com.example.moil.feature.group.presentation.ProfileAvatarSelector
 import com.example.moil.feature.group.presentation.profileAvatarResources
 import com.example.moil.ui.theme.MoilProfileEditDimension
@@ -26,7 +28,8 @@ internal fun ProfileEditScreenContent(
             .statusBarsPadding()
             .padding(horizontal = MoilProfileEditDimension.ScreenHorizontalPadding),
     ) {
-        ProfileEditHeader(
+        FamilyDetailHeader(
+            groupName = stringResource(R.string.profile_edit_title),
             onBackClick = { onEvent(ProfileEditScreenEvent.BackClicked) },
         )
 
