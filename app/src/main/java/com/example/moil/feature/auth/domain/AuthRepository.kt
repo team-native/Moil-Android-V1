@@ -3,6 +3,7 @@ package com.example.moil.feature.auth.domain
 import com.example.moil.core.domain.MoilResult
 
 interface AuthRepository {
+    suspend fun updateProfileName(name: String): MoilResult<UserProfile>
     suspend fun sendCode(name: String?, email: String, step: VerificationStep): MoilResult<Verification>
     suspend fun verifyCode(verifyId: String, code: String): MoilResult<VerifiedSession>
     suspend fun confirmSignUp(

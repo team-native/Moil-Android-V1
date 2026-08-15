@@ -23,6 +23,13 @@ data class GroupMember(
     val isMe: Boolean?,
 )
 
+data class GroupMemberProfile(
+    val groupId: Long,
+    val userId: Long,
+    val nickname: String,
+    val color: GroupColor,
+)
+
 data class InviteVerification(val groupId: Long, val groupName: String, val memberCount: Int, val inviteCode: String)
 
 data class GroupDetail(

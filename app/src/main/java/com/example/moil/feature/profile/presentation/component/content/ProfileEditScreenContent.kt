@@ -59,6 +59,12 @@ internal fun ProfileEditScreenContent(
             avatarResources = profileAvatarResources,
         )
 
+        uiState.saveError?.let { saveError ->
+            Spacer(modifier = Modifier.height(MoilProfileEditDimension.NameLabelTopPadding))
+
+            ProfileEditSaveErrorText(error = saveError)
+        }
+
         Spacer(modifier = Modifier.weight(1f))
 
         ProfileEditSaveButton(

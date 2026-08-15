@@ -14,6 +14,7 @@ import com.example.moil.core.model.GroupMemberRole
 import com.example.moil.core.settings.MemberRolePreferencesRepository
 import com.example.moil.core.settings.ThemePreferencesRepository
 import com.example.moil.core.network.SessionManager
+import com.example.moil.feature.auth.domain.CurrentUserProfileStore
 import com.example.moil.navigation.MoilAppRoute
 import com.example.moil.ui.theme.MoilTheme
 import kotlinx.coroutines.launch
@@ -24,6 +25,9 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var sessionManager: SessionManager
+
+    @Inject
+    lateinit var currentUserProfileStore: CurrentUserProfileStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +63,7 @@ class MainActivity : ComponentActivity() {
                             }
                         },
                         sessionManager = sessionManager,
+                        currentUserProfileStore = currentUserProfileStore,
                     )
                 }
             }

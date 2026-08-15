@@ -57,6 +57,18 @@ data class DeleteAccountRequestDto(
 )
 
 @Serializable
+data class UpdateProfileRequestDto(
+    @SerialName("name") val name: String,
+)
+
+@Serializable
+data class UserProfileResponseDto(
+    @SerialName("userId") val userId: Long,
+    @SerialName("name") val name: String,
+    @SerialName("email") val email: String,
+)
+
+@Serializable
 data class VerificationResponseDto(
     @SerialName("verifyId") val verifyId: String,
 )

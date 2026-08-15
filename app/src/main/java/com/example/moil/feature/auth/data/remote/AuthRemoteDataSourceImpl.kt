@@ -9,6 +9,10 @@ class AuthRemoteDataSourceImpl @Inject constructor(
     private val authenticatedAuthApiService: AuthenticatedAuthApiService,
     private val apiExecutor: ApiExecutor,
 ) : AuthRemoteDataSource {
+    override suspend fun updateProfile(request: UpdateProfileRequestDto): NetworkResult<UserProfileResponseDto> = apiExecutor.execute {
+        authenticatedAuthApiService.updateProfile(request)
+    }
+
     override suspend fun sendCode(request: SendCodeRequestDto): NetworkResult<VerificationResponseDto> = apiExecutor.execute { publicAuthApiService.sendCode(request) }
     override suspend fun verifyCode(request: VerifyCodeRequestDto): NetworkResult<VerifiedSessionResponseDto> = apiExecutor.execute { publicAuthApiService.verifyCode(request) }
     override suspend fun confirmSignUp(request: PasswordSessionRequestDto): NetworkResult<TokenResponseDto> = apiExecutor.execute { publicAuthApiService.confirmSignUp(request) }

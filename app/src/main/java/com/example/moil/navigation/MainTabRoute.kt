@@ -73,6 +73,8 @@ fun MainTabRoute(
     onCurrentUserRoleChanged: (GroupMemberRole) -> Unit,
 ) {
     val viewModel: MainTabViewModel = hiltViewModel()
+    val profileUpdateUiState by viewModel.profileUpdateUiState.collectAsStateWithLifecycle()
+    val currentUserProfile by viewModel.currentUserProfile.collectAsStateWithLifecycle()
     val groupViewModel: GroupViewModel = hiltViewModel()
     val groupUiState by groupViewModel.uiState.collectAsStateWithLifecycle()
     val calendarViewModel: CalendarViewModel = hiltViewModel()
@@ -99,6 +101,32 @@ fun MainTabRoute(
     var familyOverlay by remember { mutableStateOf<FamilyOverlay>(FamilyOverlay.None) }
     var previousDestination by remember { mutableStateOf(MoilNavigationDestination.Calendar) }
     var shouldOpenServerGroup by remember { mutableStateOf(false) }
+
+    LaunchedEffect(profileUpdateUiState) {
+        profileEditUiState = profileEditUiState.copy(
+            isSaving = profileUpdateUiState.isSaving,
+            saveError = profileUpdateUiState.saveError,
+        )
+    }
+
+    LaunchedEffect(currentUserProfile) {
+        currentUserProfile?.let { profile ->
+            profileUiState = profileUiState.copy(profileName = profile.name)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.profileUpdateEffects.collect { effect ->
+            when (effect) {
+                is ProfileUpdateEffect.Saved -> {
+                    profileUiState = profileEditUiState
+                        .copy(profileName = effect.profile.name)
+                        .toUpdatedProfileUiState(profileUiState)
+                    selectedDestination = MoilNavigationDestination.Profile
+                }
+            }
+        }
+    }
 
     LaunchedEffect(groupUiState.groups, groupUiState.selectedGroupId, groupUiState.members, groupUiState.isLoading, groupUiState.error) {
         calendarUiState = calendarUiState.copy(
@@ -566,17 +594,22 @@ fun MainTabRoute(
                             selectedDestination = MoilNavigationDestination.Profile
                         }
                         is ProfileEditScreenEvent.NameChanged -> {
-                            profileEditUiState = profileEditUiState.copy(profileName = event.profileName)
+                            viewModel.clearProfileSaveError()
+                            profileEditUiState = profileEditUiState.copy(
+                                profileName = event.profileName,
+                                saveError = null,
+                            )
                         }
                         is ProfileEditScreenEvent.ProfileAvatarSelected -> {
+                            viewModel.clearProfileSaveError()
                             profileEditUiState = profileEditUiState.copy(
                                 selectedProfileAvatarRes = event.avatarRes,
+                                saveError = null,
                             )
                         }
                         ProfileEditScreenEvent.SaveClicked -> {
                             if (profileEditUiState.canSave) {
-                                profileUiState = profileEditUiState.toUpdatedProfileUiState(profileUiState)
-                                selectedDestination = MoilNavigationDestination.Profile
+                                viewModel.updateProfileName(profileEditUiState.profileName.trim())
                             }
                         }
                     }
