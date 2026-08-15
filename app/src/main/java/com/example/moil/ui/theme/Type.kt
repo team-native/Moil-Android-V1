@@ -7,6 +7,8 @@ import androidx.compose.material3.Typography
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -117,6 +119,38 @@ val Typography = Typography(
     labelSmall = TextStyle(
         fontFamily = PretendardFontFamily,
         fontWeight = FontWeight.SemiBold,
+        fontSize = 11.sp,
+        lineHeight = 14.sp,
+    ),
+)
+
+@Immutable
+data class MoilExtraTypography(
+    val scheduleTitle: TextStyle,
+    val scheduleShareLabel: TextStyle,
+    val scheduleMemberName: TextStyle,
+)
+
+val LocalMoilExtraTypography = staticCompositionLocalOf<MoilExtraTypography> {
+    error("MoilExtraTypography is not provided.")
+}
+
+val MoilDefaultExtraTypography = MoilExtraTypography(
+    scheduleTitle = TextStyle(
+        fontFamily = PretendardFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 21.sp,
+        lineHeight = 26.sp,
+    ),
+    scheduleShareLabel = TextStyle(
+        fontFamily = PretendardFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 13.sp,
+        lineHeight = 16.sp,
+    ),
+    scheduleMemberName = TextStyle(
+        fontFamily = PretendardFontFamily,
+        fontWeight = FontWeight.Normal,
         fontSize = 11.sp,
         lineHeight = 14.sp,
     ),
