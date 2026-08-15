@@ -20,24 +20,34 @@ import com.example.moil.feature.group.domain.GroupColor
 import com.example.moil.ui.theme.LocalMoilExtraColors
 import com.example.moil.ui.theme.MoilCalendarDimension
 import com.example.moil.ui.theme.MoilRadius
+import androidx.compose.ui.unit.dp
 
 @Composable
-internal fun CalendarEventBadge(calendarEvent: CalendarEventUiModel) {
+internal fun CalendarEventBadge(
+    calendarEvent: CalendarEventUiModel,
+    modifier: Modifier = Modifier,
+    isRangeStart: Boolean = true,
+    isRangeEnd: Boolean = true,
+) {
     val extraColors = LocalMoilExtraColors.current
+    val eventShape = RoundedCornerShape(
+        topStart = if (isRangeStart) MoilRadius.Event else 0.dp,
+        bottomStart = if (isRangeStart) MoilRadius.Event else 0.dp,
+        topEnd = if (isRangeEnd) MoilRadius.Event else 0.dp,
+        bottomEnd = if (isRangeEnd) MoilRadius.Event else 0.dp,
+    )
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = MoilCalendarDimension.EventBadgeOuterHorizontalPadding)
-            .clip(RoundedCornerShape(MoilRadius.Event))
+            .clip(eventShape)
             .background(extraColors.colorForProfile(calendarEvent.displayColor))
             .padding(
                 horizontal = MoilCalendarDimension.EventBadgeHorizontalPadding,
                 vertical = MoilCalendarDimension.EventBadgeVerticalPadding,
             )
-            .semantics {
-                contentDescription = calendarEvent.title
-            },
+            .semantics { contentDescription = calendarEvent.title },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -50,7 +60,7 @@ internal fun CalendarEventBadge(calendarEvent: CalendarEventUiModel) {
     }
 }
 
-private fun com.example.moil.ui.theme.MoilExtraColors.colorForProfile(
+internal fun com.example.moil.ui.theme.MoilExtraColors.colorForProfile(
     profileColor: GroupColor,
 ): Color = when (profileColor) {
     GroupColor.Sky -> profileSky

@@ -5,6 +5,7 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -17,6 +18,7 @@ import java.time.ZoneOffset
 @Composable
 internal fun ScheduleDatePickerDialog(
     selectedDate: LocalDate,
+    minimumSelectableDate: LocalDate? = null,
     onDateConfirmed: (LocalDate) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -25,6 +27,16 @@ internal fun ScheduleDatePickerDialog(
             .atStartOfDay()
             .toInstant(ZoneOffset.UTC)
             .toEpochMilli(),
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean = minimumSelectableDate
+                ?.let { minimumDate ->
+                    !Instant.ofEpochMilli(utcTimeMillis)
+                        .atZone(ZoneOffset.UTC)
+                        .toLocalDate()
+                        .isBefore(minimumDate)
+                }
+                ?: true
+        },
     )
 
     DatePickerDialog(

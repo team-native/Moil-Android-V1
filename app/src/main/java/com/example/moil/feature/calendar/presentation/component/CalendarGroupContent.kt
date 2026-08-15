@@ -47,7 +47,7 @@ internal fun CalendarGroupContent(
         } else {
             CalendarGrid(
                 displayedMonth = uiState.displayedMonth,
-                eventsByDate = uiState.eventsByDate,
+                events = uiState.events,
                 modifier = Modifier.weight(1f),
                 onDateClick = { selectedDate ->
                     onEvent(CalendarScreenEvent.DateClicked(selectedDate))

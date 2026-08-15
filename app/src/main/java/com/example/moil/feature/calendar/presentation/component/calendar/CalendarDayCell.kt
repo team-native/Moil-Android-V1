@@ -23,8 +23,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.moil.R
-import com.example.moil.feature.calendar.presentation.CalendarEventUiModel
-import com.example.moil.feature.group.domain.GroupColor
 import com.example.moil.ui.theme.LocalMoilExtraColors
 import com.example.moil.ui.theme.MoilRadius
 import com.example.moil.ui.theme.MoilTheme
@@ -35,7 +33,7 @@ internal fun CalendarDayCell(
     date: LocalDate,
     isDisplayedMonth: Boolean,
     isToday: Boolean,
-    events: List<CalendarEventUiModel>,
+    eventCount: Int,
     modifier: Modifier,
     onClick: () -> Unit,
 ) {
@@ -43,7 +41,7 @@ internal fun CalendarDayCell(
         R.string.calendar_date_events_content_description,
         date.monthValue,
         date.dayOfMonth,
-        events.size,
+        eventCount,
     )
 
     Column(
@@ -81,26 +79,8 @@ internal fun CalendarDayCell(
                 style = MaterialTheme.typography.bodyLarge,
             )
         }
-
-        // Each visible schedule occupies its own date-local line.
-        (0 until MAX_VISIBLE_EVENTS).forEach { lineIndex ->
-            events.firstOrNull { calendarEvent -> calendarEvent.lineIndex == lineIndex }
-                ?.let { calendarEvent ->
-                    CalendarEventBadge(calendarEvent)
-                }
-        }
-
-        val hiddenEventCount = events.count { calendarEvent ->
-            calendarEvent.lineIndex >= MAX_VISIBLE_EVENTS
-        }
-
-        if (hiddenEventCount > 0) {
-            CalendarEventOverflowBadge(hiddenEventCount)
-        }
     }
 }
-
-private const val MAX_VISIBLE_EVENTS = 2
 
 @Preview(showBackground = true, widthDp = 120)
 @Composable
@@ -110,13 +90,7 @@ private fun CalendarDayCellSingleSchedulePreview() {
             date = LocalDate.of(2026, 7, 9),
             isDisplayedMonth = true,
             isToday = false,
-            events = listOf(
-                CalendarEventUiModel(
-                    title = "아빠 가족",
-                    displayColor = GroupColor.Sky,
-                    lineIndex = 0,
-                ),
-            ),
+            eventCount = 1,
             modifier = Modifier.fillMaxWidth(),
             onClick = {},
         )
@@ -131,23 +105,7 @@ private fun CalendarDayCellMultipleSchedulesPreview() {
             date = LocalDate.of(2026, 7, 22),
             isDisplayedMonth = true,
             isToday = true,
-            events = listOf(
-                CalendarEventUiModel(
-                    title = "아빠 골프",
-                    displayColor = GroupColor.Sky,
-                    lineIndex = 0,
-                ),
-                CalendarEventUiModel(
-                    title = "나 팀 회의",
-                    displayColor = GroupColor.Green,
-                    lineIndex = 1,
-                ),
-                CalendarEventUiModel(
-                    title = "동생 시험",
-                    displayColor = GroupColor.Yellow,
-                    lineIndex = 2,
-                ),
-            ),
+            eventCount = 3,
             modifier = Modifier.fillMaxWidth(),
             onClick = {},
         )

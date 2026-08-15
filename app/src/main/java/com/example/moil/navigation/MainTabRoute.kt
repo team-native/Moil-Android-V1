@@ -24,7 +24,7 @@ import com.example.moil.feature.calendar.presentation.CalendarScreenEvent
 import com.example.moil.feature.calendar.presentation.CalendarUiState
 import com.example.moil.feature.calendar.presentation.ScheduleBottomSheet
 import com.example.moil.feature.calendar.presentation.reduce
-import com.example.moil.feature.calendar.presentation.toCalendarEventsByDate
+import com.example.moil.feature.calendar.presentation.toCalendarEvents
 import com.example.moil.feature.calendar.presentation.toCalendarGroups
 import com.example.moil.feature.calendar.presentation.toCalendarMembers
 import com.example.moil.feature.calendar.presentation.CalendarViewModel
@@ -141,7 +141,7 @@ fun MainTabRoute(
             members = groupUiState.members.toCalendarMembers(),
             isGroupsLoading = groupUiState.isLoading,
             groupLoadError = groupUiState.error,
-            eventsByDate = if (groupUiState.selectedGroupId == null) emptyMap() else calendarUiState.eventsByDate,
+            events = if (groupUiState.selectedGroupId == null) emptyList() else calendarUiState.events,
         )
 
         familyUiState = familyUiState.copy(
@@ -170,7 +170,7 @@ fun MainTabRoute(
         groupUiState.selectedGroup?.myColor,
     ) {
         calendarUiState = calendarUiState.copy(
-            eventsByDate = calendarRemoteUiState.events.toCalendarEventsByDate(
+            events = calendarRemoteUiState.events.toCalendarEvents(
                 fallbackProfileColor = groupUiState.selectedGroup?.myColor
                     ?: GroupColor.Unknown,
             ),
@@ -240,7 +240,8 @@ fun MainTabRoute(
                 selectedDestination = MoilNavigationDestination.CreateGroup
             }
             CalendarScreenEvent.RetryGroupsClicked -> groupViewModel.loadGroups()
-            CalendarScreenEvent.ScheduleDateClicked -> calendarOverlay = CalendarOverlay.DatePicker
+            CalendarScreenEvent.ScheduleStartDateClicked -> calendarOverlay = CalendarOverlay.StartDatePicker
+            CalendarScreenEvent.ScheduleEndDateClicked -> calendarOverlay = CalendarOverlay.EndDatePicker
             CalendarScreenEvent.ScheduleTimeClicked -> calendarOverlay = CalendarOverlay.TimePicker
             CalendarScreenEvent.ScheduleLocationClicked -> calendarOverlay = CalendarOverlay.LocationDialog
             CalendarScreenEvent.ScheduleSheetDismissed -> {
@@ -272,7 +273,8 @@ fun MainTabRoute(
                         event = GroupEvent(
                             id = 0L,
                             title = calendarUiState.scheduleTitle.trim(),
-                            date = calendarUiState.selectedDate.toString(),
+                            startDate = calendarUiState.scheduleStartDate.toString(),
+                            endDate = calendarUiState.scheduleEndDate.toString(),
                             isAllDay = calendarUiState.isAllDay,
                             startTime = if (calendarUiState.isAllDay) null else scheduleStartTime,
                             endTime = if (calendarUiState.isAllDay) null else scheduleEndTime,
@@ -335,10 +337,19 @@ fun MainTabRoute(
             if (calendarUiState.isScheduleSheetVisible) {
                 when (calendarOverlay) {
                     CalendarOverlay.None -> Unit
-                    CalendarOverlay.DatePicker -> ScheduleDatePickerDialog(
-                        selectedDate = calendarUiState.selectedDate,
+                    CalendarOverlay.StartDatePicker -> ScheduleDatePickerDialog(
+                        selectedDate = calendarUiState.scheduleStartDate,
                         onDateConfirmed = { selectedDate ->
-                            onCalendarEvent(CalendarScreenEvent.ScheduleDateChanged(selectedDate))
+                            onCalendarEvent(CalendarScreenEvent.ScheduleStartDateChanged(selectedDate))
+                            calendarOverlay = CalendarOverlay.None
+                        },
+                        onDismiss = { calendarOverlay = CalendarOverlay.None },
+                    )
+                    CalendarOverlay.EndDatePicker -> ScheduleDatePickerDialog(
+                        selectedDate = calendarUiState.scheduleEndDate,
+                        minimumSelectableDate = calendarUiState.scheduleStartDate,
+                        onDateConfirmed = { selectedDate ->
+                            onCalendarEvent(CalendarScreenEvent.ScheduleEndDateChanged(selectedDate))
                             calendarOverlay = CalendarOverlay.None
                         },
                         onDismiss = { calendarOverlay = CalendarOverlay.None },
@@ -638,7 +649,8 @@ fun MainTabRoute(
 
 private sealed interface CalendarOverlay {
     data object None : CalendarOverlay
-    data object DatePicker : CalendarOverlay
+    data object StartDatePicker : CalendarOverlay
+    data object EndDatePicker : CalendarOverlay
     data object TimePicker : CalendarOverlay
     data object LocationDialog : CalendarOverlay
 }

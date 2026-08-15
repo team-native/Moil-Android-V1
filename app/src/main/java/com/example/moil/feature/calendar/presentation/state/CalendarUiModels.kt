@@ -17,7 +17,10 @@ data class CalendarMemberUiModel(
 )
 
 data class CalendarEventUiModel(
+    val id: Long,
     val title: String,
+    val startDate: java.time.LocalDate,
+    val endDate: java.time.LocalDate,
     val displayColor: GroupColor,
     val lineIndex: Int,
 )

@@ -24,31 +24,58 @@ internal fun List<GroupMember>.toCalendarMembers(): List<CalendarMemberUiModel> 
     )
 }
 
-internal fun List<GroupEvent>.toCalendarEventsByDate(
+internal fun List<GroupEvent>.toCalendarEvents(
     fallbackProfileColor: GroupColor,
-): Map<LocalDate, List<CalendarEventUiModel>> =
+): List<CalendarEventUiModel> =
     mapNotNull { event ->
-        runCatching { LocalDate.parse(event.date) }
+        runCatching { LocalDate.parse(event.startDate) to LocalDate.parse(event.endDate) }
             .getOrNull()
-            ?.let { eventDate ->
-                eventDate to event.toCalendarEventUiModel(fallbackProfileColor)
+            ?.takeIf { (startDate, endDate) -> !endDate.isBefore(startDate) }
+            ?.let { (startDate, endDate) ->
+                event.toCalendarEventUiModel(
+                    startDate = startDate,
+                    endDate = endDate,
+                    fallbackProfileColor = fallbackProfileColor,
+                )
             }
-    }.groupBy(
-        keySelector = { (eventDate, _) -> eventDate },
-        valueTransform = { (_, event) -> event },
-    ).mapValues { (_, events) ->
-        events.mapIndexed { lineIndex, calendarEvent ->
-            calendarEvent.copy(lineIndex = lineIndex)
-        }
-    }
+    }.assignCalendarEventLines()
 
 private fun GroupEvent.toCalendarEventUiModel(
+    startDate: LocalDate,
+    endDate: LocalDate,
     fallbackProfileColor: GroupColor,
 ): CalendarEventUiModel = CalendarEventUiModel(
+    id = id,
     title = title,
+    startDate = startDate,
+    endDate = endDate,
     // A schedule uses one color so its calendar box stays visually distinct.
     displayColor = members.firstOrNull()?.color ?: fallbackProfileColor,
     lineIndex = 0,
 )
+
+private fun List<CalendarEventUiModel>.assignCalendarEventLines(): List<CalendarEventUiModel> {
+    val laneEndDates = mutableListOf<LocalDate>()
+
+    return sortedWith(compareBy<CalendarEventUiModel> { it.startDate }.thenBy { it.endDate }.thenBy { it.id })
+        .map { event ->
+            val availableLaneIndex = laneEndDates.indexOfFirst { laneEndDate ->
+                laneEndDate.isBefore(event.startDate)
+            }
+            val laneIndex = if (availableLaneIndex >= 0) {
+                availableLaneIndex
+            } else {
+                laneEndDates.size
+            }
+
+            if (laneIndex == laneEndDates.size) {
+                laneEndDates += event.endDate
+            } else {
+                laneEndDates[laneIndex] = event.endDate
+            }
+
+            event.copy(lineIndex = laneIndex)
+        }
+}
 
 private fun GroupColor.toAvatarResource(): Int = avatarResourceForGroupColor(this)

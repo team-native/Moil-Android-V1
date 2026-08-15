@@ -2,7 +2,6 @@ package com.example.moil.feature.calendar.presentation.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,7 +12,7 @@ import com.example.moil.feature.calendar.presentation.CalendarEventUiModel
 @Composable
 internal fun CalendarGrid(
     displayedMonth: YearMonth,
-    eventsByDate: Map<LocalDate, List<CalendarEventUiModel>>,
+    events: List<CalendarEventUiModel>,
     modifier: Modifier,
     onDateClick: (LocalDate) -> Unit,
 ) {
@@ -30,24 +29,33 @@ internal fun CalendarGrid(
             .minusDays(firstDayOffset.toLong())
 
         repeat(weekCount) { weekIndex ->
-            Row(
+            val weekStartDate = firstVisibleDate.plusDays((weekIndex * 7).toLong())
+
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
             ) {
-                repeat(7) { dayIndex ->
-                    val date = firstVisibleDate.plusDays((weekIndex * 7 + dayIndex).toLong())
-                    CalendarDayCell(
-                        date = date,
-                        isDisplayedMonth = date.month == displayedMonth.month,
-                        isToday = date == todayDate,
-                        events = eventsByDate[date].orEmpty(),
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight(),
-                        onClick = { onDateClick(date) },
-                    )
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    repeat(7) { dayIndex ->
+                        val date = weekStartDate.plusDays(dayIndex.toLong())
+                        CalendarDayCell(
+                            date = date,
+                            isDisplayedMonth = date.month == displayedMonth.month,
+                            isToday = date == todayDate,
+                            eventCount = events.count { event ->
+                                !date.isBefore(event.startDate) && !date.isAfter(event.endDate)
+                            },
+                            modifier = Modifier.weight(1f),
+                            onClick = { onDateClick(date) },
+                        )
+                    }
                 }
+
+                CalendarWeekEventLanes(
+                    events = events,
+                    weekStartDate = weekStartDate,
+                )
             }
         }
     }

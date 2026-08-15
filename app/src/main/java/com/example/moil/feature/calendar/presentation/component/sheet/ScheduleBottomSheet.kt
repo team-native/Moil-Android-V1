@@ -65,14 +65,25 @@ internal fun ScheduleBottomSheet(
             )
 
             ScheduleInfoRow(
-                labelRes = R.string.schedule_date,
+                labelRes = R.string.schedule_start_date,
                 value = stringResource(
                     R.string.schedule_date_value,
-                    uiState.selectedDate.monthValue,
-                    uiState.selectedDate.dayOfMonth,
-                    stringResource(weekdayNameRes(uiState.selectedDate)),
+                    uiState.scheduleStartDate.monthValue,
+                    uiState.scheduleStartDate.dayOfMonth,
+                    stringResource(weekdayNameRes(uiState.scheduleStartDate)),
                 ),
-                onClick = { onEvent(CalendarScreenEvent.ScheduleDateClicked) },
+                onClick = { onEvent(CalendarScreenEvent.ScheduleStartDateClicked) },
+            )
+
+            ScheduleInfoRow(
+                labelRes = R.string.schedule_end_date,
+                value = stringResource(
+                    R.string.schedule_date_value,
+                    uiState.scheduleEndDate.monthValue,
+                    uiState.scheduleEndDate.dayOfMonth,
+                    stringResource(weekdayNameRes(uiState.scheduleEndDate)),
+                ),
+                onClick = { onEvent(CalendarScreenEvent.ScheduleEndDateClicked) },
             )
 
             ScheduleAllDayRow(

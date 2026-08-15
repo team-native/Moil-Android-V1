@@ -16,6 +16,8 @@ internal fun CalendarUiState.reduce(event: CalendarScreenEvent): CalendarUiState
     CalendarScreenEvent.GroupMenuClicked -> copy(isGroupMenuVisible = !isGroupMenuVisible)
     is CalendarScreenEvent.DateClicked -> copy(
         selectedDate = event.date,
+        scheduleStartDate = event.date,
+        scheduleEndDate = event.date,
         isGroupMenuVisible = false,
         isScheduleSheetVisible = true,
         sharedMemberIds = sharedMemberIds.ifEmpty {
@@ -28,10 +30,18 @@ internal fun CalendarUiState.reduce(event: CalendarScreenEvent): CalendarUiState
     CalendarScreenEvent.ScheduleSheetDismissed -> copy(isScheduleSheetVisible = false)
     CalendarScreenEvent.ScheduleSaveClicked -> copy(isScheduleSheetVisible = false)
     is CalendarScreenEvent.ScheduleTitleChanged -> copy(scheduleTitle = event.title)
-    CalendarScreenEvent.ScheduleDateClicked,
+    CalendarScreenEvent.ScheduleStartDateClicked,
+    CalendarScreenEvent.ScheduleEndDateClicked,
     CalendarScreenEvent.ScheduleTimeClicked,
     CalendarScreenEvent.ScheduleLocationClicked -> this
-    is CalendarScreenEvent.ScheduleDateChanged -> copy(selectedDate = event.date)
+    is CalendarScreenEvent.ScheduleStartDateChanged -> copy(
+        selectedDate = event.date,
+        scheduleStartDate = event.date,
+        scheduleEndDate = maxOf(scheduleEndDate, event.date),
+    )
+    is CalendarScreenEvent.ScheduleEndDateChanged -> copy(
+        scheduleEndDate = maxOf(event.date, scheduleStartDate),
+    )
     is CalendarScreenEvent.AllDayChanged -> copy(isAllDay = event.isAllDay)
     is CalendarScreenEvent.ScheduleTimeChanged -> copy(scheduleTime = event.time)
     is CalendarScreenEvent.ScheduleLocationChanged -> copy(scheduleLocation = event.location)
