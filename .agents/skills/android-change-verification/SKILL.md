@@ -86,6 +86,21 @@ description: Android 코드 변경이 끝난 뒤 빌드, 테스트, lint, format
 - 민감값이 Git에 추가되지 않았는지
 - BuildConfig 값이 비밀이라는 잘못된 전제가 없는지
 
+## 7. 커밋 메시지
+
+- 기능, 버그 수정, 리팩터링 등 변경 의도를 Conventional Commits 접두사로 명시한다.
+- 형식은 `<type>(<scope>): <summary>`를 기본으로 한다. scope가 불필요하면 생략할 수 있다.
+- 허용 type은 `feat`, `fix`, `refactor`, `docs`, `test`, `build`, `chore`를 사용한다.
+- summary는 현재형 동사로 짧게 작성하고, 변경한 기능 또는 대상이 드러나야 한다.
+
+예시:
+
+```text
+feat(calendar): add schedule bottom sheet
+fix(calendar): animate schedule sheet dismissal
+refactor(theme): extract schedule sheet tokens
+```
+
 ## 완료 보고 형식
 
 최종 보고는 다음 순서를 사용한다.

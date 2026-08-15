@@ -126,6 +126,7 @@ val Typography = Typography(
 
 @Immutable
 data class MoilExtraTypography(
+    val groupJoinTitle: TextStyle,
     val scheduleTitle: TextStyle,
     val scheduleShareLabel: TextStyle,
     val scheduleMemberName: TextStyle,
@@ -136,6 +137,12 @@ val LocalMoilExtraTypography = staticCompositionLocalOf<MoilExtraTypography> {
 }
 
 val MoilDefaultExtraTypography = MoilExtraTypography(
+    groupJoinTitle = TextStyle(
+        fontFamily = PretendardFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 29.sp,
+        lineHeight = 37.sp,
+    ),
     scheduleTitle = TextStyle(
         fontFamily = PretendardFontFamily,
         fontWeight = FontWeight.SemiBold,
