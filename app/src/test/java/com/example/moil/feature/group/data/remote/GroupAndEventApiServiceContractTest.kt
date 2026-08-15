@@ -103,16 +103,16 @@ class GroupAndEventApiServiceContractTest {
         assertRequest("GET", "/groups/1/events?month=2026-07")
 
         enqueue("{\"eventId\":5}")
-        eventApiService.createEvent(EventRequestDto(1, "식사", "2026-07-22", false, "18:00", "20:00", "서울", listOf(1, 2)))
-        assertRequest("POST", "/events", "\"sharedMemberIds\":[1,2]")
+        eventApiService.createEvent(EventRequestDto(1, "식사", "2026-07-22", "2026-07-24", false, "18:00", "20:00", "서울", listOf(1, 2)))
+        assertRequest("POST", "/events", "\"startDate\":\"2026-07-22\"")
 
         enqueue("null")
         eventApiService.getEvent(5)
         assertRequest("GET", "/events/5")
 
         enqueue("null")
-        eventApiService.updateEvent(5, UpdateEventRequestDto("식사", "2026-07-22", false, "18:00", "20:00", "서울", listOf(1)))
-        assertRequest("PATCH", "/events/5", "\"title\":\"식사\"")
+        eventApiService.updateEvent(5, UpdateEventRequestDto("식사", "2026-07-22", "2026-07-24", false, "18:00", "20:00", "서울", listOf(1)))
+        assertRequest("PATCH", "/events/5", "\"endDate\":\"2026-07-24\"")
 
         enqueue("null")
         eventApiService.deleteEvent(5)
@@ -134,6 +134,6 @@ class GroupAndEventApiServiceContractTest {
         const val groupSummaryJson = "{\"groupId\":1,\"name\":\"우리 가족\",\"inviteCode\":\"FAM-1\",\"myRole\":\"admin\"}"
         const val groupJoinJson = "{\"groupId\":1,\"name\":\"우리 가족\",\"myRole\":\"member\",\"myNickname\":\"모일\",\"myColor\":\"SKY\"}"
         const val groupDetailJson = "{\"groupId\":1,\"name\":\"우리 가족\",\"inviteCode\":\"FAM-1\",\"memberCount\":1,\"monthlyEventCount\":0,\"myRole\":\"admin\",\"members\":[{\"userId\":1,\"nickname\":\"모일\",\"role\":\"admin\",\"color\":\"RED\"}]}"
-        const val eventJson = "{\"eventId\":5,\"title\":\"식사\",\"date\":\"2026-07-22\",\"isAllDay\":false,\"startTime\":\"18:00\",\"endTime\":\"20:00\",\"location\":\"서울\",\"members\":[]}"
+        const val eventJson = "{\"eventId\":5,\"title\":\"식사\",\"startDate\":\"2026-07-22\",\"endDate\":\"2026-07-24\",\"isAllDay\":false,\"startTime\":\"18:00\",\"endTime\":\"20:00\",\"location\":\"서울\",\"members\":[]}"
     }
 }

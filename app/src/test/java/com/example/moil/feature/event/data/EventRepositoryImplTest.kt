@@ -37,7 +37,8 @@ class EventRepositoryImplTest {
                     GroupEvent(
                         id = 2L,
                         title = "서버 일정",
-                        date = "2026-08-03",
+                        startDate = "2026-08-03",
+                        endDate = "2026-08-05",
                         isAllDay = true,
                         startTime = null,
                         endTime = null,
@@ -95,7 +96,8 @@ class EventRepositoryImplTest {
     ): EventResponseDto = EventResponseDto(
         eventId = eventId,
         title = title,
-        date = "2026-08-03",
+        startDate = "2026-08-03",
+        endDate = "2026-08-05",
         isAllDay = true,
         members = listOf(EventMemberResponseDto(1L, "초록", "GREEN")),
     )
@@ -103,7 +105,8 @@ class EventRepositoryImplTest {
     private fun groupEvent(): GroupEvent = GroupEvent(
         id = 2L,
         title = "저녁 식사",
-        date = "2026-08-03",
+        startDate = "2026-08-03",
+        endDate = "2026-08-05",
         isAllDay = true,
         startTime = null,
         endTime = null,

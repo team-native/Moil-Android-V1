@@ -78,7 +78,8 @@ class EventRepositoryImpl @Inject constructor(
 private fun EventResponseDto.toDomain(): GroupEvent = GroupEvent(
     id = eventId,
     title = title,
-    date = date,
+    startDate = startDate,
+    endDate = endDate,
     isAllDay = isAllDay,
     startTime = startTime,
     endTime = endTime,
@@ -98,7 +99,8 @@ private fun GroupEvent.toCreateRequest(
 ): EventRequestDto = EventRequestDto(
     groupId = groupId,
     title = title,
-    date = date,
+    startDate = startDate,
+    endDate = endDate,
     isAllDay = isAllDay,
     startTime = startTime,
     endTime = endTime,
@@ -108,7 +110,8 @@ private fun GroupEvent.toCreateRequest(
 
 private fun GroupEvent.toUpdateRequest(memberIds: List<Long>): UpdateEventRequestDto = UpdateEventRequestDto(
     title = title,
-    date = date,
+    startDate = startDate,
+    endDate = endDate,
     isAllDay = isAllDay,
     startTime = startTime,
     endTime = endTime,
