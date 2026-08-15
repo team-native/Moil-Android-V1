@@ -1,15 +1,10 @@
 package com.example.moil.feature.calendar.presentation.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,10 +14,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
 import com.example.moil.feature.calendar.presentation.CalendarEventUiModel
 import com.example.moil.feature.group.domain.GroupColor
 import com.example.moil.ui.theme.LocalMoilExtraColors
+import com.example.moil.ui.theme.MoilCalendarDimension
+import com.example.moil.ui.theme.MoilRadius
 
 @Composable
 internal fun CalendarEventBadge(calendarEvent: CalendarEventUiModel) {
@@ -31,30 +28,23 @@ internal fun CalendarEventBadge(calendarEvent: CalendarEventUiModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 2.dp)
+            .padding(horizontal = MoilCalendarDimension.EventBadgeOuterHorizontalPadding)
+            .clip(RoundedCornerShape(MoilRadius.Event))
+            .background(extraColors.colorForProfile(calendarEvent.displayColor))
+            .padding(
+                horizontal = MoilCalendarDimension.EventBadgeHorizontalPadding,
+                vertical = MoilCalendarDimension.EventBadgeVerticalPadding,
+            )
             .semantics {
                 contentDescription = calendarEvent.title
             },
-        horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        calendarEvent.participantColors.forEach { profileColor ->
-            Box(
-                modifier = Modifier
-                    .size(4.dp)
-                    .clip(CircleShape)
-                    .background(extraColors.colorForProfile(profileColor)),
-            )
-
-            Spacer(modifier = Modifier.width(1.dp))
-        }
-
-        Spacer(modifier = Modifier.width(1.dp))
-
         Text(
             text = calendarEvent.title,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = MaterialTheme.colorScheme.onPrimary,
             maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.labelSmall,
         )
     }

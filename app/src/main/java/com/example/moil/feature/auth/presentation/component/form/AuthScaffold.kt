@@ -4,14 +4,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -23,9 +22,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.moil.R
 import com.example.moil.ui.theme.MoilAuthDimension
+import com.example.moil.ui.theme.MoilTheme
 
 @Composable
 internal fun AuthScaffold(
@@ -45,10 +47,23 @@ internal fun AuthScaffold(
         ) {
             Spacer(modifier = Modifier.height(52.dp))
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(modifier = Modifier.fillMaxWidth()) {
+                // Keep the title at the header's absolute center regardless of the back button.
+                Text(
+                    text = title,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.Center),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    style = MaterialTheme.typography.displaySmall,
+                    textAlign = TextAlign.Center,
+                )
+
                 if (canNavigateBack) {
                     Box(
-                        modifier = Modifier.size(MoilAuthDimension.BackButtonSize),
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .size(MoilAuthDimension.BackButtonSize),
                         contentAlignment = Alignment.Center,
                     ) {
                         Image(
@@ -62,15 +77,7 @@ internal fun AuthScaffold(
                                 ),
                         )
                     }
-
-                    Spacer(modifier = Modifier.width(MoilAuthDimension.BackButtonTitleSpacing))
                 }
-
-                Text(
-                    text = title,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.displaySmall,
-                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -87,5 +94,33 @@ internal fun AuthScaffold(
 
             Spacer(modifier = Modifier.height(16.dp))
         }
+    }
+}
+
+@Preview(name = "Auth Header Without Back", showBackground = true, widthDp = 390)
+@Composable
+private fun AuthScaffoldWithoutBackPreview() {
+    MoilTheme(darkTheme = false) {
+        AuthScaffold(
+            title = stringResource(R.string.auth_signup),
+            canNavigateBack = false,
+            onBackClick = {},
+            bottomContent = {},
+            content = {},
+        )
+    }
+}
+
+@Preview(name = "Auth Header With Back", showBackground = true, widthDp = 390)
+@Composable
+private fun AuthScaffoldWithBackPreview() {
+    MoilTheme(darkTheme = false) {
+        AuthScaffold(
+            title = stringResource(R.string.auth_email_verification),
+            canNavigateBack = true,
+            onBackClick = {},
+            bottomContent = {},
+            content = {},
+        )
     }
 }

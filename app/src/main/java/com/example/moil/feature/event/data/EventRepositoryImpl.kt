@@ -48,13 +48,29 @@ class EventRepositoryImpl @Inject constructor(
         )
     ) {
         is NetworkResult.Success -> {
-            eventLocalDataSource.replaceEventsInMonth(
-                groupId = groupId,
-                month = month,
-                events = result.data.map { eventResponse ->
-                    eventResponse.toLocal(groupId)
-                },
-            )
+            // 선택한 월을 중심으로 이전·현재·다음 월만 보관해 캐시 크기를 제한합니다.
+            val cacheStartMonth = month.minusMonths(1)
+            val cacheEndMonthExclusive = month.plusMonths(2)
+            val serverEvents = result.data.map { eventResponse ->
+                eventResponse.toLocal(groupId)
+            }
+            val cachedEvents = eventLocalDataSource.getEventsInMonth(groupId, month)
+
+            if (serverEvents.hasSameContentAs(cachedEvents)) {
+                eventLocalDataSource.pruneEventsOutsideCacheWindow(
+                    groupId = groupId,
+                    cacheStartMonth = cacheStartMonth,
+                    cacheEndMonthExclusive = cacheEndMonthExclusive,
+                )
+            } else {
+                eventLocalDataSource.replaceEventsInMonth(
+                    groupId = groupId,
+                    month = month,
+                    events = serverEvents,
+                    cacheStartMonth = cacheStartMonth,
+                    cacheEndMonthExclusive = cacheEndMonthExclusive,
+                )
+            }
             MoilResult.Success(Unit)
         }
 
@@ -175,6 +191,17 @@ private fun EventWithParticipants.toDomain(): GroupEvent = GroupEvent(
         )
     },
 )
+
+private fun List<EventWithParticipants>.hasSameContentAs(
+    cachedEvents: List<EventWithParticipants>,
+): Boolean = normalizedForComparison() == cachedEvents.normalizedForComparison()
+
+private fun List<EventWithParticipants>.normalizedForComparison(): List<EventWithParticipants> =
+    map { eventWithParticipants ->
+        eventWithParticipants.copy(
+            participants = eventWithParticipants.participants.sortedBy(EventParticipantEntity::userId),
+        )
+    }.sortedBy { eventWithParticipants -> eventWithParticipants.event.eventId }
 
 private fun GroupEvent.toCreateRequest(
     groupId: Long,

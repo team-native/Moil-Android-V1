@@ -2,7 +2,6 @@ package com.example.moil.feature.family.presentation
 
 import com.example.moil.R
 import com.example.moil.core.model.GroupMemberRole
-import com.example.moil.core.model.GroupProfileColor
 import com.example.moil.feature.group.domain.GroupColor
 import com.example.moil.feature.group.domain.GroupMember
 import com.example.moil.feature.group.domain.GroupRole
@@ -30,7 +29,7 @@ private fun GroupSummary.toFamilyGroup(members: List<GroupMember>): GroupUiModel
     id = id.toString(),
     name = name,
     inviteCode = inviteCode.orEmpty(),
-    profileColor = myColor.toFamilyProfileColor(),
+    profileColor = myColor,
     members = members.map(GroupMember::toFamilyMember),
 )
 
@@ -38,22 +37,9 @@ private fun GroupMember.toFamilyMember(): FamilyMemberUiModel = FamilyMemberUiMo
     id = userId,
     roleRes = role.toFamilyRoleRes(),
     name = nickname,
-    profileColor = color.toFamilyProfileColor(),
+    profileColor = color,
     isCurrentUser = isMe == true,
 )
-
-private fun GroupColor.toFamilyProfileColor(): GroupProfileColor = when (this) {
-    GroupColor.Violet,
-    GroupColor.Magenta,
-    -> GroupProfileColor.Violet
-    GroupColor.Red -> GroupProfileColor.Rose
-    GroupColor.Sky,
-    GroupColor.Green,
-    GroupColor.Yellow,
-    GroupColor.Teal,
-    GroupColor.Unknown,
-    -> GroupProfileColor.Cyan
-}
 
 private fun GroupRole.toFamilyRoleRes(): Int = when (this) {
     GroupRole.Owner,

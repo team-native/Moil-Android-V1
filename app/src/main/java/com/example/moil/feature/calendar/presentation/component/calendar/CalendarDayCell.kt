@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -19,11 +20,14 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.moil.R
 import com.example.moil.feature.calendar.presentation.CalendarEventUiModel
+import com.example.moil.feature.group.domain.GroupColor
 import com.example.moil.ui.theme.LocalMoilExtraColors
 import com.example.moil.ui.theme.MoilRadius
+import com.example.moil.ui.theme.MoilTheme
 import java.time.LocalDate
 
 @Composable
@@ -69,19 +73,26 @@ internal fun CalendarDayCell(
             Text(
                 text = date.dayOfMonth.toString(),
                 color = when {
+                    // Dates outside the displayed month always use the grey/95 token.
+                    !isDisplayedMonth -> LocalMoilExtraColors.current.calendarMutedText
                     isToday -> MaterialTheme.colorScheme.onPrimary
-                    isDisplayedMonth -> MaterialTheme.colorScheme.onSurface
-                    else -> LocalMoilExtraColors.current.calendarMutedText
+                    else -> MaterialTheme.colorScheme.onSurface
                 },
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
 
-        events.take(MaxVisibleEvents).forEach { calendarEvent ->
-            CalendarEventBadge(calendarEvent)
+        // Each visible schedule occupies its own date-local line.
+        (0 until MAX_VISIBLE_EVENTS).forEach { lineIndex ->
+            events.firstOrNull { calendarEvent -> calendarEvent.lineIndex == lineIndex }
+                ?.let { calendarEvent ->
+                    CalendarEventBadge(calendarEvent)
+                }
         }
 
-        val hiddenEventCount = events.size - MaxVisibleEvents
+        val hiddenEventCount = events.count { calendarEvent ->
+            calendarEvent.lineIndex >= MAX_VISIBLE_EVENTS
+        }
 
         if (hiddenEventCount > 0) {
             CalendarEventOverflowBadge(hiddenEventCount)
@@ -89,4 +100,56 @@ internal fun CalendarDayCell(
     }
 }
 
-private const val MaxVisibleEvents = 2
+private const val MAX_VISIBLE_EVENTS = 2
+
+@Preview(showBackground = true, widthDp = 120)
+@Composable
+private fun CalendarDayCellSingleSchedulePreview() {
+    MoilTheme(darkTheme = false) {
+        CalendarDayCell(
+            date = LocalDate.of(2026, 7, 9),
+            isDisplayedMonth = true,
+            isToday = false,
+            events = listOf(
+                CalendarEventUiModel(
+                    title = "아빠 가족",
+                    displayColor = GroupColor.Sky,
+                    lineIndex = 0,
+                ),
+            ),
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, widthDp = 120)
+@Composable
+private fun CalendarDayCellMultipleSchedulesPreview() {
+    MoilTheme(darkTheme = true) {
+        CalendarDayCell(
+            date = LocalDate.of(2026, 7, 22),
+            isDisplayedMonth = true,
+            isToday = true,
+            events = listOf(
+                CalendarEventUiModel(
+                    title = "아빠 골프",
+                    displayColor = GroupColor.Sky,
+                    lineIndex = 0,
+                ),
+                CalendarEventUiModel(
+                    title = "나 팀 회의",
+                    displayColor = GroupColor.Green,
+                    lineIndex = 1,
+                ),
+                CalendarEventUiModel(
+                    title = "동생 시험",
+                    displayColor = GroupColor.Yellow,
+                    lineIndex = 2,
+                ),
+            ),
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {},
+        )
+    }
+}

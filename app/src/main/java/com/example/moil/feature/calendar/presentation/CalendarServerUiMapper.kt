@@ -36,16 +36,19 @@ internal fun List<GroupEvent>.toCalendarEventsByDate(
     }.groupBy(
         keySelector = { (eventDate, _) -> eventDate },
         valueTransform = { (_, event) -> event },
-    )
+    ).mapValues { (_, events) ->
+        events.mapIndexed { lineIndex, calendarEvent ->
+            calendarEvent.copy(lineIndex = lineIndex)
+        }
+    }
 
 private fun GroupEvent.toCalendarEventUiModel(
     fallbackProfileColor: GroupColor,
 ): CalendarEventUiModel = CalendarEventUiModel(
     title = title,
-    participantColors = members
-        .map { member -> member.color }
-        .distinct()
-        .ifEmpty { listOf(fallbackProfileColor) },
+    // A schedule uses one color so its calendar box stays visually distinct.
+    displayColor = members.firstOrNull()?.color ?: fallbackProfileColor,
+    lineIndex = 0,
 )
 
 private fun GroupColor.toAvatarResource(): Int = avatarResourceForGroupColor(this)

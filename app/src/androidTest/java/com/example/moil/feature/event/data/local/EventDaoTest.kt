@@ -51,6 +51,45 @@ class EventDaoTest {
         assertEquals(1, augustCount)
     }
 
+    @Test
+    fun 월별_캐시_교체는_선택_월_전후_한_달_외의_같은_그룹_일정을_삭제한다() = runBlocking {
+        eventLocalDataSource.upsertEvent(eventWithParticipants(1L, 10L, "2026-06-01", "RED"))
+        eventLocalDataSource.upsertEvent(eventWithParticipants(2L, 10L, "2026-07-01", "GREEN"))
+        eventLocalDataSource.upsertEvent(eventWithParticipants(3L, 10L, "2026-08-01", "VIOLET"))
+        eventLocalDataSource.upsertEvent(eventWithParticipants(4L, 10L, "2026-09-01", "YELLOW"))
+        eventLocalDataSource.upsertEvent(eventWithParticipants(5L, 20L, "2026-06-01", "TEAL"))
+
+        eventLocalDataSource.replaceEventsInMonth(
+            groupId = 10L,
+            month = YearMonth.of(2026, 8),
+            events = listOf(eventWithParticipants(6L, 10L, "2026-08-02", "MAGENTA")),
+            cacheStartMonth = YearMonth.of(2026, 7),
+            cacheEndMonthExclusive = YearMonth.of(2026, 10),
+        )
+
+        val juneGroupEvents = eventLocalDataSource
+            .observeEventsInMonth(10L, YearMonth.of(2026, 6))
+            .first()
+        val julyGroupEvents = eventLocalDataSource
+            .observeEventsInMonth(10L, YearMonth.of(2026, 7))
+            .first()
+        val augustGroupEvents = eventLocalDataSource
+            .observeEventsInMonth(10L, YearMonth.of(2026, 8))
+            .first()
+        val septemberGroupEvents = eventLocalDataSource
+            .observeEventsInMonth(10L, YearMonth.of(2026, 9))
+            .first()
+        val juneOtherGroupEvents = eventLocalDataSource
+            .observeEventsInMonth(20L, YearMonth.of(2026, 6))
+            .first()
+
+        assertEquals(emptyList<EventWithParticipants>(), juneGroupEvents)
+        assertEquals(1, julyGroupEvents.size)
+        assertEquals(listOf(6L), augustGroupEvents.map { it.event.eventId })
+        assertEquals(1, septemberGroupEvents.size)
+        assertEquals(1, juneOtherGroupEvents.size)
+    }
+
     private fun eventWithParticipants(
         eventId: Long,
         groupId: Long,
