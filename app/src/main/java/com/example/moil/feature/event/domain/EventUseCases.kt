@@ -3,27 +3,14 @@ package com.example.moil.feature.event.domain
 import com.example.moil.core.domain.MoilResult
 import java.time.YearMonth
 import javax.inject.Inject
-import kotlinx.coroutines.flow.Flow
 
-class ObserveGroupEventsUseCase @Inject constructor(
+class GetGroupEventsUseCase @Inject constructor(
     private val repository: EventRepository,
 ) {
-    operator fun invoke(groupId: Long, month: YearMonth): Flow<List<GroupEvent>> =
-        repository.observeGroupEvents(groupId, month)
-}
-
-class ObserveMonthlyEventCountUseCase @Inject constructor(
-    private val repository: EventRepository,
-) {
-    operator fun invoke(groupId: Long, month: YearMonth): Flow<Int> =
-        repository.observeMonthlyEventCount(groupId, month)
-}
-
-class RefreshGroupEventsUseCase @Inject constructor(
-    private val repository: EventRepository,
-) {
-    suspend operator fun invoke(groupId: Long, month: YearMonth): MoilResult<Unit> =
-        repository.refreshGroupEvents(groupId, month)
+    suspend operator fun invoke(
+        groupId: Long,
+        month: YearMonth,
+    ): MoilResult<List<GroupEvent>> = repository.getGroupEvents(groupId, month)
 }
 
 class CreateEventUseCase @Inject constructor(
