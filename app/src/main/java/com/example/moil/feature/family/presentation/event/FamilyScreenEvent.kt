@@ -11,6 +11,7 @@ sealed interface FamilyScreenEvent {
     data object EmptyGroupCreateClicked : FamilyScreenEvent
     data object GroupNameChangeClicked : FamilyScreenEvent
     data object MemberPermissionsClicked : FamilyScreenEvent
+    data object InviteCodeCopyClicked : FamilyScreenEvent
     data object InviteLinkShareClicked : FamilyScreenEvent
     data object AdministratorTransferClicked : FamilyScreenEvent
 }

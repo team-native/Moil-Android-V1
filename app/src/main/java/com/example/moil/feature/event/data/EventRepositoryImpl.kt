@@ -3,10 +3,6 @@ package com.example.moil.feature.event.data
 import com.example.moil.core.domain.MoilResult
 import com.example.moil.core.domain.mapToDomain
 import com.example.moil.core.network.NetworkResult
-import com.example.moil.feature.event.data.local.EventEntity
-import com.example.moil.feature.event.data.local.EventLocalDataSource
-import com.example.moil.feature.event.data.local.EventParticipantEntity
-import com.example.moil.feature.event.data.local.EventWithParticipants
 import com.example.moil.feature.event.data.remote.EventMemberResponseDto
 import com.example.moil.feature.event.data.remote.EventRemoteDataSource
 import com.example.moil.feature.event.data.remote.EventRequestDto
@@ -18,63 +14,23 @@ import com.example.moil.feature.event.domain.GroupEvent
 import com.example.moil.feature.group.domain.toGroupColor
 import java.time.YearMonth
 import javax.inject.Inject
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 class EventRepositoryImpl @Inject constructor(
     private val eventRemoteDataSource: EventRemoteDataSource,
-    private val eventLocalDataSource: EventLocalDataSource,
 ) : EventRepository {
 
-    override fun observeGroupEvents(
+    override suspend fun getGroupEvents(
         groupId: Long,
         month: YearMonth,
-    ): Flow<List<GroupEvent>> = eventLocalDataSource
-        .observeEventsInMonth(groupId, month)
-        .map { events -> events.map(EventWithParticipants::toDomain) }
-
-    override fun observeMonthlyEventCount(
-        groupId: Long,
-        month: YearMonth,
-    ): Flow<Int> = eventLocalDataSource.observeEventCountInMonth(groupId, month)
-
-    override suspend fun refreshGroupEvents(
-        groupId: Long,
-        month: YearMonth,
-    ): MoilResult<Unit> = when (
+    ): MoilResult<List<GroupEvent>> = when (
         val result = eventRemoteDataSource.getGroupEvents(
             groupId = groupId,
             month = month.toString(),
         )
     ) {
-        is NetworkResult.Success -> {
-            // 선택한 월을 중심으로 이전·현재·다음 월만 보관해 캐시 크기를 제한합니다.
-            val cacheStartMonth = month.minusMonths(1)
-            val cacheEndMonthExclusive = month.plusMonths(2)
-            val serverEvents = result.data.map { eventResponse ->
-                eventResponse.toLocal(groupId)
-            }
-            val cachedEvents = eventLocalDataSource.getEventsInMonth(groupId, month)
+        is NetworkResult.Success -> MoilResult.Success(result.data.map(EventResponseDto::toDomain))
 
-            if (serverEvents.hasSameContentAs(cachedEvents)) {
-                eventLocalDataSource.pruneEventsOutsideCacheWindow(
-                    groupId = groupId,
-                    cacheStartMonth = cacheStartMonth,
-                    cacheEndMonthExclusive = cacheEndMonthExclusive,
-                )
-            } else {
-                eventLocalDataSource.replaceEventsInMonth(
-                    groupId = groupId,
-                    month = month,
-                    events = serverEvents,
-                    cacheStartMonth = cacheStartMonth,
-                    cacheEndMonthExclusive = cacheEndMonthExclusive,
-                )
-            }
-            MoilResult.Success(Unit)
-        }
-
-        else -> result.mapToDomain { Unit }
+        else -> result.mapToDomain { emptyList() }
     }
 
     override suspend fun createEvent(
@@ -86,13 +42,7 @@ class EventRepositoryImpl @Inject constructor(
             event.toCreateRequest(groupId, memberIds),
         )
     ) {
-        is NetworkResult.Success -> {
-            val eventId = result.data.eventId
-            eventLocalDataSource.upsertEvent(
-                event.copy(id = eventId).toLocal(groupId),
-            )
-            MoilResult.Success(eventId)
-        }
+        is NetworkResult.Success -> MoilResult.Success(result.data.eventId)
 
         else -> result.mapToDomain { response -> response.eventId }
     }
@@ -111,14 +61,7 @@ class EventRepositoryImpl @Inject constructor(
             event.toUpdateRequest(memberIds),
         )
     ) {
-        is NetworkResult.Success -> {
-            eventLocalDataSource.findGroupId(eventId)?.let { groupId ->
-                eventLocalDataSource.upsertEvent(
-                    event.copy(id = eventId).toLocal(groupId),
-                )
-            }
-            MoilResult.Success(Unit)
-        }
+        is NetworkResult.Success -> MoilResult.Success(Unit)
 
         else -> result.mapToDomain { Unit }
     }
@@ -126,10 +69,7 @@ class EventRepositoryImpl @Inject constructor(
     override suspend fun deleteEvent(eventId: Long): MoilResult<Unit> = when (
         val result = eventRemoteDataSource.deleteEvent(eventId)
     ) {
-        is NetworkResult.Success -> {
-            eventLocalDataSource.deleteEvent(eventId)
-            MoilResult.Success(Unit)
-        }
+        is NetworkResult.Success -> MoilResult.Success(Unit)
 
         else -> result.mapToDomain { Unit }
     }
@@ -151,57 +91,6 @@ private fun EventMemberResponseDto.toDomain(): EventMember = EventMember(
     nickname = nickname,
     color = colorId.toGroupColor(),
 )
-
-private fun EventResponseDto.toLocal(groupId: Long): EventWithParticipants = toDomain().toLocal(groupId)
-
-private fun GroupEvent.toLocal(groupId: Long): EventWithParticipants = EventWithParticipants(
-    event = EventEntity(
-        eventId = id,
-        groupId = groupId,
-        title = title,
-        date = date,
-        isAllDay = isAllDay,
-        startTime = startTime,
-        endTime = endTime,
-        location = location,
-    ),
-    participants = members.map { member ->
-        EventParticipantEntity(
-            eventId = id,
-            userId = member.userId,
-            nickname = member.nickname,
-            color = member.color.toWireValueOrUnknown(),
-        )
-    },
-)
-
-private fun EventWithParticipants.toDomain(): GroupEvent = GroupEvent(
-    id = event.eventId,
-    title = event.title,
-    date = event.date,
-    isAllDay = event.isAllDay,
-    startTime = event.startTime,
-    endTime = event.endTime,
-    location = event.location,
-    members = participants.map { participant ->
-        EventMember(
-            userId = participant.userId,
-            nickname = participant.nickname,
-            color = participant.color.toGroupColor(),
-        )
-    },
-)
-
-private fun List<EventWithParticipants>.hasSameContentAs(
-    cachedEvents: List<EventWithParticipants>,
-): Boolean = normalizedForComparison() == cachedEvents.normalizedForComparison()
-
-private fun List<EventWithParticipants>.normalizedForComparison(): List<EventWithParticipants> =
-    map { eventWithParticipants ->
-        eventWithParticipants.copy(
-            participants = eventWithParticipants.participants.sortedBy(EventParticipantEntity::userId),
-        )
-    }.sortedBy { eventWithParticipants -> eventWithParticipants.event.eventId }
 
 private fun GroupEvent.toCreateRequest(
     groupId: Long,
@@ -226,15 +115,3 @@ private fun GroupEvent.toUpdateRequest(memberIds: List<Long>): UpdateEventReques
     location = location,
     sharedMemberIds = memberIds,
 )
-
-private fun com.example.moil.feature.group.domain.GroupColor.toWireValueOrUnknown(): String =
-    when (this) {
-        com.example.moil.feature.group.domain.GroupColor.Sky -> "SKY"
-        com.example.moil.feature.group.domain.GroupColor.Red -> "RED"
-        com.example.moil.feature.group.domain.GroupColor.Green -> "GREEN"
-        com.example.moil.feature.group.domain.GroupColor.Yellow -> "YELLOW"
-        com.example.moil.feature.group.domain.GroupColor.Teal -> "TEAL"
-        com.example.moil.feature.group.domain.GroupColor.Violet -> "VIOLET"
-        com.example.moil.feature.group.domain.GroupColor.Magenta -> "MAGENTA"
-        com.example.moil.feature.group.domain.GroupColor.Unknown -> "UNKNOWN"
-    }
