@@ -43,6 +43,8 @@
     <string name="schedule_save">저장</string>
     <string name="schedule_title_placeholder">일정 제목</string>
     <string name="schedule_date">날짜</string>
+    <string name="schedule_start_date">시작일</string>
+    <string name="schedule_end_date">종료일</string>
     <string name="schedule_date_value">%1$d월 %2$d일 (%3$s)</string>
     <string name="schedule_all_day">하루 종일</string>
     <string name="schedule_time">시간</string>

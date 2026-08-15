@@ -54,6 +54,26 @@ class CalendarUiStateReducerTest {
     }
 
     @Test
+    fun scheduleStartDateChanged_종료일이_이전이면_시작일로_보정한다() {
+        val updatedUiState = initialUiState.copy(
+            scheduleStartDate = LocalDate.of(2026, 7, 22),
+            scheduleEndDate = LocalDate.of(2026, 7, 23),
+        ).reduce(CalendarScreenEvent.ScheduleStartDateChanged(LocalDate.of(2026, 7, 25)))
+
+        assertEquals(LocalDate.of(2026, 7, 25), updatedUiState.scheduleStartDate)
+        assertEquals(LocalDate.of(2026, 7, 25), updatedUiState.scheduleEndDate)
+    }
+
+    @Test
+    fun scheduleEndDateChanged_시작일보다_이전이면_시작일로_보정한다() {
+        val updatedUiState = initialUiState.copy(
+            scheduleStartDate = LocalDate.of(2026, 7, 22),
+        ).reduce(CalendarScreenEvent.ScheduleEndDateChanged(LocalDate.of(2026, 7, 20)))
+
+        assertEquals(LocalDate.of(2026, 7, 22), updatedUiState.scheduleEndDate)
+    }
+
+    @Test
     fun sharedMemberClicked_togglesMemberSelection() {
         val selectedUiState = initialUiState.reduce(
             CalendarScreenEvent.SharedMemberClicked(2L),
