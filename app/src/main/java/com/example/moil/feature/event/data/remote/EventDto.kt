@@ -7,7 +7,8 @@ import kotlinx.serialization.Serializable
 data class EventRequestDto(
     @SerialName("groupId") val groupId: Long,
     @SerialName("title") val title: String,
-    @SerialName("date") val date: String,
+    @SerialName("startDate") val startDate: String,
+    @SerialName("endDate") val endDate: String,
     @SerialName("isAllDay") val isAllDay: Boolean,
     @SerialName("startTime") val startTime: String? = null,
     @SerialName("endTime") val endTime: String? = null,
@@ -18,7 +19,8 @@ data class EventRequestDto(
 @Serializable
 data class UpdateEventRequestDto(
     @SerialName("title") val title: String,
-    @SerialName("date") val date: String,
+    @SerialName("startDate") val startDate: String,
+    @SerialName("endDate") val endDate: String,
     @SerialName("isAllDay") val isAllDay: Boolean,
     @SerialName("startTime") val startTime: String? = null,
     @SerialName("endTime") val endTime: String? = null,
@@ -43,7 +45,8 @@ data class EventResponseDto(
     @SerialName("eventId") val eventId: Long,
     @SerialName("groupId") val groupId: Long? = null,
     @SerialName("title") val title: String,
-    @SerialName("date") val date: String,
+    @SerialName("startDate") val startDate: String,
+    @SerialName("endDate") val endDate: String,
     @SerialName("isAllDay") val isAllDay: Boolean,
     @SerialName("startTime") val startTime: String? = null,
     @SerialName("endTime") val endTime: String? = null,
