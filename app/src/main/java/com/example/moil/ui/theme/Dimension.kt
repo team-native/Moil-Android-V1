@@ -48,3 +48,18 @@ object MoilScheduleSheet {
     val SwitchThumbPadding = 2.dp
     val BottomPadding = 24.dp
 }
+
+object MoilAuthDimension {
+    val ScreenHorizontalPadding = 24.dp
+    val FieldHeight = 53.dp
+    val PrimaryButtonHeight = 54.dp
+    val FieldCornerRadius = 14.dp
+    val FieldSpacing = 12.dp
+    val BottomActionSpacing = 14.dp
+    val BackButtonSize = 12.dp
+    val BackButtonTitleSpacing = 10.dp
+    val VerificationCodeCellWidth = 52.dp
+    val VerificationCodeCellHeight = 54.dp
+    val VerificationCodeCellSpacing = 8.dp
+    val ErrorBorderWidth = 1.dp
+}
