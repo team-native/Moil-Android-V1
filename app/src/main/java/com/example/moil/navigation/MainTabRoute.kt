@@ -3,6 +3,7 @@ package com.example.moil.navigation
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import androidx.activity.compose.BackHandler
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -16,6 +17,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.ui.NavDisplay
 import com.example.moil.R
 import com.example.moil.core.component.applyDialogBackdropBlur
 import com.example.moil.core.component.MoilNavigationDestination
@@ -68,6 +71,20 @@ import com.example.moil.core.model.GroupMemberRole
 import java.time.LocalDate
 import java.time.YearMonth
 
+/** 하단 탭 바에서 눌린 목적지를 공통 규칙으로 처리한다: Calendar/Family/Profile은 탭 전환, JoinGroup은 현재 탭 위에 push. */
+private fun MainTabNavigationState.handleBottomDestinationClick(destination: MoilNavigationDestination) {
+    when (destination) {
+        MoilNavigationDestination.Calendar -> navigateToTab(MainTabDestination.Calendar)
+        MoilNavigationDestination.Family -> navigateToTab(MainTabDestination.Family)
+        MoilNavigationDestination.Profile -> navigateToTab(MainTabDestination.Profile)
+        MoilNavigationDestination.JoinGroup -> push(MainTabDestination.JoinGroup)
+        MoilNavigationDestination.GroupDetail,
+        MoilNavigationDestination.ProfileEdit,
+        MoilNavigationDestination.CreateGroup,
+        -> Unit
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainTabRoute(
@@ -85,7 +102,7 @@ fun MainTabRoute(
     val calendarRemoteUiState by calendarViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val inviteCodeLabel = stringResource(R.string.family_group_invite_code_label)
-    var selectedDestination by remember { mutableStateOf(MoilNavigationDestination.Calendar) }
+    val navState = rememberMainTabNavigationState()
     var calendarUiState by remember {
         mutableStateOf(
             CalendarUiState(
@@ -105,8 +122,11 @@ fun MainTabRoute(
     var joinGroupUiState by remember { mutableStateOf(JoinGroupUiState()) }
     var calendarOverlay by remember { mutableStateOf<CalendarOverlay>(CalendarOverlay.None) }
     var familyOverlay by remember { mutableStateOf<FamilyOverlay>(FamilyOverlay.None) }
-    var previousDestination by remember { mutableStateOf(MoilNavigationDestination.Calendar) }
     var shouldOpenServerGroup by remember { mutableStateOf(false) }
+
+    BackHandler(enabled = navState.canGoBack) {
+        navState.popOrNavigateToStart()
+    }
 
     LaunchedEffect(profileUpdateUiState) {
         profileEditUiState = profileEditUiState.copy(
@@ -128,7 +148,7 @@ fun MainTabRoute(
                     profileUiState = profileEditUiState
                         .copy(profileName = effect.profile.name)
                         .toUpdatedProfileUiState(profileUiState)
-                    selectedDestination = MoilNavigationDestination.Profile
+                    navState.pop()
                 }
             }
         }
@@ -186,7 +206,7 @@ fun MainTabRoute(
     LaunchedEffect(groupUiState.inviteVerification) {
         val inviteVerification = groupUiState.inviteVerification
 
-        if (inviteVerification != null && selectedDestination == MoilNavigationDestination.JoinGroup) {
+        if (inviteVerification != null && navState.currentBackStack.lastOrNull() == MainTabDestination.JoinGroup) {
             val profileOptions = groupUiState.joinGroupMembers.toJoinGroupProfileOptions()
 
             joinGroupUiState = joinGroupUiState.copy(
@@ -200,8 +220,8 @@ fun MainTabRoute(
         }
     }
 
-    LaunchedEffect(groupUiState.isCurrentUserNameMissing, selectedDestination) {
-        if (groupUiState.isCurrentUserNameMissing && selectedDestination == MoilNavigationDestination.CreateGroup) {
+    LaunchedEffect(groupUiState.isCurrentUserNameMissing, navState.currentBackStack.lastOrNull()) {
+        if (groupUiState.isCurrentUserNameMissing && navState.currentBackStack.lastOrNull() == MainTabDestination.CreateGroup) {
             createGroupUiState = createGroupUiState.copy(
                 groupNameError = com.example.moil.feature.group.presentation.CreateGroupNameError.MissingUserName,
             )
@@ -213,32 +233,19 @@ fun MainTabRoute(
             shouldOpenServerGroup = false
             createGroupUiState = CreateGroupUiState()
             joinGroupUiState = JoinGroupUiState()
-            selectedDestination = MoilNavigationDestination.Calendar
+            navState.finishGroupOnboarding()
         }
     }
 
     val onCalendarEvent: (CalendarScreenEvent) -> Unit = { event ->
         when (event) {
-            is CalendarScreenEvent.DestinationClicked -> {
-                if (event.destination == MoilNavigationDestination.JoinGroup) {
-                    previousDestination = selectedDestination
-                    selectedDestination = MoilNavigationDestination.JoinGroup
-                } else {
-                    selectedDestination = event.destination
-                }
-            }
+            is CalendarScreenEvent.DestinationClicked -> navState.handleBottomDestinationClick(event.destination)
             is CalendarScreenEvent.GroupSelected -> {
                 calendarUiState = calendarUiState.reduce(event)
                 groupViewModel.selectGroup(event.groupId)
             }
-            CalendarScreenEvent.EmptyGroupJoinClicked -> {
-                previousDestination = selectedDestination
-                selectedDestination = MoilNavigationDestination.JoinGroup
-            }
-            CalendarScreenEvent.EmptyGroupCreateClicked -> {
-                previousDestination = selectedDestination
-                selectedDestination = MoilNavigationDestination.CreateGroup
-            }
+            CalendarScreenEvent.EmptyGroupJoinClicked -> navState.push(MainTabDestination.JoinGroup)
+            CalendarScreenEvent.EmptyGroupCreateClicked -> navState.push(MainTabDestination.CreateGroup)
             CalendarScreenEvent.RetryGroupsClicked -> groupViewModel.loadGroups()
             CalendarScreenEvent.ScheduleStartDateClicked -> calendarOverlay = CalendarOverlay.StartDatePicker
             CalendarScreenEvent.ScheduleEndDateClicked -> calendarOverlay = CalendarOverlay.EndDatePicker
@@ -297,354 +304,333 @@ fun MainTabRoute(
         }
     }
 
-    when (selectedDestination) {
-        MoilNavigationDestination.Calendar -> {
-            val scheduleSheetState = rememberModalBottomSheetState()
-            var isScheduleSheetRendered by remember {
-                mutableStateOf(calendarUiState.isScheduleSheetVisible)
-            }
-
-            LaunchedEffect(calendarUiState.isScheduleSheetVisible) {
-                if (calendarUiState.isScheduleSheetVisible) {
-                    isScheduleSheetRendered = true
-                    scheduleSheetState.show()
-                } else if (isScheduleSheetRendered) {
-                    scheduleSheetState.hide()
-                    isScheduleSheetRendered = false
+    NavDisplay(
+        backStack = navState.currentBackStack,
+        onBack = { navState.pop() },
+        entryProvider = entryProvider {
+            entry<MainTabDestination.Calendar> {
+                val scheduleSheetState = rememberModalBottomSheetState()
+                var isScheduleSheetRendered by remember {
+                    mutableStateOf(calendarUiState.isScheduleSheetVisible)
                 }
-            }
 
-            val isTimePickerVisible = calendarOverlay == CalendarOverlay.TimePicker
-            val calendarBackdropModifier = Modifier.applyDialogBackdropBlur(
-                shouldBlur = isTimePickerVisible,
-                blurRadius = MoilTimePickerDimension.BackgroundBlur,
-            )
+                LaunchedEffect(calendarUiState.isScheduleSheetVisible) {
+                    if (calendarUiState.isScheduleSheetVisible) {
+                        isScheduleSheetRendered = true
+                        scheduleSheetState.show()
+                    } else if (isScheduleSheetRendered) {
+                        scheduleSheetState.hide()
+                        isScheduleSheetRendered = false
+                    }
+                }
 
-            CalendarScreen(
-                uiState = calendarUiState,
-                onEvent = onCalendarEvent,
-                modifier = calendarBackdropModifier,
-            )
+                val isTimePickerVisible = calendarOverlay == CalendarOverlay.TimePicker
+                val calendarBackdropModifier = Modifier.applyDialogBackdropBlur(
+                    shouldBlur = isTimePickerVisible,
+                    blurRadius = MoilTimePickerDimension.BackgroundBlur,
+                )
 
-            if (isScheduleSheetRendered && !isTimePickerVisible) {
-                ScheduleBottomSheet(
+                CalendarScreen(
                     uiState = calendarUiState,
-                    sheetState = scheduleSheetState,
                     onEvent = onCalendarEvent,
+                    modifier = calendarBackdropModifier,
                 )
+
+                if (isScheduleSheetRendered && !isTimePickerVisible) {
+                    ScheduleBottomSheet(
+                        uiState = calendarUiState,
+                        sheetState = scheduleSheetState,
+                        onEvent = onCalendarEvent,
+                    )
+                }
+
+                if (calendarUiState.isScheduleSheetVisible) {
+                    when (calendarOverlay) {
+                        CalendarOverlay.None -> Unit
+                        CalendarOverlay.StartDatePicker -> ScheduleDatePickerDialog(
+                            selectedDate = calendarUiState.scheduleStartDate,
+                            onDateConfirmed = { selectedDate ->
+                                onCalendarEvent(CalendarScreenEvent.ScheduleStartDateChanged(selectedDate))
+                                calendarOverlay = CalendarOverlay.None
+                            },
+                            onDismiss = { calendarOverlay = CalendarOverlay.None },
+                        )
+                        CalendarOverlay.EndDatePicker -> ScheduleDatePickerDialog(
+                            selectedDate = calendarUiState.scheduleEndDate,
+                            minimumSelectableDate = calendarUiState.scheduleStartDate,
+                            onDateConfirmed = { selectedDate ->
+                                onCalendarEvent(CalendarScreenEvent.ScheduleEndDateChanged(selectedDate))
+                                calendarOverlay = CalendarOverlay.None
+                            },
+                            onDismiss = { calendarOverlay = CalendarOverlay.None },
+                        )
+                        CalendarOverlay.TimePicker -> ScheduleTimePickerDialog(
+                            selectedTime = calendarUiState.scheduleTime,
+                            onTimeConfirmed = { selectedTime ->
+                                onCalendarEvent(CalendarScreenEvent.ScheduleTimeChanged(selectedTime))
+                                calendarOverlay = CalendarOverlay.None
+                            },
+                            onDismiss = { calendarOverlay = CalendarOverlay.None },
+                        )
+                        CalendarOverlay.LocationDialog -> ScheduleLocationDialog(
+                            initialLocation = calendarUiState.scheduleLocation,
+                            onLocationConfirmed = { location ->
+                                onCalendarEvent(CalendarScreenEvent.ScheduleLocationChanged(location))
+                                calendarOverlay = CalendarOverlay.None
+                            },
+                            onDismiss = { calendarOverlay = CalendarOverlay.None },
+                        )
+                    }
+                }
             }
 
-            if (calendarUiState.isScheduleSheetVisible) {
-                when (calendarOverlay) {
-                    CalendarOverlay.None -> Unit
-                    CalendarOverlay.StartDatePicker -> ScheduleDatePickerDialog(
-                        selectedDate = calendarUiState.scheduleStartDate,
-                        onDateConfirmed = { selectedDate ->
-                            onCalendarEvent(CalendarScreenEvent.ScheduleStartDateChanged(selectedDate))
-                            calendarOverlay = CalendarOverlay.None
+            entry<MainTabDestination.Family> {
+                val familySheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+                MemberScreen(
+                    uiState = familyUiState,
+                    onEvent = { event ->
+                        when (event) {
+                            FamilyScreenEvent.BackClicked -> navState.navigateToTab(MainTabDestination.Profile)
+                            FamilyScreenEvent.LeaveGroupClicked -> Unit
+                            FamilyScreenEvent.EmptyGroupJoinClicked -> navState.push(MainTabDestination.JoinGroup)
+                            FamilyScreenEvent.EmptyGroupCreateClicked -> navState.push(MainTabDestination.CreateGroup)
+                            is FamilyScreenEvent.DestinationClicked -> navState.handleBottomDestinationClick(event.destination)
+                            is FamilyScreenEvent.GroupClicked -> {
+                                groupViewModel.selectGroup(event.groupId.toLong())
+                            }
+                            is FamilyScreenEvent.NotificationsChanged -> familyUiState = familyUiState.copy(notificationsEnabled = event.isEnabled)
+                            FamilyScreenEvent.GroupNameChangeClicked -> familyOverlay = FamilyOverlay.GroupName
+                            FamilyScreenEvent.MemberPermissionsClicked -> familyOverlay = FamilyOverlay.MemberPermissions
+                            FamilyScreenEvent.InviteCodeCopyClicked -> {
+                                familyUiState.selectedGroup?.let { selectedGroup ->
+                                    val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                    clipboardManager.setPrimaryClip(
+                                        ClipData.newPlainText(
+                                            inviteCodeLabel,
+                                            selectedGroup.inviteCode,
+                                        ),
+                                    )
+                                }
+                            }
+                            FamilyScreenEvent.InviteLinkShareClicked -> familyOverlay = FamilyOverlay.InviteShare
+                            FamilyScreenEvent.AdministratorTransferClicked -> familyOverlay = FamilyOverlay.AdministratorTransfer
+                        }
+                    },
+                )
+
+                when (familyOverlay) {
+                    FamilyOverlay.None -> Unit
+                    FamilyOverlay.GroupName -> FamilyGroupNameDialog(
+                        groupName = requireNotNull(familyUiState.selectedGroup).name,
+                        onDismissRequest = { familyOverlay = FamilyOverlay.None },
+                        onSaveClick = { updatedGroupName ->
+                            groupViewModel.renameSelectedGroup(updatedGroupName.trim())
+                            familyOverlay = FamilyOverlay.None
                         },
-                        onDismiss = { calendarOverlay = CalendarOverlay.None },
                     )
-                    CalendarOverlay.EndDatePicker -> ScheduleDatePickerDialog(
-                        selectedDate = calendarUiState.scheduleEndDate,
-                        minimumSelectableDate = calendarUiState.scheduleStartDate,
-                        onDateConfirmed = { selectedDate ->
-                            onCalendarEvent(CalendarScreenEvent.ScheduleEndDateChanged(selectedDate))
-                            calendarOverlay = CalendarOverlay.None
+                    FamilyOverlay.MemberPermissions -> FamilyMemberPermissionsBottomSheet(
+                        members = requireNotNull(familyUiState.selectedGroup).members,
+                        sheetState = familySheetState,
+                        onDismissRequest = { familyOverlay = FamilyOverlay.None },
+                        onConfirmClick = { memberRoleOverrides ->
+                            familyUiState = familyUiState.copy(
+                                memberRoleOverrides = memberRoleOverrides,
+                            )
+                            familyOverlay = FamilyOverlay.None
                         },
-                        onDismiss = { calendarOverlay = CalendarOverlay.None },
                     )
-                    CalendarOverlay.TimePicker -> ScheduleTimePickerDialog(
-                        selectedTime = calendarUiState.scheduleTime,
-                        onTimeConfirmed = { selectedTime ->
-                            onCalendarEvent(CalendarScreenEvent.ScheduleTimeChanged(selectedTime))
-                            calendarOverlay = CalendarOverlay.None
-                        },
-                        onDismiss = { calendarOverlay = CalendarOverlay.None },
+                    FamilyOverlay.InviteShare -> FamilyInviteShareBottomSheet(
+                        inviteCode = requireNotNull(familyUiState.selectedGroup).inviteCode,
+                        sheetState = familySheetState,
+                        onDismissRequest = { familyOverlay = FamilyOverlay.None },
                     )
-                    CalendarOverlay.LocationDialog -> ScheduleLocationDialog(
-                        initialLocation = calendarUiState.scheduleLocation,
-                        onLocationConfirmed = { location ->
-                            onCalendarEvent(CalendarScreenEvent.ScheduleLocationChanged(location))
-                            calendarOverlay = CalendarOverlay.None
+                    FamilyOverlay.AdministratorTransfer -> FamilyAdministratorTransferDialog(
+                        members = requireNotNull(familyUiState.selectedGroup).members,
+                        onDismissRequest = { familyOverlay = FamilyOverlay.None },
+                        onConfirmClick = { selectedMember ->
+                            groupViewModel.transferAdmin(selectedMember.id)
+                            familyOverlay = FamilyOverlay.None
                         },
-                        onDismiss = { calendarOverlay = CalendarOverlay.None },
                     )
                 }
             }
-        }
 
-        MoilNavigationDestination.Family -> {
-            val familySheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+            entry<MainTabDestination.GroupDetail> { destination ->
+                LaunchedEffect(destination.groupId) {
+                    groupViewModel.selectGroup(destination.groupId)
+                }
 
-            MemberScreen(
-                uiState = familyUiState,
-                onEvent = { event ->
-                    when (event) {
-                        FamilyScreenEvent.BackClicked -> {
-                            selectedDestination = MoilNavigationDestination.Profile
-                        }
-                        FamilyScreenEvent.EmptyGroupJoinClicked -> {
-                            previousDestination = selectedDestination
-                            selectedDestination = MoilNavigationDestination.JoinGroup
-                        }
-                        FamilyScreenEvent.EmptyGroupCreateClicked -> {
-                            previousDestination = selectedDestination
-                            selectedDestination = MoilNavigationDestination.CreateGroup
-                        }
-                        is FamilyScreenEvent.DestinationClicked -> {
-                            if (event.destination == MoilNavigationDestination.JoinGroup) {
-                                previousDestination = selectedDestination
-                                selectedDestination = MoilNavigationDestination.JoinGroup
-                            } else {
-                                selectedDestination = event.destination
+                FamilyScreen(
+                    uiState = familyUiState,
+                    onEvent = { event ->
+                        when (event) {
+                            FamilyScreenEvent.BackClicked -> navState.pop()
+                            FamilyScreenEvent.LeaveGroupClicked -> {
+                                groupViewModel.leaveSelectedGroup()
+                                navState.pop()
                             }
+                            else -> Unit
                         }
-                    is FamilyScreenEvent.GroupClicked -> {
-                        groupViewModel.selectGroup(event.groupId.toLong())
-                        }
-                        is FamilyScreenEvent.NotificationsChanged -> familyUiState = familyUiState.copy(notificationsEnabled = event.isEnabled)
-                        FamilyScreenEvent.GroupNameChangeClicked -> familyOverlay = FamilyOverlay.GroupName
-                        FamilyScreenEvent.MemberPermissionsClicked -> familyOverlay = FamilyOverlay.MemberPermissions
-                        FamilyScreenEvent.InviteCodeCopyClicked -> {
-                            familyUiState.selectedGroup?.let { selectedGroup ->
-                                val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                clipboardManager.setPrimaryClip(
-                                    ClipData.newPlainText(
-                                        inviteCodeLabel,
-                                        selectedGroup.inviteCode,
-                                    ),
-                                )
-                            }
-                        }
-                        FamilyScreenEvent.InviteLinkShareClicked -> familyOverlay = FamilyOverlay.InviteShare
-                        FamilyScreenEvent.AdministratorTransferClicked -> familyOverlay = FamilyOverlay.AdministratorTransfer
-                    }
-                },
-            )
-
-            when (familyOverlay) {
-                FamilyOverlay.None -> Unit
-                FamilyOverlay.GroupName -> FamilyGroupNameDialog(
-                    groupName = requireNotNull(familyUiState.selectedGroup).name,
-                    onDismissRequest = { familyOverlay = FamilyOverlay.None },
-                    onSaveClick = { updatedGroupName ->
-                        groupViewModel.renameSelectedGroup(updatedGroupName.trim())
-                        familyOverlay = FamilyOverlay.None
-                    },
-                )
-                FamilyOverlay.MemberPermissions -> FamilyMemberPermissionsBottomSheet(
-                    members = requireNotNull(familyUiState.selectedGroup).members,
-                    sheetState = familySheetState,
-                    onDismissRequest = { familyOverlay = FamilyOverlay.None },
-                    onConfirmClick = { memberRoleOverrides ->
-                        familyUiState = familyUiState.copy(
-                            memberRoleOverrides = memberRoleOverrides,
-                        )
-                        familyOverlay = FamilyOverlay.None
-                    },
-                )
-                FamilyOverlay.InviteShare -> FamilyInviteShareBottomSheet(
-                    inviteCode = requireNotNull(familyUiState.selectedGroup).inviteCode,
-                    sheetState = familySheetState,
-                    onDismissRequest = { familyOverlay = FamilyOverlay.None },
-                )
-                FamilyOverlay.AdministratorTransfer -> FamilyAdministratorTransferDialog(
-                    members = requireNotNull(familyUiState.selectedGroup).members,
-                    onDismissRequest = { familyOverlay = FamilyOverlay.None },
-                    onConfirmClick = { selectedMember ->
-                        groupViewModel.transferAdmin(selectedMember.id)
-                        familyOverlay = FamilyOverlay.None
                     },
                 )
             }
-        }
 
-        MoilNavigationDestination.GroupDetail -> {
-            FamilyScreen(
-                uiState = familyUiState,
-                onEvent = { event ->
-                    when (event) {
-                        FamilyScreenEvent.BackClicked -> {
-                            selectedDestination = MoilNavigationDestination.Profile
-                        }
-                        else -> Unit
-                    }
-                },
-            )
-        }
-
-        MoilNavigationDestination.JoinGroup -> {
-            JoinGroupScreen(
-                uiState = joinGroupUiState,
-                onEvent = { event ->
-                    when (event) {
-                        is JoinGroupScreenEvent.DestinationClicked -> {
-                            selectedDestination = event.destination
-                        }
-                        is JoinGroupScreenEvent.InviteCodeChanged -> {
-                            joinGroupUiState = joinGroupUiState.copy(
-                                inviteCode = event.inviteCode,
-                            )
-                        }
-                        JoinGroupScreenEvent.InviteCodeConfirmed -> {
-                            groupViewModel.verifyInvite(joinGroupUiState.inviteCode.trim())
-                        }
-                        JoinGroupScreenEvent.ProfileSetupBackClicked -> {
-                            joinGroupUiState = joinGroupUiState.copy(
-                                step = JoinGroupStep.InviteCode,
-                            )
-                        }
-                        is JoinGroupScreenEvent.ProfileNameChanged -> {
-                            joinGroupUiState = joinGroupUiState.copy(
-                                profileName = event.profileName,
-                            )
-                        }
-                        is JoinGroupScreenEvent.ProfileColorSelected -> {
-                            joinGroupUiState = joinGroupUiState.copy(
-                                selectedProfileColor = event.color,
-                            )
-                        }
-                        JoinGroupScreenEvent.JoinGroupConfirmed -> {
-                            val selectedProfileColor = joinGroupUiState.selectedProfileColor
-
-                            if (selectedProfileColor != null) {
-                                shouldOpenServerGroup = true
-                                groupViewModel.joinGroup(
-                                    inviteCode = joinGroupUiState.inviteCode.trim(),
-                                    nickname = joinGroupUiState.profileName.trim(),
-                                    color = selectedProfileColor,
+            entry<MainTabDestination.JoinGroup> {
+                JoinGroupScreen(
+                    uiState = joinGroupUiState,
+                    onEvent = { event ->
+                        when (event) {
+                            is JoinGroupScreenEvent.DestinationClicked -> navState.handleBottomDestinationClick(event.destination)
+                            is JoinGroupScreenEvent.InviteCodeChanged -> {
+                                joinGroupUiState = joinGroupUiState.copy(
+                                    inviteCode = event.inviteCode,
                                 )
                             }
+                            JoinGroupScreenEvent.InviteCodeConfirmed -> {
+                                groupViewModel.verifyInvite(joinGroupUiState.inviteCode.trim())
+                            }
+                            JoinGroupScreenEvent.ProfileSetupBackClicked -> {
+                                joinGroupUiState = joinGroupUiState.copy(
+                                    step = JoinGroupStep.InviteCode,
+                                )
+                            }
+                            is JoinGroupScreenEvent.ProfileNameChanged -> {
+                                joinGroupUiState = joinGroupUiState.copy(
+                                    profileName = event.profileName,
+                                )
+                            }
+                            is JoinGroupScreenEvent.ProfileColorSelected -> {
+                                joinGroupUiState = joinGroupUiState.copy(
+                                    selectedProfileColor = event.color,
+                                )
+                            }
+                            JoinGroupScreenEvent.JoinGroupConfirmed -> {
+                                val selectedProfileColor = joinGroupUiState.selectedProfileColor
+
+                                if (selectedProfileColor != null) {
+                                    shouldOpenServerGroup = true
+                                    groupViewModel.joinGroup(
+                                        inviteCode = joinGroupUiState.inviteCode.trim(),
+                                        nickname = joinGroupUiState.profileName.trim(),
+                                        color = selectedProfileColor,
+                                    )
+                                }
+                            }
                         }
-                    }
-                },
-            )
-        }
+                    },
+                )
+            }
 
-        MoilNavigationDestination.CreateGroup -> {
-            val existingGroupNames = groupUiState.groups.map { group -> group.name }
+            entry<MainTabDestination.CreateGroup> {
+                val existingGroupNames = groupUiState.groups.map { group -> group.name }
 
-            CreateGroupScreen(
-                uiState = createGroupUiState,
-                onEvent = { event ->
-                when (event) {
-                    CreateGroupScreenEvent.BackClicked -> {
-                        selectedDestination = previousDestination
-                    }
-                    is CreateGroupScreenEvent.GroupNameChanged -> {
-                        createGroupUiState = createGroupUiState.copy(
-                            groupName = event.groupName,
-                            groupNameError = null,
-                        )
-                    }
-                    is CreateGroupScreenEvent.ProfileAvatarSelected -> {
-                        createGroupUiState = createGroupUiState.copy(
-                            selectedProfileAvatarRes = event.avatarRes,
-                        )
-                    }
-                    CreateGroupScreenEvent.CreateGroupClicked -> {
-                        val normalizedGroupName = createGroupUiState.groupName.trim()
-                        val isDuplicateGroupName = CreateGroupNameValidator.isDuplicate(
-                            groupName = normalizedGroupName,
-                            existingGroupNames = existingGroupNames,
-                        )
+                CreateGroupScreen(
+                    uiState = createGroupUiState,
+                    onEvent = { event ->
+                        when (event) {
+                            CreateGroupScreenEvent.BackClicked -> navState.pop()
+                            is CreateGroupScreenEvent.GroupNameChanged -> {
+                                createGroupUiState = createGroupUiState.copy(
+                                    groupName = event.groupName,
+                                    groupNameError = null,
+                                )
+                            }
+                            is CreateGroupScreenEvent.ProfileAvatarSelected -> {
+                                createGroupUiState = createGroupUiState.copy(
+                                    selectedProfileAvatarRes = event.avatarRes,
+                                )
+                            }
+                            CreateGroupScreenEvent.CreateGroupClicked -> {
+                                val normalizedGroupName = createGroupUiState.groupName.trim()
+                                val isDuplicateGroupName = CreateGroupNameValidator.isDuplicate(
+                                    groupName = normalizedGroupName,
+                                    existingGroupNames = existingGroupNames,
+                                )
 
-                        if (isDuplicateGroupName) {
-                            createGroupUiState = createGroupUiState.copy(
-                                groupNameError = com.example.moil.feature.group.presentation.CreateGroupNameError.Duplicate,
-                            )
-                        } else {
-                            shouldOpenServerGroup = true
-                            groupViewModel.createGroup(
-                                name = normalizedGroupName,
-                                color = groupColorForAvatar(createGroupUiState.selectedProfileAvatarRes),
-                            )
+                                if (isDuplicateGroupName) {
+                                    createGroupUiState = createGroupUiState.copy(
+                                        groupNameError = com.example.moil.feature.group.presentation.CreateGroupNameError.Duplicate,
+                                    )
+                                } else {
+                                    shouldOpenServerGroup = true
+                                    groupViewModel.createGroup(
+                                        name = normalizedGroupName,
+                                        color = groupColorForAvatar(createGroupUiState.selectedProfileAvatarRes),
+                                    )
+                                }
+                            }
                         }
-                    }
-                }
-            },
-            )
-        }
+                    },
+                )
+            }
 
-        MoilNavigationDestination.Profile -> {
-            ProfileScreen(
-                uiState = profileUiState,
-                groups = familyUiState.groups.mapIndexed { index, group ->
-                    com.example.moil.feature.profile.presentation.ProfileGroupUiModel(
-                        id = group.id,
-                        name = group.name,
-                        indicator = if (index == 0) {
-                            com.example.moil.feature.profile.presentation.ProfileGroupIndicator.Primary
-                        } else {
-                            com.example.moil.feature.profile.presentation.ProfileGroupIndicator.Secondary
-                        },
-                    )
-                },
-                onEvent = { event ->
-                    when (event) {
-                        is ProfileScreenEvent.DestinationClicked -> {
-                            if (event.destination == MoilNavigationDestination.JoinGroup) {
-                                previousDestination = selectedDestination
-                                selectedDestination = MoilNavigationDestination.JoinGroup
+            entry<MainTabDestination.Profile> {
+                ProfileScreen(
+                    uiState = profileUiState,
+                    groups = familyUiState.groups.mapIndexed { index, group ->
+                        com.example.moil.feature.profile.presentation.ProfileGroupUiModel(
+                            id = group.id,
+                            name = group.name,
+                            indicator = if (index == 0) {
+                                com.example.moil.feature.profile.presentation.ProfileGroupIndicator.Primary
                             } else {
-                                selectedDestination = event.destination
+                                com.example.moil.feature.profile.presentation.ProfileGroupIndicator.Secondary
+                            },
+                        )
+                    },
+                    onEvent = { event ->
+                        when (event) {
+                            is ProfileScreenEvent.DestinationClicked -> navState.handleBottomDestinationClick(event.destination)
+                            is ProfileScreenEvent.GroupClicked -> {
+                                navState.push(MainTabDestination.GroupDetail(event.groupId.toLong()))
                             }
+                            is ProfileScreenEvent.DarkThemeChanged -> {
+                                profileUiState = profileUiState.copy(isDarkTheme = event.isDarkTheme)
+                                onDarkThemeChanged(event.isDarkTheme)
+                            }
+                            ProfileScreenEvent.CreateGroupClicked -> navState.push(MainTabDestination.CreateGroup)
+                            ProfileScreenEvent.ProfileImageClicked -> {
+                                profileEditUiState = profileUiState.toProfileEditUiState()
+                                navState.push(MainTabDestination.ProfileEdit)
+                            }
+                            ProfileScreenEvent.LogoutClicked -> viewModel.logout()
                         }
-                        is ProfileScreenEvent.GroupClicked -> {
-                            groupViewModel.selectGroup(event.groupId.toLong())
-                            selectedDestination = MoilNavigationDestination.GroupDetail
-                        }
-                        is ProfileScreenEvent.DarkThemeChanged -> {
-                            profileUiState = profileUiState.copy(isDarkTheme = event.isDarkTheme)
-                            onDarkThemeChanged(event.isDarkTheme)
-                        }
-                        ProfileScreenEvent.CreateGroupClicked -> {
-                            previousDestination = selectedDestination
-                            selectedDestination = MoilNavigationDestination.CreateGroup
-                        }
-                        ProfileScreenEvent.ProfileImageClicked -> {
-                            profileEditUiState = profileUiState.toProfileEditUiState()
-                            selectedDestination = MoilNavigationDestination.ProfileEdit
-                        }
-                        ProfileScreenEvent.LogoutClicked -> viewModel.logout()
-                    }
-                },
-            )
-        }
+                    },
+                )
+            }
 
-        MoilNavigationDestination.ProfileEdit -> {
-            ProfileEditScreen(
-                uiState = profileEditUiState,
-                onEvent = { event ->
-                    when (event) {
-                        ProfileEditScreenEvent.BackClicked -> {
-                            selectedDestination = MoilNavigationDestination.Profile
-                        }
-                        is ProfileEditScreenEvent.NameChanged -> {
-                            viewModel.clearProfileSaveError()
-                            profileEditUiState = profileEditUiState.copy(
-                                profileName = event.profileName,
-                                saveError = null,
-                            )
-                        }
-                        is ProfileEditScreenEvent.ProfileAvatarSelected -> {
-                            viewModel.clearProfileSaveError()
-                            profileEditUiState = profileEditUiState.copy(
-                                selectedProfileAvatarRes = event.avatarRes,
-                                saveError = null,
-                            )
-                        }
-                        ProfileEditScreenEvent.SaveClicked -> {
-                            if (profileEditUiState.canSave) {
-                                viewModel.updateProfileName(profileEditUiState.profileName.trim())
+            entry<MainTabDestination.ProfileEdit> {
+                ProfileEditScreen(
+                    uiState = profileEditUiState,
+                    onEvent = { event ->
+                        when (event) {
+                            ProfileEditScreenEvent.BackClicked -> navState.pop()
+                            is ProfileEditScreenEvent.NameChanged -> {
+                                viewModel.clearProfileSaveError()
+                                profileEditUiState = profileEditUiState.copy(
+                                    profileName = event.profileName,
+                                    saveError = null,
+                                )
+                            }
+                            is ProfileEditScreenEvent.ProfileAvatarSelected -> {
+                                viewModel.clearProfileSaveError()
+                                profileEditUiState = profileEditUiState.copy(
+                                    selectedProfileAvatarRes = event.avatarRes,
+                                    saveError = null,
+                                )
+                            }
+                            ProfileEditScreenEvent.SaveClicked -> {
+                                if (profileEditUiState.canSave) {
+                                    viewModel.updateProfileName(profileEditUiState.profileName.trim())
+                                }
                             }
                         }
-                    }
-                },
-            )
-        }
-    }
+                    },
+                )
+            }
+        },
+    )
 }
 
 private sealed interface CalendarOverlay {

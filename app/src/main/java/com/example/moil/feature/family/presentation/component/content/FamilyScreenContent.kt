@@ -85,7 +85,7 @@ internal fun FamilyScreenContent(
                 text = stringResource(R.string.family_group_leave),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onEvent(FamilyScreenEvent.BackClicked) }
+                    .clickable { onEvent(FamilyScreenEvent.LeaveGroupClicked) }
                     .padding(vertical = MoilGroupDetailDimension.LeaveActionVerticalPadding),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.titleSmall,

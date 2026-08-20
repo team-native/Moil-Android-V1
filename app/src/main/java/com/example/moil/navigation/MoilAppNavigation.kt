@@ -1,10 +1,8 @@
 package com.example.moil.navigation
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -12,6 +10,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.ui.NavDisplay
 import com.example.moil.core.network.SessionManager
 import com.example.moil.core.network.SessionEvent
 import com.example.moil.core.network.SessionState
@@ -19,10 +21,17 @@ import com.example.moil.feature.auth.presentation.LoginRoute
 import com.example.moil.feature.auth.presentation.SignUpRoute
 import com.example.moil.feature.auth.domain.CurrentUserProfileStore
 import com.example.moil.core.model.GroupMemberRole
+import kotlinx.serialization.Serializable
 
-private sealed interface MoilAppDestination {
+@Serializable
+private sealed interface MoilAppDestination : NavKey {
+    @Serializable
     data object Login : MoilAppDestination
+
+    @Serializable
     data object SignUp : MoilAppDestination
+
+    @Serializable
     data object Main : MoilAppDestination
 }
 
@@ -74,11 +83,10 @@ private fun MoilAppNavigation(
     isAuthenticated: Boolean,
     sessionExpirationCount: Int,
 ) {
-    val destinationBackStack = remember {
-        mutableStateListOf(if (isAuthenticated) MoilAppDestination.Main else MoilAppDestination.Login)
-    }
+    val backStack = rememberNavBackStack(
+        if (isAuthenticated) MoilAppDestination.Main else MoilAppDestination.Login,
+    )
     var registeredEmail by remember { mutableStateOf("") }
-    val currentDestination = destinationBackStack.last()
 
     LaunchedEffect(isAuthenticated, sessionExpirationCount) {
         val expectedDestination = if (isAuthenticated) {
@@ -86,47 +94,49 @@ private fun MoilAppNavigation(
         } else {
             MoilAppDestination.Login
         }
-        if (destinationBackStack.last() != expectedDestination) {
-            destinationBackStack.clear()
-            destinationBackStack += expectedDestination
+        if (backStack.lastOrNull() != expectedDestination) {
+            backStack.clear()
+            backStack.add(expectedDestination)
         }
     }
 
-    BackHandler(enabled = destinationBackStack.size > 1) {
-        destinationBackStack.removeAt(destinationBackStack.lastIndex)
-    }
+    NavDisplay(
+        backStack = backStack,
+        onBack = { backStack.removeLastOrNull() },
+        entryProvider = entryProvider {
+            entry<MoilAppDestination.Login> {
+                LoginRoute(
+                    initialEmail = registeredEmail,
+                    onNavigateToSignUp = {
+                        backStack.add(MoilAppDestination.SignUp)
+                    },
+                    onLoginCompleted = {
+                        backStack.clear()
+                        backStack.add(MoilAppDestination.Main)
+                    },
+                )
+            }
 
-    when (currentDestination) {
-        MoilAppDestination.Login -> {
-            LoginRoute(
-                initialEmail = registeredEmail,
-                onNavigateToSignUp = {
-                    destinationBackStack += MoilAppDestination.SignUp
-                },
-                onLoginCompleted = {
-                    destinationBackStack.clear()
-                    destinationBackStack += MoilAppDestination.Main
-                },
-            )
-        }
+            entry<MoilAppDestination.SignUp> {
+                SignUpRoute(
+                    onNavigateBack = {
+                        backStack.removeLastOrNull()
+                    },
+                    onSignUpCompleted = { email ->
+                        registeredEmail = email
+                        backStack.removeLastOrNull()
+                    },
+                )
+            }
 
-        MoilAppDestination.SignUp -> {
-            SignUpRoute(
-                onNavigateBack = {
-                    destinationBackStack.removeAt(destinationBackStack.lastIndex)
-                },
-                onSignUpCompleted = { email ->
-                    registeredEmail = email
-                    destinationBackStack.removeAt(destinationBackStack.lastIndex)
-                },
-            )
-        }
-
-        MoilAppDestination.Main -> MainTabRoute(
-            isDarkTheme = isDarkTheme,
-            onDarkThemeChanged = onDarkThemeChanged,
-            currentUserRole = currentUserRole,
-            onCurrentUserRoleChanged = onCurrentUserRoleChanged,
-        )
-    }
+            entry<MoilAppDestination.Main> {
+                MainTabRoute(
+                    isDarkTheme = isDarkTheme,
+                    onDarkThemeChanged = onDarkThemeChanged,
+                    currentUserRole = currentUserRole,
+                    onCurrentUserRoleChanged = onCurrentUserRoleChanged,
+                )
+            }
+        },
+    )
 }
