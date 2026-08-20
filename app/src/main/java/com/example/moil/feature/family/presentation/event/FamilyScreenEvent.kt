@@ -7,6 +7,7 @@ sealed interface FamilyScreenEvent {
     data class GroupClicked(val groupId: String) : FamilyScreenEvent
     data class NotificationsChanged(val isEnabled: Boolean) : FamilyScreenEvent
     data object BackClicked : FamilyScreenEvent
+    data object LeaveGroupClicked : FamilyScreenEvent
     data object EmptyGroupJoinClicked : FamilyScreenEvent
     data object EmptyGroupCreateClicked : FamilyScreenEvent
     data object GroupNameChangeClicked : FamilyScreenEvent
