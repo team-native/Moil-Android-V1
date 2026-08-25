@@ -2,16 +2,16 @@ package com.example.moil.navigation
 
 import com.example.moil.core.domain.MoilError
 import com.example.moil.core.domain.MoilResult
-import com.example.moil.feature.auth.domain.AuthRepository
-import com.example.moil.feature.auth.domain.AuthSession
-import com.example.moil.feature.auth.domain.CurrentUserProfileStore
-import com.example.moil.feature.auth.domain.LogoutUseCase
-import com.example.moil.feature.auth.domain.UpdateProfileNameUseCase
-import com.example.moil.feature.auth.domain.UserProfile
-import com.example.moil.feature.auth.domain.Verification
-import com.example.moil.feature.auth.domain.VerificationStep
-import com.example.moil.feature.auth.domain.VerifiedSession
-import com.example.moil.feature.profile.presentation.ProfileEditSaveError
+import com.example.moil.feature.auth.module.domain.model.AuthSession
+import com.example.moil.feature.auth.module.domain.model.UserProfile
+import com.example.moil.feature.auth.module.domain.model.Verification
+import com.example.moil.feature.auth.module.domain.model.VerificationStep
+import com.example.moil.feature.auth.module.domain.model.VerifiedSession
+import com.example.moil.feature.auth.module.domain.repository.AuthRepository
+import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfileStore
+import com.example.moil.feature.auth.module.domain.usecase.LogoutUseCase
+import com.example.moil.feature.auth.module.domain.usecase.UpdateProfileNameUseCase
+import com.example.moil.feature.profile.viewmodel.ProfileEditSaveError
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -13,7 +13,7 @@ import com.example.moil.core.model.GroupMemberRole
 import com.example.moil.core.settings.MemberRolePreferencesRepository
 import com.example.moil.core.settings.ThemePreferencesRepository
 import com.example.moil.core.network.SessionManager
-import com.example.moil.feature.auth.domain.CurrentUserProfileStore
+import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfileStore
 import com.example.moil.navigation.MoilAppRoute
 import com.example.moil.ui.theme.MoilTheme
 import kotlinx.coroutines.launch

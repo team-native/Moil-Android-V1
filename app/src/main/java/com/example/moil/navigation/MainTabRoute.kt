@@ -19,51 +19,51 @@ import androidx.compose.ui.res.stringResource
 import com.example.moil.R
 import com.example.moil.core.component.applyDialogBackdropBlur
 import com.example.moil.core.component.MoilNavigationDestination
-import com.example.moil.feature.calendar.presentation.CalendarScreen
-import com.example.moil.feature.calendar.presentation.CalendarScreenEvent
-import com.example.moil.feature.calendar.presentation.CalendarUiState
-import com.example.moil.feature.calendar.presentation.ScheduleBottomSheet
-import com.example.moil.feature.calendar.presentation.reduce
-import com.example.moil.feature.calendar.presentation.toCalendarEvents
-import com.example.moil.feature.calendar.presentation.toCalendarGroups
-import com.example.moil.feature.calendar.presentation.toCalendarMembers
-import com.example.moil.feature.calendar.presentation.CalendarViewModel
-import com.example.moil.feature.event.domain.EventMember
-import com.example.moil.feature.event.domain.GroupEvent
-import com.example.moil.feature.calendar.presentation.component.dialog.ScheduleDatePickerDialog
-import com.example.moil.feature.calendar.presentation.component.dialog.ScheduleLocationDialog
-import com.example.moil.feature.calendar.presentation.component.dialog.ScheduleTimePickerDialog
+import com.example.moil.feature.calendar.view.CalendarScreen
+import com.example.moil.feature.calendar.viewmodel.CalendarScreenEvent
+import com.example.moil.feature.calendar.viewmodel.CalendarUiState
+import com.example.moil.feature.calendar.view.ScheduleBottomSheet
+import com.example.moil.feature.calendar.viewmodel.reduce
+import com.example.moil.feature.calendar.viewmodel.toCalendarEvents
+import com.example.moil.feature.calendar.viewmodel.toCalendarGroups
+import com.example.moil.feature.calendar.viewmodel.toCalendarMembers
+import com.example.moil.feature.calendar.viewmodel.CalendarViewModel
+import com.example.moil.feature.event.module.domain.model.EventMember
+import com.example.moil.feature.event.module.domain.model.GroupEvent
+import com.example.moil.feature.calendar.view.ScheduleDatePickerDialog
+import com.example.moil.feature.calendar.view.ScheduleLocationDialog
+import com.example.moil.feature.calendar.view.ScheduleTimePickerDialog
 import com.example.moil.ui.theme.MoilTimePickerDimension
-import com.example.moil.feature.family.presentation.FamilyScreen
-import com.example.moil.feature.family.presentation.MemberScreen
-import com.example.moil.feature.family.presentation.FamilyScreenEvent
-import com.example.moil.feature.family.presentation.FamilyUiState
-import com.example.moil.feature.family.presentation.toFamilyGroups
-import com.example.moil.feature.family.presentation.toFamilyMemberRole
-import com.example.moil.feature.family.presentation.FamilyAdministratorTransferDialog
-import com.example.moil.feature.family.presentation.FamilyGroupNameDialog
-import com.example.moil.feature.family.presentation.FamilyInviteShareBottomSheet
-import com.example.moil.feature.family.presentation.FamilyMemberPermissionsBottomSheet
-import com.example.moil.feature.group.presentation.CreateGroupScreen
-import com.example.moil.feature.group.presentation.CreateGroupScreenEvent
-import com.example.moil.feature.group.presentation.CreateGroupUiState
-import com.example.moil.feature.group.presentation.CreateGroupNameValidator
-import com.example.moil.feature.group.presentation.JoinGroupScreen
-import com.example.moil.feature.group.presentation.JoinGroupScreenEvent
-import com.example.moil.feature.group.presentation.JoinGroupStep
-import com.example.moil.feature.group.presentation.JoinGroupUiState
-import com.example.moil.feature.group.presentation.GroupViewModel
-import com.example.moil.feature.group.presentation.groupColorForAvatar
-import com.example.moil.feature.group.presentation.toJoinGroupProfileOptions
-import com.example.moil.feature.group.domain.GroupColor
-import com.example.moil.feature.profile.presentation.ProfileScreen
-import com.example.moil.feature.profile.presentation.ProfileScreenEvent
-import com.example.moil.feature.profile.presentation.ProfileEditScreen
-import com.example.moil.feature.profile.presentation.ProfileEditScreenEvent
-import com.example.moil.feature.profile.presentation.ProfileEditUiState
-import com.example.moil.feature.profile.presentation.ProfileUiState
-import com.example.moil.feature.profile.presentation.toProfileEditUiState
-import com.example.moil.feature.profile.presentation.toUpdatedProfileUiState
+import com.example.moil.feature.family.view.FamilyScreen
+import com.example.moil.feature.family.view.MemberScreen
+import com.example.moil.feature.family.viewmodel.FamilyScreenEvent
+import com.example.moil.feature.family.viewmodel.FamilyUiState
+import com.example.moil.feature.family.viewmodel.toFamilyGroups
+import com.example.moil.feature.family.viewmodel.toFamilyMemberRole
+import com.example.moil.feature.family.view.FamilyAdministratorTransferDialog
+import com.example.moil.feature.family.view.FamilyGroupNameDialog
+import com.example.moil.feature.family.view.FamilyInviteShareBottomSheet
+import com.example.moil.feature.family.view.FamilyMemberPermissionsBottomSheet
+import com.example.moil.feature.group.module.domain.model.GroupColor
+import com.example.moil.feature.group.view.CreateGroupScreen
+import com.example.moil.feature.group.view.JoinGroupScreen
+import com.example.moil.feature.group.viewmodel.CreateGroupNameValidator
+import com.example.moil.feature.group.viewmodel.CreateGroupScreenEvent
+import com.example.moil.feature.group.viewmodel.CreateGroupUiState
+import com.example.moil.feature.group.viewmodel.GroupViewModel
+import com.example.moil.feature.group.viewmodel.JoinGroupScreenEvent
+import com.example.moil.feature.group.viewmodel.JoinGroupStep
+import com.example.moil.feature.group.viewmodel.JoinGroupUiState
+import com.example.moil.feature.group.viewmodel.groupColorForAvatar
+import com.example.moil.feature.group.viewmodel.toJoinGroupProfileOptions
+import com.example.moil.feature.profile.view.ProfileScreen
+import com.example.moil.feature.profile.viewmodel.ProfileScreenEvent
+import com.example.moil.feature.profile.view.ProfileEditScreen
+import com.example.moil.feature.profile.viewmodel.ProfileEditScreenEvent
+import com.example.moil.feature.profile.viewmodel.ProfileEditUiState
+import com.example.moil.feature.profile.viewmodel.ProfileUiState
+import com.example.moil.feature.profile.viewmodel.toProfileEditUiState
+import com.example.moil.feature.profile.viewmodel.toUpdatedProfileUiState
 import com.example.moil.core.model.GroupMemberRole
 import java.time.LocalDate
 import java.time.YearMonth
@@ -203,7 +203,7 @@ fun MainTabRoute(
     LaunchedEffect(groupUiState.isCurrentUserNameMissing, selectedDestination) {
         if (groupUiState.isCurrentUserNameMissing && selectedDestination == MoilNavigationDestination.CreateGroup) {
             createGroupUiState = createGroupUiState.copy(
-                groupNameError = com.example.moil.feature.group.presentation.CreateGroupNameError.MissingUserName,
+                groupNameError = com.example.moil.feature.group.viewmodel.CreateGroupNameError.MissingUserName,
             )
         }
     }
@@ -552,7 +552,7 @@ fun MainTabRoute(
 
                         if (isDuplicateGroupName) {
                             createGroupUiState = createGroupUiState.copy(
-                                groupNameError = com.example.moil.feature.group.presentation.CreateGroupNameError.Duplicate,
+                                groupNameError = com.example.moil.feature.group.viewmodel.CreateGroupNameError.Duplicate,
                             )
                         } else {
                             shouldOpenServerGroup = true
@@ -571,13 +571,13 @@ fun MainTabRoute(
             ProfileScreen(
                 uiState = profileUiState,
                 groups = familyUiState.groups.mapIndexed { index, group ->
-                    com.example.moil.feature.profile.presentation.ProfileGroupUiModel(
+                    com.example.moil.feature.profile.viewmodel.ProfileGroupUiModel(
                         id = group.id,
                         name = group.name,
                         indicator = if (index == 0) {
-                            com.example.moil.feature.profile.presentation.ProfileGroupIndicator.Primary
+                            com.example.moil.feature.profile.viewmodel.ProfileGroupIndicator.Primary
                         } else {
-                            com.example.moil.feature.profile.presentation.ProfileGroupIndicator.Secondary
+                            com.example.moil.feature.profile.viewmodel.ProfileGroupIndicator.Secondary
                         },
                     )
                 },

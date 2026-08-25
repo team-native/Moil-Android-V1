@@ -15,9 +15,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.example.moil.core.network.SessionManager
 import com.example.moil.core.network.SessionEvent
 import com.example.moil.core.network.SessionState
-import com.example.moil.feature.auth.presentation.LoginRoute
-import com.example.moil.feature.auth.presentation.SignUpRoute
-import com.example.moil.feature.auth.domain.CurrentUserProfileStore
+import com.example.moil.feature.auth.view.LoginRoute
+import com.example.moil.feature.auth.view.SignUpRoute
+import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfileStore
 import com.example.moil.core.model.GroupMemberRole
 
 private sealed interface MoilAppDestination {

@@ -1,13 +1,13 @@
 package com.example.moil.core.di
 
-import com.example.moil.feature.auth.data.AuthRepositoryImpl
-import com.example.moil.feature.auth.data.local.DefaultCurrentUserProfileStore
-import com.example.moil.feature.auth.domain.AuthRepository
-import com.example.moil.feature.auth.domain.CurrentUserProfileStore
-import com.example.moil.feature.event.data.EventRepositoryImpl
-import com.example.moil.feature.event.domain.EventRepository
-import com.example.moil.feature.group.data.GroupRepositoryImpl
-import com.example.moil.feature.group.domain.GroupRepository
+import com.example.moil.feature.auth.module.data.repository.AuthRepositoryImpl
+import com.example.moil.feature.auth.module.data.repository.DefaultCurrentUserProfileStore
+import com.example.moil.feature.auth.module.domain.repository.AuthRepository
+import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfileStore
+import com.example.moil.feature.event.module.data.repository.EventRepositoryImpl
+import com.example.moil.feature.event.module.domain.repository.EventRepository
+import com.example.moil.feature.group.module.data.repository.GroupRepositoryImpl
+import com.example.moil.feature.group.module.domain.repository.GroupRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

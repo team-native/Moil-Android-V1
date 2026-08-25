@@ -1,6 +1,6 @@
 package com.example.moil.core.network
 
-import com.example.moil.feature.auth.data.remote.RefreshAuthApiService
+import com.example.moil.feature.auth.module.data.remote.RefreshAuthApiService
 import dagger.Lazy
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
