@@ -25,7 +25,9 @@ class VerifyCodeUseCase @Inject constructor(
         repository.verifyCode(verifyId, code)
 }
 
-class ConfirmSignUpUseCase @Inject constructor(private val repository: AuthRepository) {
+class ConfirmSignUpUseCase @Inject constructor(
+    private val repository: AuthRepository,
+) {
     suspend operator fun invoke(
         sessionId: String,
         password: String,
