@@ -7,7 +7,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.moil.core.model.GroupMemberRole
@@ -29,16 +28,16 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var currentUserProfileStore: CurrentUserProfileStore
 
+    @Inject
+    lateinit var themePreferencesRepository: ThemePreferencesRepository
+
+    @Inject
+    lateinit var memberRolePreferencesRepository: MemberRolePreferencesRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val themePreferencesRepository = remember {
-                ThemePreferencesRepository(applicationContext)
-            }
-            val memberRolePreferencesRepository = remember {
-                MemberRolePreferencesRepository(applicationContext)
-            }
             val isDarkThemeEnabled by themePreferencesRepository.isDarkTheme.collectAsStateWithLifecycle(
                 initialValue = false,
             )

@@ -7,6 +7,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.moil.core.model.GroupMemberRole
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -22,7 +24,9 @@ private val Context.memberRolePreferencesDataStore: DataStore<Preferences> by pr
  * Application Context만 참조하며 UI 객체나 콜백을 보관하지 않으므로 Activity 수명과 분리되어도
  * 화면 누수가 발생하지 않습니다.
  */
-class MemberRolePreferencesRepository(context: Context) {
+class MemberRolePreferencesRepository @Inject constructor(
+    @ApplicationContext context: Context,
+) {
     private val appContext = context.applicationContext
 
     val currentUserRole: Flow<GroupMemberRole> = appContext.memberRolePreferencesDataStore.data.map {
