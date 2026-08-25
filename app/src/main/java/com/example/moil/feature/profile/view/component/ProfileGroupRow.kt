@@ -1,4 +1,4 @@
-package com.example.moil.feature.profile.presentation
+package com.example.moil.feature.profile.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,6 +22,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import com.example.moil.R
+import com.example.moil.feature.profile.viewmodel.ProfileGroupIndicator
+import com.example.moil.feature.profile.viewmodel.ProfileGroupUiModel
 import com.example.moil.ui.theme.LocalMoilExtraColors
 import com.example.moil.ui.theme.LocalMoilIsDarkTheme
 import com.example.moil.ui.theme.MoilProfileDimension

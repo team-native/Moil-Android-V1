@@ -7,7 +7,7 @@ import com.example.moil.feature.auth.module.domain.model.UserProfile
 import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfileStore
 import com.example.moil.feature.auth.module.domain.usecase.LogoutUseCase
 import com.example.moil.feature.auth.module.domain.usecase.UpdateProfileNameUseCase
-import com.example.moil.feature.profile.presentation.ProfileEditSaveError
+import com.example.moil.feature.profile.viewmodel.ProfileEditSaveError
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow

@@ -1,4 +1,4 @@
-package com.example.moil.feature.profile.presentation
+package com.example.moil.feature.profile.viewmodel
 
 import com.example.moil.R
 import org.junit.Assert.assertEquals

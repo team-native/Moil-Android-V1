@@ -11,7 +11,7 @@ import com.example.moil.feature.auth.module.domain.repository.AuthRepository
 import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfileStore
 import com.example.moil.feature.auth.module.domain.usecase.LogoutUseCase
 import com.example.moil.feature.auth.module.domain.usecase.UpdateProfileNameUseCase
-import com.example.moil.feature.profile.presentation.ProfileEditSaveError
+import com.example.moil.feature.profile.viewmodel.ProfileEditSaveError
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
 import kotlinx.coroutines.ExperimentalCoroutinesApi

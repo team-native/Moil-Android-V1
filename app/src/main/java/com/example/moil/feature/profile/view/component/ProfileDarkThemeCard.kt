@@ -1,4 +1,4 @@
-package com.example.moil.feature.profile.presentation
+package com.example.moil.feature.profile.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

@@ -1,9 +1,13 @@
-package com.example.moil.feature.profile.presentation
+package com.example.moil.feature.profile.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.moil.R
+import com.example.moil.feature.profile.viewmodel.ProfileGroupIndicator
+import com.example.moil.feature.profile.viewmodel.ProfileGroupUiModel
+import com.example.moil.feature.profile.viewmodel.ProfileScreenEvent
+import com.example.moil.feature.profile.viewmodel.ProfileUiState
 import com.example.moil.ui.theme.MoilTheme
 
 @Composable

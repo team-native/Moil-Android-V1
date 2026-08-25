@@ -1,4 +1,4 @@
-package com.example.moil.feature.profile.presentation
+package com.example.moil.feature.profile.view
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +14,8 @@ import com.example.moil.R
 import com.example.moil.feature.family.view.FamilyDetailHeader
 import com.example.moil.feature.group.view.ProfileAvatarSelector
 import com.example.moil.feature.group.view.profileAvatarResources
+import com.example.moil.feature.profile.viewmodel.ProfileEditScreenEvent
+import com.example.moil.feature.profile.viewmodel.ProfileEditUiState
 import com.example.moil.ui.theme.MoilProfileEditDimension
 import com.example.moil.ui.theme.MoilTheme
 

@@ -1,4 +1,4 @@
-package com.example.moil.feature.profile.presentation
+package com.example.moil.feature.profile.view
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +12,9 @@ import androidx.compose.ui.res.stringResource
 import com.example.moil.R
 import com.example.moil.core.component.MoilNavigationDestination
 import com.example.moil.core.component.MoilTabScaffold
+import com.example.moil.feature.profile.viewmodel.ProfileGroupUiModel
+import com.example.moil.feature.profile.viewmodel.ProfileScreenEvent
+import com.example.moil.feature.profile.viewmodel.ProfileUiState
 import com.example.moil.ui.theme.MoilProfileDimension
 
 @Composable

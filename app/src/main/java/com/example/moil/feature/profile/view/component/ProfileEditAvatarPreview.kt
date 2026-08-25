@@ -1,4 +1,4 @@
-package com.example.moil.feature.profile.presentation
+package com.example.moil.feature.profile.view
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image

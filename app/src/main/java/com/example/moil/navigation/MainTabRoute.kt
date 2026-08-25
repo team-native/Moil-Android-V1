@@ -56,14 +56,14 @@ import com.example.moil.feature.group.viewmodel.JoinGroupStep
 import com.example.moil.feature.group.viewmodel.JoinGroupUiState
 import com.example.moil.feature.group.viewmodel.groupColorForAvatar
 import com.example.moil.feature.group.viewmodel.toJoinGroupProfileOptions
-import com.example.moil.feature.profile.presentation.ProfileScreen
-import com.example.moil.feature.profile.presentation.ProfileScreenEvent
-import com.example.moil.feature.profile.presentation.ProfileEditScreen
-import com.example.moil.feature.profile.presentation.ProfileEditScreenEvent
-import com.example.moil.feature.profile.presentation.ProfileEditUiState
-import com.example.moil.feature.profile.presentation.ProfileUiState
-import com.example.moil.feature.profile.presentation.toProfileEditUiState
-import com.example.moil.feature.profile.presentation.toUpdatedProfileUiState
+import com.example.moil.feature.profile.view.ProfileScreen
+import com.example.moil.feature.profile.viewmodel.ProfileScreenEvent
+import com.example.moil.feature.profile.view.ProfileEditScreen
+import com.example.moil.feature.profile.viewmodel.ProfileEditScreenEvent
+import com.example.moil.feature.profile.viewmodel.ProfileEditUiState
+import com.example.moil.feature.profile.viewmodel.ProfileUiState
+import com.example.moil.feature.profile.viewmodel.toProfileEditUiState
+import com.example.moil.feature.profile.viewmodel.toUpdatedProfileUiState
 import com.example.moil.core.model.GroupMemberRole
 import java.time.LocalDate
 import java.time.YearMonth
@@ -571,13 +571,13 @@ fun MainTabRoute(
             ProfileScreen(
                 uiState = profileUiState,
                 groups = familyUiState.groups.mapIndexed { index, group ->
-                    com.example.moil.feature.profile.presentation.ProfileGroupUiModel(
+                    com.example.moil.feature.profile.viewmodel.ProfileGroupUiModel(
                         id = group.id,
                         name = group.name,
                         indicator = if (index == 0) {
-                            com.example.moil.feature.profile.presentation.ProfileGroupIndicator.Primary
+                            com.example.moil.feature.profile.viewmodel.ProfileGroupIndicator.Primary
                         } else {
-                            com.example.moil.feature.profile.presentation.ProfileGroupIndicator.Secondary
+                            com.example.moil.feature.profile.viewmodel.ProfileGroupIndicator.Secondary
                         },
                     )
                 },

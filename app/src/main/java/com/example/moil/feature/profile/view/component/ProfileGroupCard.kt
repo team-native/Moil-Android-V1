@@ -1,4 +1,4 @@
-package com.example.moil.feature.profile.presentation
+package com.example.moil.feature.profile.view
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.example.moil.R
+import com.example.moil.feature.profile.viewmodel.ProfileGroupUiModel
 import com.example.moil.ui.theme.LocalMoilExtraColors
 import com.example.moil.ui.theme.MoilProfileDimension
 

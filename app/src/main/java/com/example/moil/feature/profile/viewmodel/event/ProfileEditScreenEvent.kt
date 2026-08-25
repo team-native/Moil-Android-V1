@@ -1,4 +1,4 @@
-package com.example.moil.feature.profile.presentation
+package com.example.moil.feature.profile.viewmodel
 
 import androidx.annotation.DrawableRes
 
