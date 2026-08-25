@@ -3,7 +3,7 @@ package com.example.moil.feature.group.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moil.core.domain.MoilResult
-import com.example.moil.feature.auth.domain.CurrentUserProfileStore
+import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfileStore
 import com.example.moil.feature.group.module.domain.model.GroupColor
 import com.example.moil.feature.group.module.domain.model.GroupRole
 import com.example.moil.feature.group.module.domain.model.InviteVerification

@@ -3,10 +3,10 @@ package com.example.moil.navigation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moil.core.domain.MoilResult
-import com.example.moil.feature.auth.domain.LogoutUseCase
-import com.example.moil.feature.auth.domain.CurrentUserProfileStore
-import com.example.moil.feature.auth.domain.UpdateProfileNameUseCase
-import com.example.moil.feature.auth.domain.UserProfile
+import com.example.moil.feature.auth.module.domain.model.UserProfile
+import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfileStore
+import com.example.moil.feature.auth.module.domain.usecase.LogoutUseCase
+import com.example.moil.feature.auth.module.domain.usecase.UpdateProfileNameUseCase
 import com.example.moil.feature.profile.presentation.ProfileEditSaveError
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

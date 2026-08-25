@@ -1,9 +1,9 @@
 package com.example.moil.core.network
 
 import com.example.moil.BuildConfig
-import com.example.moil.feature.auth.data.remote.AuthenticatedAuthApiService
-import com.example.moil.feature.auth.data.remote.PublicAuthApiService
-import com.example.moil.feature.auth.data.remote.RefreshAuthApiService
+import com.example.moil.feature.auth.module.data.remote.AuthenticatedAuthApiService
+import com.example.moil.feature.auth.module.data.remote.PublicAuthApiService
+import com.example.moil.feature.auth.module.data.remote.RefreshAuthApiService
 import com.example.moil.feature.group.module.data.remote.GroupApiService
 import com.example.moil.feature.event.module.data.remote.EventApiService
 import dagger.Module

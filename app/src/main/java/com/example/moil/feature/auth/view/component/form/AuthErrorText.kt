@@ -1,0 +1,20 @@
+package com.example.moil.feature.auth.view
+
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+
+@Composable
+internal fun AuthErrorText(text: String) {
+    Spacer(modifier = Modifier.height(6.dp))
+
+    Text(
+        text = text,
+        color = MaterialTheme.colorScheme.error,
+        style = MaterialTheme.typography.labelMedium,
+    )
+}

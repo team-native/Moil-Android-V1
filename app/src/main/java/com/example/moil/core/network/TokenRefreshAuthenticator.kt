@@ -1,7 +1,7 @@
 package com.example.moil.core.network
 
-import com.example.moil.feature.auth.data.remote.RefreshAuthApiService
-import com.example.moil.feature.auth.data.remote.RefreshTokenRequestDto
+import com.example.moil.feature.auth.module.data.dto.RefreshTokenRequestDto
+import com.example.moil.feature.auth.module.data.remote.RefreshAuthApiService
 import javax.inject.Inject
 import okhttp3.Authenticator
 import okhttp3.Request
