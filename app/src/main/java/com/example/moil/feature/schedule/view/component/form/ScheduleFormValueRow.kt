@@ -1,4 +1,4 @@
-package com.example.moil.feature.schedule.presentation
+package com.example.moil.feature.schedule.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

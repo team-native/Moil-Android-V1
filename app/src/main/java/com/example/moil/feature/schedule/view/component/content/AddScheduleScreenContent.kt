@@ -1,4 +1,4 @@
-package com.example.moil.feature.schedule.presentation
+package com.example.moil.feature.schedule.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import com.example.moil.R
 import com.example.moil.core.component.MoilNavigationDestination
 import com.example.moil.core.component.MoilTabScaffold
+import com.example.moil.feature.schedule.viewmodel.AddScheduleScreenEvent
+import com.example.moil.feature.schedule.viewmodel.AddScheduleUiState
 import com.example.moil.ui.theme.MoilSpacing
 
 @Composable

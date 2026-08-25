@@ -1,4 +1,4 @@
-package com.example.moil.feature.schedule.presentation
+package com.example.moil.feature.schedule.viewmodel
 
 import com.example.moil.core.component.MoilNavigationDestination
 
