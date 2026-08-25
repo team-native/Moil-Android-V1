@@ -1,4 +1,4 @@
-package com.example.moil.feature.family.presentation
+package com.example.moil.feature.family.view
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.example.moil.feature.family.viewmodel.GroupUiModel
 import com.example.moil.ui.theme.MoilMemberDimension
 
 @Composable

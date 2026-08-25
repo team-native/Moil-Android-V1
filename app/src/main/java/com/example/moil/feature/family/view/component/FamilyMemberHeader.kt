@@ -1,4 +1,4 @@
-package com.example.moil.feature.family.presentation
+package com.example.moil.feature.family.view
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth

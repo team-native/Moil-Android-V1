@@ -1,6 +1,8 @@
-package com.example.moil.feature.family.presentation
+package com.example.moil.feature.family.view
 
 import androidx.compose.runtime.Composable
+import com.example.moil.feature.family.viewmodel.FamilyScreenEvent
+import com.example.moil.feature.family.viewmodel.FamilyUiState
 
 @Composable
 fun FamilyScreen(

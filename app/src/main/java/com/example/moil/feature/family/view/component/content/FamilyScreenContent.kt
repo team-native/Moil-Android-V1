@@ -1,4 +1,4 @@
-package com.example.moil.feature.family.presentation
+package com.example.moil.feature.family.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -27,6 +27,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.example.moil.R
+import com.example.moil.feature.family.viewmodel.FamilyMemberUiModel
+import com.example.moil.feature.family.viewmodel.FamilyScreenEvent
+import com.example.moil.feature.family.viewmodel.FamilyUiState
+import com.example.moil.feature.family.viewmodel.GroupUiModel
 import com.example.moil.ui.theme.LocalMoilExtraColors
 import com.example.moil.ui.theme.MoilGroupDetailDimension
 import com.example.moil.ui.theme.MoilMemberDimension

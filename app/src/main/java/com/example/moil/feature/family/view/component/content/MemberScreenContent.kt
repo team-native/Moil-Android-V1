@@ -1,4 +1,4 @@
-package com.example.moil.feature.family.presentation
+package com.example.moil.feature.family.view
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,7 +35,9 @@ import com.example.moil.core.component.MoilSwitch
 import com.example.moil.core.component.MoilTabScaffold
 import com.example.moil.core.component.content.MoilEmptyJoinedGroupContent
 import com.example.moil.core.model.GroupMemberRole
-import com.example.moil.feature.family.presentation.FamilyMemberHeader
+import com.example.moil.feature.family.viewmodel.FamilyScreenEvent
+import com.example.moil.feature.family.viewmodel.FamilyUiState
+import com.example.moil.feature.family.viewmodel.GroupUiModel
 import com.example.moil.ui.theme.LocalMoilExtraColors
 import com.example.moil.ui.theme.MoilMemberDimension
 import com.example.moil.ui.theme.MoilSpacing

@@ -1,7 +1,9 @@
-package com.example.moil.feature.family.presentation
+package com.example.moil.feature.family.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.moil.feature.family.viewmodel.FamilyScreenEvent
+import com.example.moil.feature.family.viewmodel.FamilyUiState
 import com.example.moil.ui.theme.MoilTheme
 
 @Composable

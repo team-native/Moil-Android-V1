@@ -1,4 +1,4 @@
-package com.example.moil.feature.family.presentation
+package com.example.moil.feature.family.viewmodel
 
 import com.example.moil.feature.group.module.domain.model.GroupColor
 import com.example.moil.feature.group.module.domain.model.GroupMember

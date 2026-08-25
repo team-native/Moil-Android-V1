@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.moil.R
-import com.example.moil.feature.family.presentation.FamilyDetailHeader
+import com.example.moil.feature.family.view.FamilyDetailHeader
 import com.example.moil.feature.group.view.ProfileAvatarSelector
 import com.example.moil.feature.group.view.profileAvatarResources
 import com.example.moil.ui.theme.MoilProfileEditDimension

@@ -1,4 +1,4 @@
-package com.example.moil.feature.family.presentation
+package com.example.moil.feature.family.viewmodel
 
 import com.example.moil.core.component.MoilNavigationDestination
 
