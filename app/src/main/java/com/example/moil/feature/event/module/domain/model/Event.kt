@@ -1,6 +1,6 @@
 package com.example.moil.feature.event.module.domain.model
 
-import com.example.moil.feature.group.domain.GroupColor
+import com.example.moil.feature.group.module.domain.model.GroupColor
 
 data class GroupEvent(
     val id: Long,

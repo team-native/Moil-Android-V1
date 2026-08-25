@@ -4,7 +4,7 @@ import com.example.moil.BuildConfig
 import com.example.moil.feature.auth.data.remote.AuthenticatedAuthApiService
 import com.example.moil.feature.auth.data.remote.PublicAuthApiService
 import com.example.moil.feature.auth.data.remote.RefreshAuthApiService
-import com.example.moil.feature.group.data.remote.GroupApiService
+import com.example.moil.feature.group.module.data.remote.GroupApiService
 import com.example.moil.feature.event.module.data.remote.EventApiService
 import dagger.Module
 import dagger.Provides

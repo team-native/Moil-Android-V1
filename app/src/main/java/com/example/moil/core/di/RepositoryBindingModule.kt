@@ -6,8 +6,8 @@ import com.example.moil.feature.auth.domain.AuthRepository
 import com.example.moil.feature.auth.domain.CurrentUserProfileStore
 import com.example.moil.feature.event.module.data.repository.EventRepositoryImpl
 import com.example.moil.feature.event.module.domain.repository.EventRepository
-import com.example.moil.feature.group.data.GroupRepositoryImpl
-import com.example.moil.feature.group.domain.GroupRepository
+import com.example.moil.feature.group.module.data.repository.GroupRepositoryImpl
+import com.example.moil.feature.group.module.domain.repository.GroupRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

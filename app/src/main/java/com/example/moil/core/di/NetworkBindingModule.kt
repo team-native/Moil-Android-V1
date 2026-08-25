@@ -6,8 +6,8 @@ import com.example.moil.feature.auth.data.remote.AuthRemoteDataSource
 import com.example.moil.feature.auth.data.remote.AuthRemoteDataSourceImpl
 import com.example.moil.feature.event.module.data.remote.EventRemoteDataSource
 import com.example.moil.feature.event.module.data.remote.EventRemoteDataSourceImpl
-import com.example.moil.feature.group.data.remote.GroupRemoteDataSource
-import com.example.moil.feature.group.data.remote.GroupRemoteDataSourceImpl
+import com.example.moil.feature.group.module.data.remote.GroupRemoteDataSource
+import com.example.moil.feature.group.module.data.remote.GroupRemoteDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

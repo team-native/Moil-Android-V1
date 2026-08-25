@@ -1,10 +1,10 @@
 package com.example.moil.feature.calendar.presentation
 
 import com.example.moil.feature.event.module.domain.model.GroupEvent
-import com.example.moil.feature.group.domain.GroupColor
-import com.example.moil.feature.group.domain.GroupMember
-import com.example.moil.feature.group.domain.GroupSummary
-import com.example.moil.feature.group.presentation.avatarResourceForGroupColor
+import com.example.moil.feature.group.module.domain.model.GroupColor
+import com.example.moil.feature.group.module.domain.model.GroupMember
+import com.example.moil.feature.group.module.domain.model.GroupSummary
+import com.example.moil.feature.group.viewmodel.avatarResourceForGroupColor
 import java.time.LocalDate
 
 internal fun List<GroupSummary>.toCalendarGroups(): List<CalendarGroupUiModel> = map { group ->

@@ -3,7 +3,7 @@ package com.example.moil.feature.calendar.presentation
 import java.time.LocalDate
 import java.time.YearMonth
 import com.example.moil.R
-import com.example.moil.feature.group.domain.GroupColor
+import com.example.moil.feature.group.module.domain.model.GroupColor
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

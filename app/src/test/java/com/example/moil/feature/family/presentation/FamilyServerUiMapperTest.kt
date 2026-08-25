@@ -1,9 +1,9 @@
 package com.example.moil.feature.family.presentation
 
-import com.example.moil.feature.group.domain.GroupColor
-import com.example.moil.feature.group.domain.GroupMember
-import com.example.moil.feature.group.domain.GroupRole
-import com.example.moil.feature.group.domain.GroupSummary
+import com.example.moil.feature.group.module.domain.model.GroupColor
+import com.example.moil.feature.group.module.domain.model.GroupMember
+import com.example.moil.feature.group.module.domain.model.GroupRole
+import com.example.moil.feature.group.module.domain.model.GroupSummary
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

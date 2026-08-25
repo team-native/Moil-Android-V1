@@ -1,7 +1,7 @@
 package com.example.moil.feature.calendar.presentation
 
 import androidx.annotation.DrawableRes
-import com.example.moil.feature.group.domain.GroupColor
+import com.example.moil.feature.group.module.domain.model.GroupColor
 
 data class CalendarGroupUiModel(
     val id: Long,

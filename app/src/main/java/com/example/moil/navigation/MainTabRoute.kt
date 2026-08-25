@@ -44,18 +44,18 @@ import com.example.moil.feature.family.presentation.FamilyAdministratorTransferD
 import com.example.moil.feature.family.presentation.FamilyGroupNameDialog
 import com.example.moil.feature.family.presentation.FamilyInviteShareBottomSheet
 import com.example.moil.feature.family.presentation.FamilyMemberPermissionsBottomSheet
-import com.example.moil.feature.group.presentation.CreateGroupScreen
-import com.example.moil.feature.group.presentation.CreateGroupScreenEvent
-import com.example.moil.feature.group.presentation.CreateGroupUiState
-import com.example.moil.feature.group.presentation.CreateGroupNameValidator
-import com.example.moil.feature.group.presentation.JoinGroupScreen
-import com.example.moil.feature.group.presentation.JoinGroupScreenEvent
-import com.example.moil.feature.group.presentation.JoinGroupStep
-import com.example.moil.feature.group.presentation.JoinGroupUiState
-import com.example.moil.feature.group.presentation.GroupViewModel
-import com.example.moil.feature.group.presentation.groupColorForAvatar
-import com.example.moil.feature.group.presentation.toJoinGroupProfileOptions
-import com.example.moil.feature.group.domain.GroupColor
+import com.example.moil.feature.group.module.domain.model.GroupColor
+import com.example.moil.feature.group.view.CreateGroupScreen
+import com.example.moil.feature.group.view.JoinGroupScreen
+import com.example.moil.feature.group.viewmodel.CreateGroupNameValidator
+import com.example.moil.feature.group.viewmodel.CreateGroupScreenEvent
+import com.example.moil.feature.group.viewmodel.CreateGroupUiState
+import com.example.moil.feature.group.viewmodel.GroupViewModel
+import com.example.moil.feature.group.viewmodel.JoinGroupScreenEvent
+import com.example.moil.feature.group.viewmodel.JoinGroupStep
+import com.example.moil.feature.group.viewmodel.JoinGroupUiState
+import com.example.moil.feature.group.viewmodel.groupColorForAvatar
+import com.example.moil.feature.group.viewmodel.toJoinGroupProfileOptions
 import com.example.moil.feature.profile.presentation.ProfileScreen
 import com.example.moil.feature.profile.presentation.ProfileScreenEvent
 import com.example.moil.feature.profile.presentation.ProfileEditScreen
@@ -203,7 +203,7 @@ fun MainTabRoute(
     LaunchedEffect(groupUiState.isCurrentUserNameMissing, selectedDestination) {
         if (groupUiState.isCurrentUserNameMissing && selectedDestination == MoilNavigationDestination.CreateGroup) {
             createGroupUiState = createGroupUiState.copy(
-                groupNameError = com.example.moil.feature.group.presentation.CreateGroupNameError.MissingUserName,
+                groupNameError = com.example.moil.feature.group.viewmodel.CreateGroupNameError.MissingUserName,
             )
         }
     }
@@ -552,7 +552,7 @@ fun MainTabRoute(
 
                         if (isDuplicateGroupName) {
                             createGroupUiState = createGroupUiState.copy(
-                                groupNameError = com.example.moil.feature.group.presentation.CreateGroupNameError.Duplicate,
+                                groupNameError = com.example.moil.feature.group.viewmodel.CreateGroupNameError.Duplicate,
                             )
                         } else {
                             shouldOpenServerGroup = true

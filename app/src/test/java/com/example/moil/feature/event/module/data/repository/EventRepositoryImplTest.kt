@@ -10,7 +10,7 @@ import com.example.moil.feature.event.module.data.dto.UpdateEventRequestDto
 import com.example.moil.feature.event.module.data.remote.EventRemoteDataSource
 import com.example.moil.feature.event.module.domain.model.EventMember
 import com.example.moil.feature.event.module.domain.model.GroupEvent
-import com.example.moil.feature.group.domain.GroupColor
+import com.example.moil.feature.group.module.domain.model.GroupColor
 import java.time.YearMonth
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals

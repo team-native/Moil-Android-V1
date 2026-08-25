@@ -25,8 +25,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.example.moil.R
-import com.example.moil.feature.group.domain.GroupColor
-import com.example.moil.feature.group.presentation.avatarResourceForGroupColor
+import com.example.moil.feature.group.module.domain.model.GroupColor
+import com.example.moil.feature.group.viewmodel.avatarResourceForGroupColor
 import com.example.moil.ui.theme.LocalMoilExtraColors
 import com.example.moil.ui.theme.MoilMemberDimension
 import com.example.moil.ui.theme.MoilTheme

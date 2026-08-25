@@ -2,7 +2,7 @@ package com.example.moil.feature.family.presentation
 
 import androidx.annotation.StringRes
 import com.example.moil.core.model.GroupMemberRole
-import com.example.moil.feature.group.domain.GroupColor
+import com.example.moil.feature.group.module.domain.model.GroupColor
 import java.time.YearMonth
 
 data class FamilyUiState(
