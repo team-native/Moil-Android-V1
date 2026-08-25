@@ -1,17 +1,15 @@
-package com.example.moil.feature.event.data
+package com.example.moil.feature.event.module.data.repository
 
 import com.example.moil.core.domain.MoilResult
 import com.example.moil.core.domain.mapToDomain
 import com.example.moil.core.network.NetworkResult
-import com.example.moil.feature.event.data.remote.EventMemberResponseDto
-import com.example.moil.feature.event.data.remote.EventRemoteDataSource
-import com.example.moil.feature.event.data.remote.EventRequestDto
-import com.example.moil.feature.event.data.remote.EventResponseDto
-import com.example.moil.feature.event.data.remote.UpdateEventRequestDto
-import com.example.moil.feature.event.domain.EventMember
-import com.example.moil.feature.event.domain.EventRepository
-import com.example.moil.feature.event.domain.GroupEvent
-import com.example.moil.feature.group.domain.toGroupColor
+import com.example.moil.feature.event.module.data.dto.EventResponseDto
+import com.example.moil.feature.event.module.data.mapper.toCreateRequest
+import com.example.moil.feature.event.module.data.mapper.toDomain
+import com.example.moil.feature.event.module.data.mapper.toUpdateRequest
+import com.example.moil.feature.event.module.data.remote.EventRemoteDataSource
+import com.example.moil.feature.event.module.domain.model.GroupEvent
+import com.example.moil.feature.event.module.domain.repository.EventRepository
 import java.time.YearMonth
 import javax.inject.Inject
 
@@ -74,47 +72,3 @@ class EventRepositoryImpl @Inject constructor(
         else -> result.mapToDomain { Unit }
     }
 }
-
-private fun EventResponseDto.toDomain(): GroupEvent = GroupEvent(
-    id = eventId,
-    title = title,
-    startDate = startDate,
-    endDate = endDate,
-    isAllDay = isAllDay,
-    startTime = startTime,
-    endTime = endTime,
-    location = location,
-    members = members.map(EventMemberResponseDto::toDomain),
-)
-
-private fun EventMemberResponseDto.toDomain(): EventMember = EventMember(
-    userId = userId,
-    nickname = nickname,
-    color = colorId.toGroupColor(),
-)
-
-private fun GroupEvent.toCreateRequest(
-    groupId: Long,
-    memberIds: List<Long>,
-): EventRequestDto = EventRequestDto(
-    groupId = groupId,
-    title = title,
-    startDate = startDate,
-    endDate = endDate,
-    isAllDay = isAllDay,
-    startTime = startTime,
-    endTime = endTime,
-    location = location,
-    sharedMemberIds = memberIds,
-)
-
-private fun GroupEvent.toUpdateRequest(memberIds: List<Long>): UpdateEventRequestDto = UpdateEventRequestDto(
-    title = title,
-    startDate = startDate,
-    endDate = endDate,
-    isAllDay = isAllDay,
-    startTime = startTime,
-    endTime = endTime,
-    location = location,
-    sharedMemberIds = memberIds,
-)

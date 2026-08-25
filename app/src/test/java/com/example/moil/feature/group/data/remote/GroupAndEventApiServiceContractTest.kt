@@ -1,8 +1,8 @@
 package com.example.moil.feature.group.data.remote
 
-import com.example.moil.feature.event.data.remote.EventApiService
-import com.example.moil.feature.event.data.remote.EventRequestDto
-import com.example.moil.feature.event.data.remote.UpdateEventRequestDto
+import com.example.moil.feature.event.module.data.dto.EventRequestDto
+import com.example.moil.feature.event.module.data.dto.UpdateEventRequestDto
+import com.example.moil.feature.event.module.data.remote.EventApiService
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import mockwebserver3.MockResponse

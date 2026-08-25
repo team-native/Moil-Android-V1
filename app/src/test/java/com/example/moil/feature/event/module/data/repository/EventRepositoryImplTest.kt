@@ -1,15 +1,15 @@
-package com.example.moil.feature.event.data
+package com.example.moil.feature.event.module.data.repository
 
 import com.example.moil.core.domain.MoilResult
 import com.example.moil.core.network.NetworkResult
-import com.example.moil.feature.event.data.remote.CreateEventResponseDto
-import com.example.moil.feature.event.data.remote.EventMemberResponseDto
-import com.example.moil.feature.event.data.remote.EventRemoteDataSource
-import com.example.moil.feature.event.data.remote.EventRequestDto
-import com.example.moil.feature.event.data.remote.EventResponseDto
-import com.example.moil.feature.event.data.remote.UpdateEventRequestDto
-import com.example.moil.feature.event.domain.EventMember
-import com.example.moil.feature.event.domain.GroupEvent
+import com.example.moil.feature.event.module.data.dto.CreateEventResponseDto
+import com.example.moil.feature.event.module.data.dto.EventMemberResponseDto
+import com.example.moil.feature.event.module.data.dto.EventRequestDto
+import com.example.moil.feature.event.module.data.dto.EventResponseDto
+import com.example.moil.feature.event.module.data.dto.UpdateEventRequestDto
+import com.example.moil.feature.event.module.data.remote.EventRemoteDataSource
+import com.example.moil.feature.event.module.domain.model.EventMember
+import com.example.moil.feature.event.module.domain.model.GroupEvent
 import com.example.moil.feature.group.domain.GroupColor
 import java.time.YearMonth
 import kotlinx.coroutines.runBlocking

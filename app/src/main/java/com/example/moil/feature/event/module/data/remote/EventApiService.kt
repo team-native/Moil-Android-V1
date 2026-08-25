@@ -1,6 +1,10 @@
-package com.example.moil.feature.event.data.remote
+package com.example.moil.feature.event.module.data.remote
 
 import com.example.moil.core.network.ApiEnvelopeDto
+import com.example.moil.feature.event.module.data.dto.CreateEventResponseDto
+import com.example.moil.feature.event.module.data.dto.EventRequestDto
+import com.example.moil.feature.event.module.data.dto.EventResponseDto
+import com.example.moil.feature.event.module.data.dto.UpdateEventRequestDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE

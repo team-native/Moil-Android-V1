@@ -1,7 +1,7 @@
 package com.example.moil.feature.calendar.presentation
 
-import com.example.moil.feature.event.domain.EventMember
-import com.example.moil.feature.event.domain.GroupEvent
+import com.example.moil.feature.event.module.domain.model.EventMember
+import com.example.moil.feature.event.module.domain.model.GroupEvent
 import com.example.moil.feature.group.domain.GroupColor
 import org.junit.Assert.assertEquals
 import org.junit.Test

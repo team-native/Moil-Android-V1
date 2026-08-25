@@ -1,6 +1,7 @@
-package com.example.moil.feature.event.domain
+package com.example.moil.feature.event.module.domain.repository
 
 import com.example.moil.core.domain.MoilResult
+import com.example.moil.feature.event.module.domain.model.GroupEvent
 import java.time.YearMonth
 
 interface EventRepository {

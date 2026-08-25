@@ -28,8 +28,8 @@ import com.example.moil.feature.calendar.presentation.toCalendarEvents
 import com.example.moil.feature.calendar.presentation.toCalendarGroups
 import com.example.moil.feature.calendar.presentation.toCalendarMembers
 import com.example.moil.feature.calendar.presentation.CalendarViewModel
-import com.example.moil.feature.event.domain.EventMember
-import com.example.moil.feature.event.domain.GroupEvent
+import com.example.moil.feature.event.module.domain.model.EventMember
+import com.example.moil.feature.event.module.domain.model.GroupEvent
 import com.example.moil.feature.calendar.presentation.component.dialog.ScheduleDatePickerDialog
 import com.example.moil.feature.calendar.presentation.component.dialog.ScheduleLocationDialog
 import com.example.moil.feature.calendar.presentation.component.dialog.ScheduleTimePickerDialog

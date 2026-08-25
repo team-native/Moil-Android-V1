@@ -1,4 +1,4 @@
-package com.example.moil.feature.event.domain
+package com.example.moil.feature.event.module.domain.model
 
 import com.example.moil.feature.group.domain.GroupColor
 
