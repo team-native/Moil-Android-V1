@@ -65,17 +65,26 @@ object NetworkModule {
     @Provides
     @Singleton
     @PublicClient
-    fun providePublicRetrofit(@PublicClient okHttpClient: OkHttpClient, json: Json): Retrofit = createRetrofit(okHttpClient, json)
+    fun providePublicRetrofit(
+        @PublicClient okHttpClient: OkHttpClient,
+        json: Json,
+    ): Retrofit = createRetrofit(okHttpClient, json)
 
     @Provides
     @Singleton
     @AuthenticatedClient
-    fun provideAuthenticatedRetrofit(@AuthenticatedClient okHttpClient: OkHttpClient, json: Json): Retrofit = createRetrofit(okHttpClient, json)
+    fun provideAuthenticatedRetrofit(
+        @AuthenticatedClient okHttpClient: OkHttpClient,
+        json: Json,
+    ): Retrofit = createRetrofit(okHttpClient, json)
 
     @Provides
     @Singleton
     @RefreshClient
-    fun provideRefreshRetrofit(@RefreshClient okHttpClient: OkHttpClient, json: Json): Retrofit = createRetrofit(okHttpClient, json)
+    fun provideRefreshRetrofit(
+        @RefreshClient okHttpClient: OkHttpClient,
+        json: Json,
+    ): Retrofit = createRetrofit(okHttpClient, json)
 
     @Provides
     @Singleton
