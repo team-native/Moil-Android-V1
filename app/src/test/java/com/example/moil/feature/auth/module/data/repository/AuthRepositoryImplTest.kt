@@ -11,6 +11,7 @@ import com.example.moil.feature.auth.module.data.dto.DeleteAccountRequestDto
 import com.example.moil.feature.auth.module.data.dto.LoginRequestDto
 import com.example.moil.feature.auth.module.data.dto.PasswordSessionRequestDto
 import com.example.moil.feature.auth.module.data.dto.SendCodeRequestDto
+import com.example.moil.feature.auth.module.data.dto.SocialLoginCallbackRequestDto
 import com.example.moil.feature.auth.module.data.dto.TokenResponseDto
 import com.example.moil.feature.auth.module.data.dto.UpdateProfileRequestDto
 import com.example.moil.feature.auth.module.data.dto.UserProfileResponseDto
@@ -18,6 +19,12 @@ import com.example.moil.feature.auth.module.data.dto.VerificationResponseDto
 import com.example.moil.feature.auth.module.data.dto.VerifiedSessionResponseDto
 import com.example.moil.feature.auth.module.data.dto.VerifyCodeRequestDto
 import com.example.moil.feature.auth.module.data.remote.AuthRemoteDataSource
+import com.example.moil.feature.auth.module.data.oauth.OAuthAttemptStore
+import com.example.moil.feature.auth.module.data.oauth.OAuthAuthorizationRequestFactory
+import com.example.moil.feature.auth.module.domain.model.OAuthAuthorizationRequest
+import com.example.moil.feature.auth.module.domain.model.SocialLoginCallback
+import com.example.moil.feature.auth.module.domain.model.SocialLoginProvider
+import com.example.moil.feature.auth.module.domain.model.AuthSession
 import com.example.moil.feature.auth.module.domain.model.UserProfile
 import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfileStore
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -41,6 +48,7 @@ class AuthRepositoryImplTest {
             ),
             sessionManager = FakeSessionManager(),
             currentUserProfileStore = profileStore,
+            oauthAuthorizationRequestFactory = OAuthAuthorizationRequestFactory(OAuthAttemptStore()),
         )
 
         val result = repository.updateProfileName("네이티브")
@@ -60,6 +68,7 @@ class AuthRepositoryImplTest {
             authRemoteDataSource = FakeAuthRemoteDataSource(logoutResult = NetworkResult.Success(Unit)),
             sessionManager = sessionManager,
             currentUserProfileStore = profileStore,
+            oauthAuthorizationRequestFactory = OAuthAuthorizationRequestFactory(OAuthAttemptStore()),
         )
 
         val result = repository.logout()
@@ -84,6 +93,10 @@ private class FakeAuthRemoteDataSource(
     override suspend fun changePassword(request: ChangePasswordRequestDto): NetworkResult<Unit> = unused()
     override suspend fun logout(): NetworkResult<Unit> = logoutResult
     override suspend fun deleteAccount(request: DeleteAccountRequestDto): NetworkResult<Unit> = unused()
+    override suspend fun completeSocialLogin(
+        socialLoginType: String,
+        request: SocialLoginCallbackRequestDto,
+    ): NetworkResult<TokenResponseDto> = unused()
 
     private fun <T> unused(): NetworkResult<T> = NetworkResult.NetworkError(IllegalStateException("not used"))
 }

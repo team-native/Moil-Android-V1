@@ -7,7 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.moil.core.model.GroupMemberRole
 import com.example.moil.core.settings.MemberRolePreferencesRepository
@@ -22,6 +24,8 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private var pendingDeepLinkUri by mutableStateOf<String?>(null)
+
     @Inject
     lateinit var sessionManager: SessionManager
 
@@ -36,6 +40,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        pendingDeepLinkUri = intent.dataString
         enableEdgeToEdge()
         setContent {
             val isDarkThemeEnabled by themePreferencesRepository.isDarkTheme.collectAsStateWithLifecycle(
@@ -63,9 +68,18 @@ class MainActivity : ComponentActivity() {
                         },
                         sessionManager = sessionManager,
                         currentUserProfileStore = currentUserProfileStore,
+                        deepLinkUri = pendingDeepLinkUri,
+                        onDeepLinkConsumed = {
+                            pendingDeepLinkUri = null
+                        },
                     )
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        pendingDeepLinkUri = intent.dataString
     }
 }

@@ -8,5 +8,6 @@ sealed interface MoilResult<out T> {
 sealed interface MoilError {
     data class Server(val status: Int, val message: String) : MoilError
     data class Http(val code: Int, val message: String) : MoilError
+    data class Configuration(val message: String) : MoilError
     data object Network : MoilError
 }

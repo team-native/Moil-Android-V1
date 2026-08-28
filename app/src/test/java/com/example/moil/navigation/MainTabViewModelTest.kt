@@ -3,6 +3,9 @@ package com.example.moil.navigation
 import com.example.moil.core.domain.MoilError
 import com.example.moil.core.domain.MoilResult
 import com.example.moil.feature.auth.module.domain.model.AuthSession
+import com.example.moil.feature.auth.module.domain.model.OAuthAuthorizationRequest
+import com.example.moil.feature.auth.module.domain.model.SocialLoginCallback
+import com.example.moil.feature.auth.module.domain.model.SocialLoginProvider
 import com.example.moil.feature.auth.module.domain.model.UserProfile
 import com.example.moil.feature.auth.module.domain.model.Verification
 import com.example.moil.feature.auth.module.domain.model.VerificationStep
@@ -109,6 +112,8 @@ private class FakeAuthRepository(
     override suspend fun verifyCode(verifyId: String, code: String): MoilResult<VerifiedSession> = unused()
     override suspend fun confirmSignUp(sessionId: String, password: String, passwordConfirmation: String, userName: String): MoilResult<AuthSession> = unused()
     override suspend fun login(email: String, password: String): MoilResult<AuthSession> = unused()
+    override suspend fun startSocialLogin(provider: SocialLoginProvider): MoilResult<OAuthAuthorizationRequest> = unused()
+    override suspend fun completeSocialLogin(callback: SocialLoginCallback): MoilResult<AuthSession> = unused()
     override suspend fun resetPassword(sessionId: String, password: String, passwordConfirmation: String): MoilResult<Unit> = unused()
     override suspend fun changePassword(origin: String, newPassword: String, passwordConfirmation: String): MoilResult<Unit> = unused()
     override suspend fun logout(): MoilResult<Unit> = unused()

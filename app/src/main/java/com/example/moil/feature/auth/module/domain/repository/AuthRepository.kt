@@ -2,6 +2,9 @@ package com.example.moil.feature.auth.module.domain.repository
 
 import com.example.moil.core.domain.MoilResult
 import com.example.moil.feature.auth.module.domain.model.AuthSession
+import com.example.moil.feature.auth.module.domain.model.OAuthAuthorizationRequest
+import com.example.moil.feature.auth.module.domain.model.SocialLoginCallback
+import com.example.moil.feature.auth.module.domain.model.SocialLoginProvider
 import com.example.moil.feature.auth.module.domain.model.Verification
 import com.example.moil.feature.auth.module.domain.model.VerificationStep
 import com.example.moil.feature.auth.module.domain.model.VerifiedSession
@@ -18,6 +21,8 @@ interface AuthRepository {
         userName: String,
     ): MoilResult<AuthSession>
     suspend fun login(email: String, password: String): MoilResult<AuthSession>
+    suspend fun startSocialLogin(provider: SocialLoginProvider): MoilResult<OAuthAuthorizationRequest>
+    suspend fun completeSocialLogin(callback: SocialLoginCallback): MoilResult<AuthSession>
     suspend fun resetPassword(sessionId: String, password: String, passwordConfirmation: String): MoilResult<Unit>
     suspend fun changePassword(origin: String, newPassword: String, passwordConfirmation: String): MoilResult<Unit>
     suspend fun logout(): MoilResult<Unit>

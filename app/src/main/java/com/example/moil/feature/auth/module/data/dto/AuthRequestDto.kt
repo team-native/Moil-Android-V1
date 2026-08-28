@@ -60,3 +60,10 @@ data class DeleteAccountRequestDto(
 data class UpdateProfileRequestDto(
     @SerialName("name") val name: String,
 )
+
+@Serializable
+data class SocialLoginCallbackRequestDto(
+    @SerialName("code") val code: String,
+    @SerialName("user") val user: String? = null,
+    @SerialName("codeVerifier") val codeVerifier: String? = null,
+)

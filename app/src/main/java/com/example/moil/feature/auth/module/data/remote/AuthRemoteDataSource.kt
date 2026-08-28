@@ -6,6 +6,7 @@ import com.example.moil.feature.auth.module.data.dto.DeleteAccountRequestDto
 import com.example.moil.feature.auth.module.data.dto.LoginRequestDto
 import com.example.moil.feature.auth.module.data.dto.PasswordSessionRequestDto
 import com.example.moil.feature.auth.module.data.dto.SendCodeRequestDto
+import com.example.moil.feature.auth.module.data.dto.SocialLoginCallbackRequestDto
 import com.example.moil.feature.auth.module.data.dto.TokenResponseDto
 import com.example.moil.feature.auth.module.data.dto.UpdateProfileRequestDto
 import com.example.moil.feature.auth.module.data.dto.UserProfileResponseDto
@@ -23,4 +24,8 @@ interface AuthRemoteDataSource {
     suspend fun changePassword(request: ChangePasswordRequestDto): NetworkResult<Unit>
     suspend fun logout(): NetworkResult<Unit>
     suspend fun deleteAccount(request: DeleteAccountRequestDto): NetworkResult<Unit>
+    suspend fun completeSocialLogin(
+        socialLoginType: String,
+        request: SocialLoginCallbackRequestDto,
+    ): NetworkResult<TokenResponseDto>
 }
