@@ -15,11 +15,16 @@ import com.example.moil.feature.auth.module.data.mapper.toDomain
 import com.example.moil.feature.auth.module.data.mapper.toDto
 import com.example.moil.feature.auth.module.data.mapper.toUserProfileOrNull
 import com.example.moil.feature.auth.module.data.remote.AuthRemoteDataSource
+import com.example.moil.feature.auth.module.data.dto.SocialLoginCallbackRequestDto
+import com.example.moil.feature.auth.module.data.oauth.OAuthAuthorizationRequestFactory
 import com.example.moil.feature.auth.module.domain.model.AuthSession
 import com.example.moil.feature.auth.module.domain.model.UserProfile
 import com.example.moil.feature.auth.module.domain.model.Verification
 import com.example.moil.feature.auth.module.domain.model.VerificationStep
 import com.example.moil.feature.auth.module.domain.model.VerifiedSession
+import com.example.moil.feature.auth.module.domain.model.OAuthAuthorizationRequest
+import com.example.moil.feature.auth.module.domain.model.SocialLoginCallback
+import com.example.moil.feature.auth.module.domain.model.SocialLoginProvider
 import com.example.moil.feature.auth.module.domain.repository.AuthRepository
 import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfileStore
 import javax.inject.Inject
@@ -28,6 +33,7 @@ class AuthRepositoryImpl @Inject constructor(
     private val authRemoteDataSource: AuthRemoteDataSource,
     private val sessionManager: SessionManager,
     private val currentUserProfileStore: CurrentUserProfileStore,
+    private val oauthAuthorizationRequestFactory: OAuthAuthorizationRequestFactory,
 ) : AuthRepository {
     // 마이페이지 프로필 저장 이벤트에서 서버 이름 변경 결과를 Domain 모델로 변환합니다.
     override suspend fun updateProfileName(name: String): MoilResult<UserProfile> {
@@ -79,6 +85,40 @@ class AuthRepositoryImpl @Inject constructor(
             }
         saveSessionIfSuccessful(result)
         return result
+    }
+
+    override suspend fun startSocialLogin(provider: SocialLoginProvider): MoilResult<OAuthAuthorizationRequest> =
+        oauthAuthorizationRequestFactory.create(provider)
+
+    override suspend fun completeSocialLogin(callback: SocialLoginCallback): MoilResult<AuthSession> {
+        val codeVerifier = oauthAuthorizationRequestFactory.consumeCodeVerifier(callback)
+            ?: return MoilResult.Failure(
+                com.example.moil.core.domain.MoilError.Configuration("소셜 로그인 요청을 확인할 수 없습니다."),
+            )
+        val result = authRemoteDataSource
+            .completeSocialLogin(
+                socialLoginType = callback.provider.wireValue,
+                request = SocialLoginCallbackRequestDto(
+                    code = callback.code,
+                    state = callback.state,
+                    user = callback.user,
+                    codeVerifier = codeVerifier,
+                ),
+            )
+            .mapToDomain { response ->
+                AuthSession(
+                    accessToken = response.accessToken,
+                    refreshToken = response.refreshToken,
+                    profile = response.toUserProfileOrNull(),
+                )
+            }
+        saveSessionIfSuccessful(result)
+        return result
+    }
+
+    // Provider 취소 또는 오류 callback 뒤에는 메모리의 1회성 verifier를 즉시 폐기합니다.
+    override fun cancelSocialLoginAttempt() {
+        oauthAuthorizationRequestFactory.discardAttempt()
     }
 
     override suspend fun resetPassword(sessionId: String, password: String, passwordConfirmation: String): MoilResult<Unit> = authRemoteDataSource

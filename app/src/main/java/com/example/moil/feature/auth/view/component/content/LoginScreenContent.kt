@@ -17,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.moil.R
+import com.example.moil.feature.auth.module.domain.model.SocialLoginProvider
 import com.example.moil.feature.auth.viewmodel.LoginScreenEvent
 import com.example.moil.feature.auth.viewmodel.LoginUiState
 import com.example.moil.feature.auth.viewmodel.emailRegex
@@ -99,6 +100,36 @@ internal fun LoginScreenContent(
                 text = stringResource(R.string.auth_login),
                 enabled = uiState.canLogin(),
                 onClick = { onEvent(LoginScreenEvent.LoginClicked) },
+            )
+
+            Spacer(modifier = Modifier.height(MoilAuthDimension.FieldSpacing))
+
+            SocialLoginButton(
+                provider = SocialLoginProvider.Google,
+                enabled = !uiState.isLoading,
+                onClick = {
+                    onEvent(LoginScreenEvent.SocialLoginClicked(SocialLoginProvider.Google))
+                },
+            )
+
+            Spacer(modifier = Modifier.height(MoilAuthDimension.FieldSpacing))
+
+            SocialLoginButton(
+                provider = SocialLoginProvider.Kakao,
+                enabled = !uiState.isLoading,
+                onClick = {
+                    onEvent(LoginScreenEvent.SocialLoginClicked(SocialLoginProvider.Kakao))
+                },
+            )
+
+            Spacer(modifier = Modifier.height(MoilAuthDimension.FieldSpacing))
+
+            SocialLoginButton(
+                provider = SocialLoginProvider.Apple,
+                enabled = !uiState.isLoading,
+                onClick = {
+                    onEvent(LoginScreenEvent.SocialLoginClicked(SocialLoginProvider.Apple))
+                },
             )
 
             Spacer(modifier = Modifier.height(MoilAuthDimension.BottomActionSpacing))

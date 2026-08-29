@@ -4,9 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moil.core.domain.MoilResult
 import com.example.moil.feature.auth.module.domain.model.VerificationStep
+import com.example.moil.feature.auth.module.domain.model.SocialLoginCallback
+import com.example.moil.feature.auth.module.domain.model.SocialLoginProvider
+import com.example.moil.feature.auth.module.domain.usecase.CompleteSocialLoginUseCase
+import com.example.moil.feature.auth.module.domain.usecase.CancelSocialLoginUseCase
 import com.example.moil.feature.auth.module.domain.usecase.ConfirmSignUpUseCase
 import com.example.moil.feature.auth.module.domain.usecase.LoginUseCase
 import com.example.moil.feature.auth.module.domain.usecase.SendVerificationCodeUseCase
+import com.example.moil.feature.auth.module.domain.usecase.StartSocialLoginUseCase
 import com.example.moil.feature.auth.module.domain.usecase.VerifyCodeUseCase
 import com.example.moil.feature.auth.view.canCreateAccount
 import com.example.moil.feature.auth.view.canLogin
@@ -25,6 +30,7 @@ import kotlinx.coroutines.launch
 sealed interface AuthEffect {
     data object LoginCompleted : AuthEffect
     data class SignUpCompleted(val email: String) : AuthEffect
+    data class OpenSocialLogin(val authorizationUrl: String) : AuthEffect
 }
 
 @HiltViewModel
@@ -33,6 +39,9 @@ class AuthViewModel @Inject constructor(
     private val verifyCodeUseCase: VerifyCodeUseCase,
     private val confirmSignUpUseCase: ConfirmSignUpUseCase,
     private val loginUseCase: LoginUseCase,
+    private val startSocialLoginUseCase: StartSocialLoginUseCase,
+    private val completeSocialLoginUseCase: CompleteSocialLoginUseCase,
+    private val cancelSocialLoginUseCase: CancelSocialLoginUseCase,
 ) : ViewModel() {
     private val mutableLoginUiState = MutableStateFlow(LoginUiState())
     val loginUiState: StateFlow<LoginUiState> = mutableLoginUiState.asStateFlow()
@@ -53,7 +62,59 @@ class AuthViewModel @Inject constructor(
             is LoginScreenEvent.PasswordChanged -> mutableLoginUiState.value = mutableLoginUiState.value.copy(password = event.password, errorMessage = null)
             LoginScreenEvent.LoginClicked -> login()
             LoginScreenEvent.ForgotPasswordClicked, LoginScreenEvent.SignUpClicked -> Unit
+            is LoginScreenEvent.SocialLoginClicked -> startSocialLogin(event.provider)
         }
+    }
+
+    /** 소셜 로그인 버튼 이벤트에서 인증 URL을 만들고 Route가 Custom Tabs를 열도록 효과를 보냅니다. */
+    private fun startSocialLogin(provider: SocialLoginProvider) {
+        if (mutableLoginUiState.value.isLoading) {
+            return
+        }
+
+        viewModelScope.launch {
+            mutableLoginUiState.value = mutableLoginUiState.value.copy(
+                isLoading = true,
+                errorMessage = null,
+            )
+            when (val result = startSocialLoginUseCase(provider)) {
+                is MoilResult.Success -> {
+                    mutableLoginUiState.value = mutableLoginUiState.value.copy(isLoading = false)
+                    mutableEffects.emit(AuthEffect.OpenSocialLogin(result.value.authorizationUrl))
+                }
+                is MoilResult.Failure -> mutableLoginUiState.value = mutableLoginUiState.value.copy(
+                    isLoading = false,
+                    errorMessage = result.error.toMessage(),
+                )
+            }
+        }
+    }
+
+    /** Activity가 전달한 OAuth callback을 검증된 서버 callback UseCase로 완료합니다. */
+    fun handleSocialLoginCallback(callback: SocialLoginCallback) = viewModelScope.launch {
+        mutableLoginUiState.value = mutableLoginUiState.value.copy(
+            isLoading = true,
+            errorMessage = null,
+        )
+        when (val result = completeSocialLoginUseCase(callback)) {
+            is MoilResult.Success -> {
+                mutableLoginUiState.value = mutableLoginUiState.value.copy(isLoading = false)
+                mutableEffects.emit(AuthEffect.LoginCompleted)
+            }
+            is MoilResult.Failure -> mutableLoginUiState.value = mutableLoginUiState.value.copy(
+                isLoading = false,
+                errorMessage = result.error.toMessage(),
+            )
+        }
+    }
+
+    /** Provider 취소·오류 callback에서 verifier를 폐기하고 안전한 재시도 메시지를 보여줍니다. */
+    fun handleSocialLoginFailure() {
+        cancelSocialLoginUseCase()
+        mutableLoginUiState.value = mutableLoginUiState.value.copy(
+            isLoading = false,
+            errorMessage = "소셜 로그인이 취소되었거나 실패했습니다. 다시 시도해주세요.",
+        )
     }
 
     fun onSignUpEvent(event: SignUpScreenEvent) {
@@ -161,5 +222,6 @@ class AuthViewModel @Inject constructor(
 private fun com.example.moil.core.domain.MoilError.toMessage(): String = when (this) {
     is com.example.moil.core.domain.MoilError.Server -> message
     is com.example.moil.core.domain.MoilError.Http -> message
+    is com.example.moil.core.domain.MoilError.Configuration -> message
     com.example.moil.core.domain.MoilError.Network -> "네트워크 연결을 확인해주세요."
 }

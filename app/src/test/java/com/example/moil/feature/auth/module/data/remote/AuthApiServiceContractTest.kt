@@ -6,6 +6,7 @@ import com.example.moil.feature.auth.module.data.dto.LoginRequestDto
 import com.example.moil.feature.auth.module.data.dto.PasswordSessionRequestDto
 import com.example.moil.feature.auth.module.data.dto.RefreshTokenRequestDto
 import com.example.moil.feature.auth.module.data.dto.SendCodeRequestDto
+import com.example.moil.feature.auth.module.data.dto.SocialLoginCallbackRequestDto
 import com.example.moil.feature.auth.module.data.dto.UpdateProfileRequestDto
 import com.example.moil.feature.auth.module.data.dto.VerificationStepDto
 import com.example.moil.feature.auth.module.data.dto.VerifyCodeRequestDto
@@ -76,6 +77,23 @@ class AuthApiServiceContractTest {
         refreshAuthApiService.refresh(RefreshTokenRequestDto("old-refresh")).execute()
 
         assertRequest("POST", "/auth/refresh", "\"refresh_token\":\"old-refresh\"")
+    }
+
+    @Test
+    fun `소셜 로그인 토큰 교환은 provider path와 code body를 사용한다`() = runBlocking {
+        enqueueEnvelope("{\"accessToken\":\"access\",\"refreshToken\":\"refresh\"}")
+
+        publicAuthApiService.completeSocialLogin(
+            socialLoginType = "google",
+            request = SocialLoginCallbackRequestDto(
+                code = "google-auth-code",
+                state = "oauth-state",
+                user = null,
+                codeVerifier = "pkce-verifier",
+            ),
+        )
+
+        assertRequest("POST", "/oauth/google/token", "\"code\":\"google-auth-code\"")
     }
 
     @Test

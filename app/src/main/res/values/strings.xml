@@ -158,6 +158,9 @@
     <string name="auth_forgot_password">비밀번호를 잊으셨나요?</string>
     <string name="auth_login_prompt">계정이 없으신가요?</string>
     <string name="auth_signup">회원가입</string>
+    <string name="auth_login_google">Google로 로그인</string>
+    <string name="auth_login_kakao">Kakao로 로그인</string>
+    <string name="auth_login_apple">Apple로 로그인</string>
     <string name="auth_signup_prompt">이미 계정이 있으신가요?</string>
     <string name="auth_name">이름</string>
     <string name="auth_name_placeholder">이름 입력</string>

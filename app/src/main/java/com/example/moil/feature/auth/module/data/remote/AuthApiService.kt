@@ -7,6 +7,7 @@ import com.example.moil.feature.auth.module.data.dto.LoginRequestDto
 import com.example.moil.feature.auth.module.data.dto.PasswordSessionRequestDto
 import com.example.moil.feature.auth.module.data.dto.RefreshTokenRequestDto
 import com.example.moil.feature.auth.module.data.dto.SendCodeRequestDto
+import com.example.moil.feature.auth.module.data.dto.SocialLoginCallbackRequestDto
 import com.example.moil.feature.auth.module.data.dto.TokenResponseDto
 import com.example.moil.feature.auth.module.data.dto.UpdateProfileRequestDto
 import com.example.moil.feature.auth.module.data.dto.UserProfileResponseDto
@@ -18,6 +19,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface PublicAuthApiService {
     @POST("auth/send-code")
@@ -34,6 +36,12 @@ interface PublicAuthApiService {
 
     @POST("auth/reset-password")
     suspend fun resetPassword(@Body request: PasswordSessionRequestDto): Response<ApiEnvelopeDto<Unit>>
+
+    @POST("oauth/{socialLoginType}/token")
+    suspend fun completeSocialLogin(
+        @Path("socialLoginType") socialLoginType: String,
+        @Body request: SocialLoginCallbackRequestDto,
+    ): Response<ApiEnvelopeDto<TokenResponseDto>>
 }
 
 interface AuthenticatedAuthApiService {
