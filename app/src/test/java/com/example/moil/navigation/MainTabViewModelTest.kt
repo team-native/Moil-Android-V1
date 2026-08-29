@@ -114,6 +114,7 @@ private class FakeAuthRepository(
     override suspend fun login(email: String, password: String): MoilResult<AuthSession> = unused()
     override suspend fun startSocialLogin(provider: SocialLoginProvider): MoilResult<OAuthAuthorizationRequest> = unused()
     override suspend fun completeSocialLogin(callback: SocialLoginCallback): MoilResult<AuthSession> = unused()
+    override fun cancelSocialLoginAttempt() = Unit
     override suspend fun resetPassword(sessionId: String, password: String, passwordConfirmation: String): MoilResult<Unit> = unused()
     override suspend fun changePassword(origin: String, newPassword: String, passwordConfirmation: String): MoilResult<Unit> = unused()
     override suspend fun logout(): MoilResult<Unit> = unused()

@@ -7,6 +7,7 @@ import com.example.moil.feature.auth.module.domain.model.VerificationStep
 import com.example.moil.feature.auth.module.domain.model.SocialLoginCallback
 import com.example.moil.feature.auth.module.domain.model.SocialLoginProvider
 import com.example.moil.feature.auth.module.domain.usecase.CompleteSocialLoginUseCase
+import com.example.moil.feature.auth.module.domain.usecase.CancelSocialLoginUseCase
 import com.example.moil.feature.auth.module.domain.usecase.ConfirmSignUpUseCase
 import com.example.moil.feature.auth.module.domain.usecase.LoginUseCase
 import com.example.moil.feature.auth.module.domain.usecase.SendVerificationCodeUseCase
@@ -40,6 +41,7 @@ class AuthViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val startSocialLoginUseCase: StartSocialLoginUseCase,
     private val completeSocialLoginUseCase: CompleteSocialLoginUseCase,
+    private val cancelSocialLoginUseCase: CancelSocialLoginUseCase,
 ) : ViewModel() {
     private val mutableLoginUiState = MutableStateFlow(LoginUiState())
     val loginUiState: StateFlow<LoginUiState> = mutableLoginUiState.asStateFlow()
@@ -104,6 +106,15 @@ class AuthViewModel @Inject constructor(
                 errorMessage = result.error.toMessage(),
             )
         }
+    }
+
+    /** Provider 취소·오류 callback에서 verifier를 폐기하고 안전한 재시도 메시지를 보여줍니다. */
+    fun handleSocialLoginFailure() {
+        cancelSocialLoginUseCase()
+        mutableLoginUiState.value = mutableLoginUiState.value.copy(
+            isLoading = false,
+            errorMessage = "소셜 로그인이 취소되었거나 실패했습니다. 다시 시도해주세요.",
+        )
     }
 
     fun onSignUpEvent(event: SignUpScreenEvent) {

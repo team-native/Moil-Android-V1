@@ -29,4 +29,9 @@ class OAuthAttemptStore @Inject constructor() {
             storedAttempt.provider == provider && storedAttempt.state == state
         }
     }
+
+    @Synchronized
+    fun clear() {
+        currentAttempt = null
+    }
 }

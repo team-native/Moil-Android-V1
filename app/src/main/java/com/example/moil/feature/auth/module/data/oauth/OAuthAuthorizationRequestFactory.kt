@@ -50,6 +50,11 @@ class OAuthAuthorizationRequestFactory @Inject constructor(
     fun consumeCodeVerifier(callback: SocialLoginCallback): String? =
         oauthAttemptStore.consume(callback.provider, callback.state)?.codeVerifier
 
+    // Provider가 취소·실패 callback을 반환했을 때 이전 로그인 시도를 재사용하지 못하게 폐기합니다.
+    fun discardAttempt() {
+        oauthAttemptStore.clear()
+    }
+
     private fun randomUrlSafeString(length: Int): String {
         val randomBytes = ByteArray(length)
         secureRandom.nextBytes(randomBytes)

@@ -13,6 +13,11 @@ sealed interface AppDeepLink {
         val state: String,
         val user: String?,
     ) : AppDeepLink
+
+    data class OAuthFailure(
+        val provider: String,
+        val state: String?,
+    ) : AppDeepLink
 }
 
 object AppDeepLinkParser {
@@ -42,7 +47,7 @@ object AppDeepLinkParser {
         return AppDeepLink.JoinGroup(groupId)
     }
 
-    private fun parseOAuthCallback(uri: URI): AppDeepLink.OAuthCallback? {
+    private fun parseOAuthCallback(uri: URI): AppDeepLink? {
         val pathSegments = uri.path
             .split('/')
             .filter(String::isNotBlank)
@@ -52,17 +57,18 @@ object AppDeepLinkParser {
             ?.lowercase()
             ?.takeIf { candidateProvider -> candidateProvider in SUPPORTED_PROVIDERS }
             ?: return null
-        val code = uri.queryParameter("code")?.takeIf(String::isNotBlank) ?: return null
-        val state = uri.queryParameter("state")?.takeIf(String::isNotBlank) ?: return null
-
+        val state = uri.queryParameter("state")?.takeIf(String::isNotBlank)
         if (uri.queryParameter("error") != null) {
-            return null
+            return AppDeepLink.OAuthFailure(provider = provider, state = state)
         }
+
+        val code = uri.queryParameter("code")?.takeIf(String::isNotBlank) ?: return null
+        val requiredState = state ?: return null
 
         return AppDeepLink.OAuthCallback(
             provider = provider,
             code = code,
-            state = state,
+            state = requiredState,
             user = uri.queryParameter("user"),
         )
     }

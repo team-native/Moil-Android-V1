@@ -31,6 +31,9 @@ class AppDeepLinkParserTest {
         assertNull(AppDeepLinkParser.parse("https://example.com/join/123"))
         assertNull(AppDeepLinkParser.parse("moil://join/0"))
         assertNull(AppDeepLinkParser.parse("moil://oauth/google/callback?code=auth-code"))
-        assertNull(AppDeepLinkParser.parse("moil://oauth/google/callback?error=access_denied&state=state-1"))
+        assertEquals(
+            AppDeepLink.OAuthFailure(provider = "google", state = "state-1"),
+            AppDeepLinkParser.parse("moil://oauth/google/callback?error=access_denied&state=state-1"),
+        )
     }
 }

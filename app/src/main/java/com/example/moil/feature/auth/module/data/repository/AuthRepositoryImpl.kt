@@ -100,6 +100,7 @@ class AuthRepositoryImpl @Inject constructor(
                 socialLoginType = callback.provider.wireValue,
                 request = SocialLoginCallbackRequestDto(
                     code = callback.code,
+                    state = callback.state,
                     user = callback.user,
                     codeVerifier = codeVerifier,
                 ),
@@ -113,6 +114,11 @@ class AuthRepositoryImpl @Inject constructor(
             }
         saveSessionIfSuccessful(result)
         return result
+    }
+
+    // Provider 취소 또는 오류 callback 뒤에는 메모리의 1회성 verifier를 즉시 폐기합니다.
+    override fun cancelSocialLoginAttempt() {
+        oauthAuthorizationRequestFactory.discardAttempt()
     }
 
     override suspend fun resetPassword(sessionId: String, password: String, passwordConfirmation: String): MoilResult<Unit> = authRemoteDataSource

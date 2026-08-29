@@ -27,6 +27,11 @@ data class SocialLoginCallback(
     val user: String? = null,
 )
 
+data class SocialLoginFailure(
+    val provider: SocialLoginProvider,
+    val state: String?,
+)
+
 data class Verification(val verifyId: String)
 data class VerifiedSession(val sessionId: String)
 data class AuthSession(

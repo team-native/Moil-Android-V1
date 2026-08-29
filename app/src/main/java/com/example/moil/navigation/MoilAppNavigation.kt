@@ -42,6 +42,7 @@ fun MoilAppRoute(
     val lifecycleOwner = LocalLifecycleOwner.current
     var sessionExpirationCount by remember { mutableStateOf(0) }
     var pendingOAuthCallback by remember { mutableStateOf<SocialLoginCallback?>(null) }
+    var pendingOAuthFailure by remember { mutableStateOf(false) }
     val appDeepLink = androidx.compose.runtime.remember(deepLinkUri) {
         AppDeepLinkParser.parse(deepLinkUri)
     }
@@ -59,6 +60,9 @@ fun MoilAppRoute(
                     state = parsedDeepLink.state,
                     user = parsedDeepLink.user,
                 )
+            }
+            is AppDeepLink.OAuthFailure -> {
+                pendingOAuthFailure = true
             }
             null -> Unit
         }
@@ -93,6 +97,8 @@ fun MoilAppRoute(
         sessionExpirationCount = sessionExpirationCount,
         pendingOAuthCallback = pendingOAuthCallback,
         onOAuthCallbackConsumed = { pendingOAuthCallback = null },
+        hasPendingOAuthFailure = pendingOAuthFailure,
+        onOAuthFailureConsumed = { pendingOAuthFailure = false },
     )
 }
 
@@ -106,6 +112,8 @@ private fun MoilAppNavigation(
     sessionExpirationCount: Int,
     pendingOAuthCallback: SocialLoginCallback?,
     onOAuthCallbackConsumed: () -> Unit,
+    hasPendingOAuthFailure: Boolean,
+    onOAuthFailureConsumed: () -> Unit,
 ) {
     val destinationBackStack = remember {
         mutableStateListOf(if (isAuthenticated) MoilAppDestination.Main else MoilAppDestination.Login)
@@ -135,6 +143,8 @@ private fun MoilAppNavigation(
                 initialEmail = registeredEmail,
                 socialLoginCallback = pendingOAuthCallback,
                 onSocialLoginCallbackConsumed = onOAuthCallbackConsumed,
+                hasSocialLoginFailure = hasPendingOAuthFailure,
+                onSocialLoginFailureConsumed = onOAuthFailureConsumed,
                 onNavigateToSignUp = {
                     destinationBackStack += MoilAppDestination.SignUp
                 },

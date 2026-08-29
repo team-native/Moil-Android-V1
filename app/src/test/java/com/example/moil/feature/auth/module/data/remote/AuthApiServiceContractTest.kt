@@ -87,6 +87,7 @@ class AuthApiServiceContractTest {
             socialLoginType = "google",
             request = SocialLoginCallbackRequestDto(
                 code = "google-auth-code",
+                state = "oauth-state",
                 user = null,
                 codeVerifier = "pkce-verifier",
             ),

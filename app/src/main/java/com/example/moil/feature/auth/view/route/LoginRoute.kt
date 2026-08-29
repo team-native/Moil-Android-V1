@@ -18,6 +18,8 @@ fun LoginRoute(
     initialEmail: String,
     socialLoginCallback: SocialLoginCallback? = null,
     onSocialLoginCallbackConsumed: () -> Unit = {},
+    hasSocialLoginFailure: Boolean = false,
+    onSocialLoginFailureConsumed: () -> Unit = {},
     onNavigateToSignUp: () -> Unit,
     onLoginCompleted: () -> Unit,
 ) {
@@ -43,6 +45,13 @@ fun LoginRoute(
         socialLoginCallback?.let { callback ->
             onSocialLoginCallbackConsumed()
             viewModel.handleSocialLoginCallback(callback)
+        }
+    }
+
+    LaunchedEffect(hasSocialLoginFailure) {
+        if (hasSocialLoginFailure) {
+            onSocialLoginFailureConsumed()
+            viewModel.handleSocialLoginFailure()
         }
     }
 

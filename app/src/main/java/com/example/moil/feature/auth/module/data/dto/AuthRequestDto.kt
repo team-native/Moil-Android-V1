@@ -64,6 +64,7 @@ data class UpdateProfileRequestDto(
 @Serializable
 data class SocialLoginCallbackRequestDto(
     @SerialName("code") val code: String,
+    @SerialName("state") val state: String,
+    @SerialName("codeVerifier") val codeVerifier: String,
     @SerialName("user") val user: String? = null,
-    @SerialName("codeVerifier") val codeVerifier: String? = null,
 )

@@ -23,6 +23,7 @@ interface AuthRepository {
     suspend fun login(email: String, password: String): MoilResult<AuthSession>
     suspend fun startSocialLogin(provider: SocialLoginProvider): MoilResult<OAuthAuthorizationRequest>
     suspend fun completeSocialLogin(callback: SocialLoginCallback): MoilResult<AuthSession>
+    fun cancelSocialLoginAttempt()
     suspend fun resetPassword(sessionId: String, password: String, passwordConfirmation: String): MoilResult<Unit>
     suspend fun changePassword(origin: String, newPassword: String, passwordConfirmation: String): MoilResult<Unit>
     suspend fun logout(): MoilResult<Unit>
