@@ -2,8 +2,8 @@ package com.example.moil.navigation
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -12,14 +12,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import com.example.moil.core.network.SessionManager
+import com.example.moil.core.model.GroupMemberRole
 import com.example.moil.core.network.SessionEvent
+import com.example.moil.core.network.SessionManager
 import com.example.moil.core.network.SessionState
+import com.example.moil.feature.auth.module.domain.model.SocialLoginCallback
+import com.example.moil.feature.auth.module.domain.model.SocialLoginProvider
+import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfileStore
 import com.example.moil.feature.auth.view.LoginRoute
 import com.example.moil.feature.auth.view.SignUpRoute
-import com.example.moil.feature.auth.module.domain.model.SocialLoginCallback
-import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfileStore
-import com.example.moil.core.model.GroupMemberRole
 
 private sealed interface MoilAppDestination {
     data object Login : MoilAppDestination
@@ -41,29 +42,26 @@ fun MoilAppRoute(
     val sessionState by sessionManager.sessionState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
     var sessionExpirationCount by remember { mutableStateOf(0) }
+    var pendingJoinGroupId by remember { mutableStateOf<Long?>(null) }
     var pendingOAuthCallback by remember { mutableStateOf<SocialLoginCallback?>(null) }
     var pendingOAuthFailure by remember { mutableStateOf(false) }
-    val appDeepLink = androidx.compose.runtime.remember(deepLinkUri) {
+    val appDeepLink = remember(deepLinkUri) {
         AppDeepLinkParser.parse(deepLinkUri)
     }
 
     LaunchedEffect(appDeepLink) {
         when (val parsedDeepLink = appDeepLink) {
-            // JoinGroup 딥링크 처리는 group-invite 기능 브랜치에서 이어서 배선한다.
-            is AppDeepLink.JoinGroup -> Unit
+            is AppDeepLink.JoinGroup -> pendingJoinGroupId = parsedDeepLink.groupId
             is AppDeepLink.OAuthCallback -> {
                 pendingOAuthCallback = SocialLoginCallback(
-                    provider = com.example.moil.feature.auth.module.domain.model.SocialLoginProvider
-                        .fromWireValue(parsedDeepLink.provider)
+                    provider = SocialLoginProvider.fromWireValue(parsedDeepLink.provider)
                         ?: return@LaunchedEffect,
                     code = parsedDeepLink.code,
                     state = parsedDeepLink.state,
                     user = parsedDeepLink.user,
                 )
             }
-            is AppDeepLink.OAuthFailure -> {
-                pendingOAuthFailure = true
-            }
+            is AppDeepLink.OAuthFailure -> pendingOAuthFailure = true
             null -> Unit
         }
 
@@ -95,6 +93,8 @@ fun MoilAppRoute(
         onCurrentUserRoleChanged = onCurrentUserRoleChanged,
         isAuthenticated = sessionState is SessionState.Authenticated,
         sessionExpirationCount = sessionExpirationCount,
+        pendingJoinGroupId = pendingJoinGroupId,
+        onJoinGroupDeepLinkHandled = { pendingJoinGroupId = null },
         pendingOAuthCallback = pendingOAuthCallback,
         onOAuthCallbackConsumed = { pendingOAuthCallback = null },
         hasPendingOAuthFailure = pendingOAuthFailure,
@@ -110,6 +110,8 @@ private fun MoilAppNavigation(
     onCurrentUserRoleChanged: (GroupMemberRole) -> Unit,
     isAuthenticated: Boolean,
     sessionExpirationCount: Int,
+    pendingJoinGroupId: Long?,
+    onJoinGroupDeepLinkHandled: () -> Unit,
     pendingOAuthCallback: SocialLoginCallback?,
     onOAuthCallbackConsumed: () -> Unit,
     hasPendingOAuthFailure: Boolean,
@@ -172,6 +174,8 @@ private fun MoilAppNavigation(
             onDarkThemeChanged = onDarkThemeChanged,
             currentUserRole = currentUserRole,
             onCurrentUserRoleChanged = onCurrentUserRoleChanged,
+            pendingJoinGroupId = pendingJoinGroupId,
+            onJoinGroupDeepLinkHandled = onJoinGroupDeepLinkHandled,
         )
     }
 }

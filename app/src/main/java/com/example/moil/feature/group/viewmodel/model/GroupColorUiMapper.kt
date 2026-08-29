@@ -24,6 +24,7 @@ fun GroupMember.toJoinGroupUsedProfileUiModel(): JoinGroupUsedProfileUiModel =
     JoinGroupUsedProfileUiModel(
         nickname = nickname,
         color = color,
+        imagePath = imagePath,
     )
 
 fun List<GroupMember>.toJoinGroupProfileOptions(): JoinGroupProfileOptions {

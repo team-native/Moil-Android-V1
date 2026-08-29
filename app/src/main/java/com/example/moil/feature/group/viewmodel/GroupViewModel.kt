@@ -18,12 +18,20 @@ import com.example.moil.feature.group.module.domain.usecase.TransferAdminUseCase
 import com.example.moil.feature.group.module.domain.usecase.UpdateGroupNotificationUseCase
 import com.example.moil.feature.group.module.domain.usecase.UpdateMemberRolesUseCase
 import com.example.moil.feature.group.module.domain.usecase.VerifyInviteUseCase
+import com.example.moil.feature.image.module.domain.usecase.UploadProfileImageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+
+sealed interface GroupEffect {
+    data class GroupOperationCompleted(val groupId: Long) : GroupEffect
+}
 
 @HiltViewModel
 class GroupViewModel @Inject constructor(
@@ -38,10 +46,13 @@ class GroupViewModel @Inject constructor(
     private val updateMemberRolesUseCase: UpdateMemberRolesUseCase,
     private val transferAdminUseCase: TransferAdminUseCase,
     private val leaveGroupUseCase: LeaveGroupUseCase,
+    private val uploadProfileImageUseCase: UploadProfileImageUseCase,
     private val currentUserProfileStore: CurrentUserProfileStore,
 ) : ViewModel() {
     private val mutableUiState = MutableStateFlow(GroupUiState())
     val uiState: StateFlow<GroupUiState> = mutableUiState.asStateFlow()
+    private val mutableEffects = MutableSharedFlow<GroupEffect>()
+    val effects: SharedFlow<GroupEffect> = mutableEffects.asSharedFlow()
 
     init {
         loadGroups()
@@ -94,8 +105,16 @@ class GroupViewModel @Inject constructor(
         }
     }
 
-    /** 그룹 생성 화면에서 가입 때 저장한 이름을 닉네임으로 사용해 서버에 그룹을 생성합니다. */
-    fun createGroup(name: String, color: GroupColor) = viewModelScope.launch {
+    /** 그룹 생성 화면의 선택 이미지를 먼저 업로드한 뒤 색상 또는 이미지 경로로 그룹을 생성합니다. */
+    fun createGroup(
+        name: String,
+        color: GroupColor?,
+        selectedImageUri: String?,
+    ) = viewModelScope.launch {
+        if (mutableUiState.value.isSubmitting) {
+            return@launch
+        }
+
         val nickname = currentUserProfileStore.profile.value?.name
 
         if (nickname == null) {
@@ -106,9 +125,34 @@ class GroupViewModel @Inject constructor(
             return@launch
         }
 
-        when (val result = createGroupUseCase(name, nickname, color)) {
-            is MoilResult.Success -> loadGroups(preferredGroupId = result.value.id)
-            is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(error = result.error)
+        mutableUiState.value = mutableUiState.value.copy(
+            isSubmitting = true,
+            error = null,
+        )
+
+        when (val imageResult = uploadSelectedImage(selectedImageUri)) {
+            is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(
+                isSubmitting = false,
+                error = imageResult.error,
+            )
+            is MoilResult.Success -> when (
+                val result = createGroupUseCase(
+                    name = name,
+                    nickname = nickname,
+                    color = if (imageResult.value == null) color else null,
+                    imagePath = imageResult.value,
+                )
+            ) {
+                is MoilResult.Success -> {
+                    mutableUiState.value = mutableUiState.value.copy(isSubmitting = false)
+                    loadGroups(preferredGroupId = result.value.id)
+                    mutableEffects.emit(GroupEffect.GroupOperationCompleted(result.value.id))
+                }
+                is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(
+                    isSubmitting = false,
+                    error = result.error,
+                )
+            }
         }
     }
 
@@ -143,10 +187,45 @@ class GroupViewModel @Inject constructor(
         }
     }
 
-    fun joinGroup(inviteCode: String, nickname: String, color: GroupColor) = viewModelScope.launch {
-        when (val result = joinGroupUseCase(inviteCode, nickname, color)) {
-            is MoilResult.Success -> loadGroups(preferredGroupId = result.value.id)
-            is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(error = result.error)
+    /** 그룹 가입 프로필 이미지를 업로드한 뒤 가입 요청을 실행합니다. */
+    fun joinGroup(
+        inviteCode: String,
+        nickname: String,
+        color: GroupColor?,
+        selectedImageUri: String?,
+    ) = viewModelScope.launch {
+        if (mutableUiState.value.isSubmitting) {
+            return@launch
+        }
+
+        mutableUiState.value = mutableUiState.value.copy(
+            isSubmitting = true,
+            error = null,
+        )
+
+        when (val imageResult = uploadSelectedImage(selectedImageUri)) {
+            is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(
+                isSubmitting = false,
+                error = imageResult.error,
+            )
+            is MoilResult.Success -> when (
+                val result = joinGroupUseCase(
+                    code = inviteCode,
+                    nickname = nickname,
+                    color = if (imageResult.value == null) color else null,
+                    imagePath = imageResult.value,
+                )
+            ) {
+                is MoilResult.Success -> {
+                    mutableUiState.value = mutableUiState.value.copy(isSubmitting = false)
+                    loadGroups(preferredGroupId = result.value.id)
+                    mutableEffects.emit(GroupEffect.GroupOperationCompleted(result.value.id))
+                }
+                is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(
+                    isSubmitting = false,
+                    error = result.error,
+                )
+            }
         }
     }
 
@@ -193,6 +272,17 @@ class GroupViewModel @Inject constructor(
         when (val result = getGroupUseCase(groupId)) {
             is MoilResult.Success -> mutableUiState.value = mutableUiState.value.copy(selectedGroupDetail = result.value)
             is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(error = result.error)
+        }
+    }
+
+    private suspend fun uploadSelectedImage(selectedImageUri: String?): MoilResult<String?> {
+        if (selectedImageUri.isNullOrBlank()) {
+            return MoilResult.Success(null)
+        }
+
+        return when (val result = uploadProfileImageUseCase(selectedImageUri)) {
+            is MoilResult.Success -> MoilResult.Success(result.value.imagePath)
+            is MoilResult.Failure -> MoilResult.Failure(result.error)
         }
     }
 }

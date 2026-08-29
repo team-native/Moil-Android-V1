@@ -28,6 +28,7 @@ data class GroupUiModel(
     val name: String,
     val inviteCode: String,
     val profileColor: GroupColor,
+    val profileImagePath: String? = null,
     val members: List<FamilyMemberUiModel>,
 )
 
@@ -36,5 +37,6 @@ data class FamilyMemberUiModel(
     @param:StringRes val roleRes: Int,
     val name: String,
     val profileColor: GroupColor,
+    val profileImagePath: String? = null,
     val isCurrentUser: Boolean,
 )

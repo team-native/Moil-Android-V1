@@ -12,6 +12,7 @@ data class GroupSummary(
     val myNickname: String?,
     val myColor: GroupColor,
     val memberCount: Int?,
+    val myImagePath: String? = null,
 )
 
 data class GroupMember(
@@ -21,6 +22,7 @@ data class GroupMember(
     val role: GroupRole,
     val color: GroupColor,
     val isMe: Boolean?,
+    val imagePath: String? = null,
 )
 
 data class GroupMemberProfile(
@@ -28,6 +30,7 @@ data class GroupMemberProfile(
     val userId: Long,
     val nickname: String,
     val color: GroupColor,
+    val imagePath: String? = null,
 )
 
 data class InviteVerification(val groupId: Long, val groupName: String, val memberCount: Int, val inviteCode: String)

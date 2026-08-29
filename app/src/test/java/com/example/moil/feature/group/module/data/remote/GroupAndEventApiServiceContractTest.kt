@@ -66,6 +66,7 @@ class GroupAndEventApiServiceContractTest {
         enqueue(groupJoinJson)
         val joinResponse = groupApiService.joinGroup(JoinGroupRequestDto("FAM-1", "모일", "SKY"))
         assertNull(joinResponse.body()?.data?.inviteCode)
+        assertEquals("/image/joined", joinResponse.body()?.data?.myImagePath)
         assertRequest("POST", "/groups/join", "\"inviteCode\":\"FAM-1\"")
 
         enqueue(groupDetailJson)
@@ -77,20 +78,24 @@ class GroupAndEventApiServiceContractTest {
         groupApiService.leaveGroup(1)
         assertRequest("DELETE", "/groups/1/members/me")
 
-        enqueue("{\"groupId\":1,\"userId\":2,\"nickname\":\"모일\",\"colorId\":\"SKY\"}")
+        enqueue("{\"groupId\":1,\"userId\":2,\"nickname\":\"모일\",\"colorId\":null,\"imagePath\":\"/image/profile\"}")
         val profileResponse = groupApiService.updateMyGroupProfile(
             groupId = 1,
             request = UpdateMyGroupProfileRequestDto("모일", "SKY"),
         )
-        assertEquals("SKY", profileResponse.body()?.data?.colorId)
+        assertNull(profileResponse.body()?.data?.colorId)
+        assertEquals("/image/profile", profileResponse.body()?.data?.imagePath)
         assertRequest("PATCH", "/groups/1/members/me", "\"colorId\":\"SKY\"")
 
-        enqueue("[]")
-        groupApiService.getMembers(1)
+        enqueue("[{\"userId\":2,\"nickname\":\"모일\",\"email\":\"moil@example.com\",\"role\":\"member\",\"colorId\":null,\"imagePath\":\"/image/member\",\"isMe\":true}]")
+        val membersResponse = groupApiService.getMembers(1)
+        assertNull(membersResponse.body()?.data?.single()?.colorId)
+        assertEquals("/image/member", membersResponse.body()?.data?.single()?.imagePath)
         assertRequest("GET", "/groups/1/members")
 
-        enqueue("null")
-        groupApiService.updateNotification(1, NotificationRequestDto(true))
+        enqueue("{\"groupId\":1,\"notificationEnabled\":true}")
+        val notificationResponse = groupApiService.updateNotification(1, NotificationRequestDto(true))
+        assertEquals(true, notificationResponse.body()?.data?.notificationEnabled)
         assertRequest("PATCH", "/groups/1/notification", "\"enabled\":true")
 
         enqueue("null")
@@ -113,16 +118,16 @@ class GroupAndEventApiServiceContractTest {
         assertRequest("GET", "/groups/1/events?month=2026-07")
 
         enqueue("{\"eventId\":5}")
-        eventApiService.createEvent(EventRequestDto(1, "식사", "2026-07-22", "2026-07-24", false, "18:00", "20:00", "서울", listOf(1, 2)))
-        assertRequest("POST", "/events", "\"startDate\":\"2026-07-22\"")
+        eventApiService.createEvent(EventRequestDto(1, "식사", "2026-07-22", "18:00", "20:00", "서울", "메모", listOf(1, 2)))
+        assertRequest("POST", "/events", "\"date\":\"2026-07-22\"")
 
         enqueue("null")
         eventApiService.getEvent(5)
         assertRequest("GET", "/events/5")
 
         enqueue("null")
-        eventApiService.updateEvent(5, UpdateEventRequestDto("식사", "2026-07-22", "2026-07-24", false, "18:00", "20:00", "서울", listOf(1)))
-        assertRequest("PATCH", "/events/5", "\"endDate\":\"2026-07-24\"")
+        eventApiService.updateEvent(5, UpdateEventRequestDto("식사", "2026-07-22", "18:00", "20:00", "서울", "메모", listOf(1)))
+        assertRequest("PATCH", "/events/5", "\"memo\":\"메모\"")
 
         enqueue("null")
         eventApiService.deleteEvent(5)
@@ -142,8 +147,8 @@ class GroupAndEventApiServiceContractTest {
 
     private companion object {
         const val groupSummaryJson = "{\"groupId\":1,\"name\":\"우리 가족\",\"inviteCode\":\"FAM-1\",\"myRole\":\"admin\"}"
-        const val groupJoinJson = "{\"groupId\":1,\"name\":\"우리 가족\",\"myRole\":\"member\",\"myNickname\":\"모일\",\"myColor\":\"SKY\"}"
-        const val groupDetailJson = "{\"groupId\":1,\"name\":\"우리 가족\",\"inviteCode\":\"FAM-1\",\"memberCount\":1,\"monthlyEventCount\":0,\"myRole\":\"admin\",\"members\":[{\"userId\":1,\"nickname\":\"모일\",\"role\":\"admin\",\"color\":\"RED\"}]}"
-        const val eventJson = "{\"eventId\":5,\"title\":\"식사\",\"startDate\":\"2026-07-22\",\"endDate\":\"2026-07-24\",\"isAllDay\":false,\"startTime\":\"18:00\",\"endTime\":\"20:00\",\"location\":\"서울\",\"members\":[]}"
+        const val groupJoinJson = "{\"groupId\":1,\"name\":\"우리 가족\",\"myRole\":\"member\",\"myNickname\":\"모일\",\"myColor\":\"SKY\",\"myImagePath\":\"/image/joined\"}"
+        const val groupDetailJson = "{\"groupId\":1,\"name\":\"우리 가족\",\"inviteCode\":\"FAM-1\",\"memberCount\":1,\"monthlyEventCount\":0,\"myRole\":\"admin\",\"members\":[{\"userId\":1,\"nickname\":\"모일\",\"role\":\"admin\",\"colorId\":\"RED\",\"imagePath\":null}]}"
+        const val eventJson = "{\"eventId\":5,\"title\":\"식사\",\"date\":\"2026-07-22\",\"startTime\":\"18:00\",\"endTime\":\"20:00\",\"location\":\"서울\",\"memo\":\"메모\",\"members\":[]}"
     }
 }

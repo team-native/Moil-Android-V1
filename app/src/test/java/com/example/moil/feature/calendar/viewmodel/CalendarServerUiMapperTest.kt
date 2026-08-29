@@ -3,6 +3,10 @@ package com.example.moil.feature.calendar.viewmodel
 import com.example.moil.feature.event.module.domain.model.EventMember
 import com.example.moil.feature.event.module.domain.model.GroupEvent
 import com.example.moil.feature.group.module.domain.model.GroupColor
+import com.example.moil.feature.group.module.domain.model.GroupMember
+import com.example.moil.feature.group.module.domain.model.GroupRole
+import java.time.LocalDate
+import java.time.LocalTime
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -27,20 +31,57 @@ class CalendarServerUiMapperTest {
     }
 
     @Test
-    fun `겹치는 기간 일정은 서로 다른 라인을 배정한다`() {
+    fun `일정 목록은 날짜와 시간 및 메모를 화면 모델로 변환한다`() {
+        val scheduleUiModel = listOf(
+            eventWithDetails(),
+        ).toCalendarSchedules(GroupColor.Green).single()
+
+        assertEquals(LocalDate.of(2026, 8, 3), scheduleUiModel.date)
+        assertEquals(LocalTime.of(10, 0), scheduleUiModel.startTime)
+        assertEquals(LocalTime.of(11, 30), scheduleUiModel.endTime)
+        assertEquals("회의실 A", scheduleUiModel.location)
+        assertEquals("신규 서비스 리뷰", scheduleUiModel.memo)
+    }
+
+    @Test
+    fun `일정 참여자의 이미지는 그룹 멤버 정보로 보강한다`() {
+        val scheduleUiModel = listOf(
+            eventWithDetails().copy(
+                members = listOf(EventMember(7L, "모일", GroupColor.Sky)),
+            ),
+        ).toCalendarSchedules(
+            fallbackProfileColor = GroupColor.Green,
+            groupMembers = listOf(
+                GroupMember(
+                    userId = 7L,
+                    nickname = "모일",
+                    email = "moil@example.com",
+                    role = GroupRole.Member,
+                    color = GroupColor.Sky,
+                    isMe = true,
+                    imagePath = "/image/profile",
+                ),
+            ),
+        ).single()
+
+        assertEquals("/image/profile", scheduleUiModel.members.single().imagePath)
+    }
+
+    @Test
+    fun `같은 날짜의 일정은 서로 다른 라인을 배정한다`() {
         val calendarEvents = listOf(
-            event(id = 1L, startDate = "2026-08-03", endDate = "2026-08-05"),
-            event(id = 2L, startDate = "2026-08-04", endDate = "2026-08-06"),
-            event(id = 3L, startDate = "2026-08-07", endDate = "2026-08-08"),
+            event(id = 1L, date = "2026-08-03"),
+            event(id = 2L, date = "2026-08-03"),
+            event(id = 3L, date = "2026-08-07"),
         ).toCalendarEvents(GroupColor.Green)
 
         assertEquals(listOf(0, 1, 0), calendarEvents.map { event -> event.lineIndex })
     }
 
     @Test
-    fun `종료일이 시작일보다 빠른 일정은 표시 대상에서 제외한다`() {
+    fun `날짜 형식이 잘못된 일정은 표시 대상에서 제외한다`() {
         val calendarEvents = listOf(
-            event(startDate = "2026-08-05", endDate = "2026-08-03"),
+            event(date = "잘못된 날짜"),
         ).toCalendarEvents(GroupColor.Green)
 
         assertEquals(emptyList<CalendarEventUiModel>(), calendarEvents)
@@ -48,18 +89,27 @@ class CalendarServerUiMapperTest {
 
     private fun event(
         id: Long = 1L,
-        startDate: String = "2026-08-03",
-        endDate: String = "2026-08-03",
+        date: String = "2026-08-03",
         members: List<EventMember> = emptyList(),
     ): GroupEvent = GroupEvent(
         id = id,
         title = "가족 일정",
-        startDate = startDate,
-        endDate = endDate,
-        isAllDay = true,
+        date = date,
         startTime = null,
         endTime = null,
         location = null,
+        memo = null,
         members = members,
+    )
+
+    private fun eventWithDetails(): GroupEvent = GroupEvent(
+        id = 4L,
+        title = "디자인 회의",
+        date = "2026-08-03",
+        startTime = "10:00",
+        endTime = "11:30",
+        location = "회의실 A",
+        memo = "신규 서비스 리뷰",
+        members = emptyList(),
     )
 }

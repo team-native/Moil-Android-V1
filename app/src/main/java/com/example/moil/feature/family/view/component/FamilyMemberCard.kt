@@ -27,6 +27,7 @@ internal fun FamilyMemberCard(
                     name = member.name,
                     roleRes = memberRoleOverrides[member.id] ?: member.roleRes,
                     profileColor = member.profileColor,
+                    profileImagePath = member.profileImagePath,
                 )
 
                 if (index < members.lastIndex) {

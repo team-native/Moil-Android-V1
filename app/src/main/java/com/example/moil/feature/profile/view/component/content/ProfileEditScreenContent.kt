@@ -58,6 +58,7 @@ internal fun ProfileEditScreenContent(
             onProfileAvatarSelected = { avatarRes ->
                 onEvent(ProfileEditScreenEvent.ProfileAvatarSelected(avatarRes))
             },
+            showCustomProfileImage = false,
             avatarResources = profileAvatarResources,
         )
 

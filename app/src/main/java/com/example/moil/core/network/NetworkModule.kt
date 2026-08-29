@@ -6,6 +6,7 @@ import com.example.moil.feature.auth.module.data.remote.PublicAuthApiService
 import com.example.moil.feature.auth.module.data.remote.RefreshAuthApiService
 import com.example.moil.feature.group.module.data.remote.GroupApiService
 import com.example.moil.feature.event.module.data.remote.EventApiService
+import com.example.moil.feature.image.module.data.remote.ImageApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -105,6 +106,10 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideEventApiService(@AuthenticatedClient retrofit: Retrofit): EventApiService = retrofit.create(EventApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideImageApiService(@AuthenticatedClient retrofit: Retrofit): ImageApiService = retrofit.create(ImageApiService::class.java)
 
     private fun baseClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient.Builder = OkHttpClient.Builder()
         .connectTimeout(BuildConfig.CONNECT_TIMEOUT_SECONDS.toLong(), TimeUnit.SECONDS)

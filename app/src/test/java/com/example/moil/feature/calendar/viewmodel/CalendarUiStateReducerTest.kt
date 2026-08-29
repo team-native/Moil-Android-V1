@@ -25,6 +25,7 @@ class CalendarUiStateReducerTest {
         assertEquals(selectedDate, updatedUiState.selectedDate)
         assertFalse(updatedUiState.isGroupMenuVisible)
         assertTrue(updatedUiState.isScheduleSheetVisible)
+        assertEquals(CalendarScheduleSheetMode.List, updatedUiState.scheduleSheetMode)
     }
 
     @Test
@@ -54,23 +55,44 @@ class CalendarUiStateReducerTest {
     }
 
     @Test
-    fun scheduleStartDateChanged_종료일이_이전이면_시작일로_보정한다() {
-        val updatedUiState = initialUiState.copy(
-            scheduleStartDate = LocalDate.of(2026, 7, 22),
-            scheduleEndDate = LocalDate.of(2026, 7, 23),
-        ).reduce(CalendarScreenEvent.ScheduleStartDateChanged(LocalDate.of(2026, 7, 25)))
+    fun scheduleCreateClicked_switchesToCreateMode() {
+        val updatedUiState = initialUiState.copy(isScheduleSheetVisible = true)
+            .reduce(CalendarScreenEvent.ScheduleCreateClicked)
 
-        assertEquals(LocalDate.of(2026, 7, 25), updatedUiState.scheduleStartDate)
-        assertEquals(LocalDate.of(2026, 7, 25), updatedUiState.scheduleEndDate)
+        assertEquals(CalendarScheduleSheetMode.Create, updatedUiState.scheduleSheetMode)
     }
 
     @Test
-    fun scheduleEndDateChanged_시작일보다_이전이면_시작일로_보정한다() {
-        val updatedUiState = initialUiState.copy(
-            scheduleStartDate = LocalDate.of(2026, 7, 22),
-        ).reduce(CalendarScreenEvent.ScheduleEndDateChanged(LocalDate.of(2026, 7, 20)))
+    fun scheduleItemClicked_switchesToDetailMode() {
+        val updatedUiState = initialUiState.reduce(
+            CalendarScreenEvent.ScheduleItemClicked(eventId = 12L),
+        )
 
-        assertEquals(LocalDate.of(2026, 7, 22), updatedUiState.scheduleEndDate)
+        assertEquals(CalendarScheduleSheetMode.Detail, updatedUiState.scheduleSheetMode)
+        assertEquals(12L, updatedUiState.selectedEventId)
+    }
+
+    @Test
+    fun scheduleEditCanceled_returnsToDetailMode() {
+        val updatedUiState = initialUiState.copy(
+            isScheduleSheetVisible = true,
+            scheduleSheetMode = CalendarScheduleSheetMode.Edit,
+            selectedEventId = 12L,
+        ).reduce(CalendarScreenEvent.ScheduleEditCanceled)
+
+        assertEquals(CalendarScheduleSheetMode.Detail, updatedUiState.scheduleSheetMode)
+        assertTrue(updatedUiState.isScheduleSheetVisible)
+    }
+
+    @Test
+    fun scheduleDateChanged_선택한_날짜를_수정한다() {
+        val selectedDate = LocalDate.of(2026, 7, 25)
+
+        val updatedUiState = initialUiState.reduce(
+            CalendarScreenEvent.ScheduleDateChanged(selectedDate),
+        )
+
+        assertEquals(selectedDate, updatedUiState.scheduleDate)
     }
 
     @Test

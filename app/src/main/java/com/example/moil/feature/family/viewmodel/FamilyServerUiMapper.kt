@@ -30,6 +30,7 @@ private fun GroupSummary.toFamilyGroup(members: List<GroupMember>): GroupUiModel
     name = name,
     inviteCode = inviteCode.orEmpty(),
     profileColor = myColor,
+    profileImagePath = myImagePath,
     members = members.map(GroupMember::toFamilyMember),
 )
 
@@ -38,6 +39,7 @@ private fun GroupMember.toFamilyMember(): FamilyMemberUiModel = FamilyMemberUiMo
     roleRes = role.toFamilyRoleRes(),
     name = nickname,
     profileColor = color,
+    profileImagePath = imagePath,
     isCurrentUser = isMe == true,
 )
 

@@ -8,6 +8,8 @@ import com.example.moil.feature.event.module.data.remote.EventRemoteDataSource
 import com.example.moil.feature.event.module.data.remote.EventRemoteDataSourceImpl
 import com.example.moil.feature.group.module.data.remote.GroupRemoteDataSource
 import com.example.moil.feature.group.module.data.remote.GroupRemoteDataSourceImpl
+import com.example.moil.feature.image.module.data.remote.ImageRemoteDataSource
+import com.example.moil.feature.image.module.data.remote.ImageRemoteDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -27,4 +29,7 @@ abstract class NetworkBindingModule {
 
     @Binds
     abstract fun bindEventRemoteDataSource(implementation: EventRemoteDataSourceImpl): EventRemoteDataSource
+
+    @Binds
+    abstract fun bindImageRemoteDataSource(implementation: ImageRemoteDataSourceImpl): ImageRemoteDataSource
 }

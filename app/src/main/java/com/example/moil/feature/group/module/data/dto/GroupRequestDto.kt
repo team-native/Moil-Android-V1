@@ -15,7 +15,8 @@ enum class MemberRoleRequestDto {
 data class CreateGroupRequestDto(
     @SerialName("name") val name: String,
     @SerialName("nickname") val nickname: String,
-    @SerialName("colorId") val colorId: String,
+    @SerialName("colorId") val colorId: String? = null,
+    @SerialName("imagePath") val imagePath: String? = null,
 )
 
 @Serializable
@@ -27,13 +28,15 @@ data class VerifyInviteRequestDto(
 data class JoinGroupRequestDto(
     @SerialName("inviteCode") val inviteCode: String,
     @SerialName("nickname") val nickname: String,
-    @SerialName("colorId") val colorId: String,
+    @SerialName("colorId") val colorId: String? = null,
+    @SerialName("imagePath") val imagePath: String? = null,
 )
 
 @Serializable
 data class UpdateMyGroupProfileRequestDto(
     @SerialName("nickname") val nickname: String,
-    @SerialName("colorId") val colorId: String,
+    @SerialName("colorId") val colorId: String? = null,
+    @SerialName("imagePath") val imagePath: String? = null,
 )
 
 @Serializable

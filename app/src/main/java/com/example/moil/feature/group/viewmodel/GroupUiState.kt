@@ -15,6 +15,7 @@ data class GroupUiState(
     val inviteVerification: InviteVerification? = null,
     val joinGroupMembers: List<GroupMember> = emptyList(),
     val isCurrentUserNameMissing: Boolean = false,
+    val isSubmitting: Boolean = false,
     val error: MoilError? = null,
 ) {
     val selectedGroup: GroupSummary?
