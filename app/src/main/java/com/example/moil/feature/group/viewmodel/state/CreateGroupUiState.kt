@@ -5,7 +5,8 @@ import com.example.moil.R
 
 data class CreateGroupUiState(
     val groupName: String = "",
-    @param:DrawableRes val selectedProfileAvatarRes: Int = R.drawable.family_avatar_mom,
+    @param:DrawableRes val selectedProfileAvatarRes: Int? = R.drawable.family_avatar_mom,
+    val selectedProfileImageUri: String? = null,
     val groupNameError: CreateGroupNameError? = null,
 )
 

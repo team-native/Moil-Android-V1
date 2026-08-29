@@ -5,6 +5,7 @@ import com.example.moil.feature.group.module.data.dto.GroupMemberProfileResponse
 import com.example.moil.feature.group.module.data.dto.GroupMemberResponseDto
 import com.example.moil.feature.group.module.data.dto.GroupSummaryResponseDto
 import com.example.moil.feature.group.module.data.dto.MemberRoleRequestDto
+import com.example.moil.feature.group.module.domain.model.GroupColor
 import com.example.moil.feature.group.module.domain.model.GroupDetail
 import com.example.moil.feature.group.module.domain.model.GroupMember
 import com.example.moil.feature.group.module.domain.model.GroupMemberProfile
@@ -21,6 +22,7 @@ internal fun GroupSummaryResponseDto.toDomain(): GroupSummary = GroupSummary(
     myNickname = myNickname,
     myColor = (myColor ?: "").toGroupColor(),
     memberCount = memberCount,
+    myImagePath = myImagePath,
 )
 
 internal fun GroupMemberResponseDto.toDomain(): GroupMember = GroupMember(
@@ -28,15 +30,17 @@ internal fun GroupMemberResponseDto.toDomain(): GroupMember = GroupMember(
     nickname = nickname,
     email = email,
     role = role.toGroupRole(),
-    color = colorId.toGroupColor(),
+    color = colorId?.toGroupColor() ?: GroupColor.Unknown,
     isMe = isMe,
+    imagePath = imagePath,
 )
 
 internal fun GroupMemberProfileResponseDto.toDomain(): GroupMemberProfile = GroupMemberProfile(
     groupId = groupId,
     userId = userId,
     nickname = nickname,
-    color = colorId.toGroupColor(),
+    color = colorId?.toGroupColor() ?: GroupColor.Unknown,
+    imagePath = imagePath,
 )
 
 internal fun GroupDetailResponseDto.toDomain(): GroupDetail = GroupDetail(
@@ -52,8 +56,10 @@ internal fun GroupDetailResponseDto.toDomain(): GroupDetail = GroupDetail(
             nickname = member.nickname,
             email = null,
             role = member.role.toGroupRole(),
-            color = member.colorId.toGroupColor(),
+            color = member.colorId?.toGroupColor()
+                ?: GroupColor.Unknown,
             isMe = null,
+            imagePath = member.imagePath,
         )
     },
 )

@@ -37,12 +37,11 @@ class EventRepositoryImplTest {
                     GroupEvent(
                         id = 2L,
                         title = "서버 일정",
-                        startDate = "2026-08-03",
-                        endDate = "2026-08-05",
-                        isAllDay = true,
+                        date = "2026-08-03",
                         startTime = null,
                         endTime = null,
                         location = null,
+                        memo = null,
                         members = listOf(EventMember(1L, "초록", GroupColor.Green)),
                     ),
                 ),
@@ -78,6 +77,23 @@ class EventRepositoryImplTest {
     }
 
     @Test
+    fun `일정 상세 조회는 서버 메모를 포함한 Domain 일정으로 변환한다`() = runBlocking {
+        val repository = EventRepositoryImpl(
+            FakeEventRemoteDataSource(
+                eventResult = NetworkResult.Success(
+                    eventResponse(eventId = 3L, title = "상세 일정").copy(
+                        memo = "준비물 확인",
+                    ),
+                ),
+            ),
+        )
+
+        val result = repository.getEvent(3L)
+
+        assertEquals("준비물 확인", (result as MoilResult.Success).value.memo)
+    }
+
+    @Test
     fun `일정 수정과 삭제 성공은 성공 결과를 반환한다`() = runBlocking {
         val repository = EventRepositoryImpl(
             FakeEventRemoteDataSource(
@@ -96,21 +112,18 @@ class EventRepositoryImplTest {
     ): EventResponseDto = EventResponseDto(
         eventId = eventId,
         title = title,
-        startDate = "2026-08-03",
-        endDate = "2026-08-05",
-        isAllDay = true,
+        date = "2026-08-03",
         members = listOf(EventMemberResponseDto(1L, "초록", "GREEN")),
     )
 
     private fun groupEvent(): GroupEvent = GroupEvent(
         id = 2L,
         title = "저녁 식사",
-        startDate = "2026-08-03",
-        endDate = "2026-08-05",
-        isAllDay = true,
+        date = "2026-08-03",
         startTime = null,
         endTime = null,
         location = null,
+        memo = null,
         members = emptyList(),
     )
 }
@@ -119,6 +132,8 @@ private class FakeEventRemoteDataSource(
     private val groupEventsResult: NetworkResult<List<EventResponseDto>> = NetworkResult.Success(emptyList()),
     private val createEventResult: NetworkResult<CreateEventResponseDto> =
         NetworkResult.Success(CreateEventResponseDto(1L)),
+    private val eventResult: NetworkResult<EventResponseDto> =
+        NetworkResult.NetworkError(IllegalStateException("not used")),
     private val updateEventResult: NetworkResult<Unit> = NetworkResult.Success(Unit),
     private val deleteEventResult: NetworkResult<Unit> = NetworkResult.Success(Unit),
 ) : EventRemoteDataSource {
@@ -133,7 +148,7 @@ private class FakeEventRemoteDataSource(
     ): NetworkResult<CreateEventResponseDto> = createEventResult
 
     override suspend fun getEvent(eventId: Long): NetworkResult<EventResponseDto> =
-        NetworkResult.NetworkError(IllegalStateException("not used"))
+        eventResult
 
     override suspend fun updateEvent(
         eventId: Long,

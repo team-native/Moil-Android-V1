@@ -1,7 +1,6 @@
 package com.example.moil.feature.family.view
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,12 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.example.moil.R
+import com.example.moil.core.component.display.MoilRemoteAvatar
 import com.example.moil.feature.group.module.domain.model.GroupColor
 import com.example.moil.feature.group.viewmodel.avatarResourceForGroupColor
 import com.example.moil.ui.theme.LocalMoilExtraColors
@@ -36,6 +34,7 @@ internal fun FamilyMemberRow(
     name: String,
     @StringRes roleRes: Int,
     profileColor: GroupColor,
+    profileImagePath: String? = null,
     rowHeight: Dp = MoilMemberDimension.MemberRowHeight,
     avatarSize: Dp = MoilMemberDimension.MemberAvatarSize,
     horizontalPadding: Dp = MoilMemberDimension.ListItemHorizontalPadding,
@@ -48,13 +47,11 @@ internal fun FamilyMemberRow(
             .height(rowHeight),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Image(
-            painter = painterResource(avatarResourceForGroupColor(profileColor)),
-            contentDescription = null,
-            modifier = Modifier
-                .size(avatarSize)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop,
+        MoilRemoteAvatar(
+            imagePath = profileImagePath,
+            fallbackAvatarRes = avatarResourceForGroupColor(profileColor),
+            contentDescription = name,
+            size = avatarSize,
         )
 
         Spacer(modifier = Modifier.width(contentSpacing))

@@ -67,9 +67,17 @@ internal fun JoinGroupProfileSetupContent(
             labelRes = R.string.group_join_profile_color_label,
             selectedProfileAvatarRes = uiState.selectedProfileColor
                 ?.let(::avatarResourceForGroupColor)
-                ?: R.drawable.family_avatar_mine,
+                ?: if (uiState.selectedProfileImageUri == null) {
+                    R.drawable.family_avatar_mine
+                } else {
+                    null
+                },
+            selectedProfileImageUri = uiState.selectedProfileImageUri,
             onProfileAvatarSelected = { avatarRes ->
                 onEvent(JoinGroupScreenEvent.ProfileColorSelected(groupColorForAvatar(avatarRes)))
+            },
+            onCustomProfileImageClick = {
+                onEvent(JoinGroupScreenEvent.CustomProfileImageClicked)
             },
             avatarResources = uiState.availableProfileColors.map(::avatarResourceForGroupColor),
         )
@@ -82,7 +90,8 @@ internal fun JoinGroupProfileSetupContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(MoilGroupCreateDimension.BottomButtonHeight),
-            enabled = uiState.profileName.isNotBlank() && uiState.selectedProfileColor != null,
+            enabled = uiState.profileName.isNotBlank() &&
+                (uiState.selectedProfileColor != null || uiState.selectedProfileImageUri != null),
         )
 
         Spacer(modifier = Modifier.height(MoilGroupCreateDimension.BottomButtonPadding))

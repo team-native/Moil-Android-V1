@@ -8,7 +8,8 @@ data class GroupMemberProfileResponseDto(
     @SerialName("groupId") val groupId: Long,
     @SerialName("userId") val userId: Long,
     @SerialName("nickname") val nickname: String,
-    @SerialName("colorId") val colorId: String,
+    @SerialName("colorId") val colorId: String? = null,
+    @SerialName("imagePath") val imagePath: String? = null,
 )
 
 @Serializable
@@ -19,6 +20,7 @@ data class GroupSummaryResponseDto(
     @SerialName("myRole") val myRole: String,
     @SerialName("myNickname") val myNickname: String? = null,
     @SerialName("myColor") val myColor: String? = null,
+    @SerialName("myImagePath") val myImagePath: String? = null,
     @SerialName("memberCount") val memberCount: Int? = null,
 )
 
@@ -28,7 +30,8 @@ data class GroupMemberResponseDto(
     @SerialName("nickname") val nickname: String,
     @SerialName("email") val email: String? = null,
     @SerialName("role") val role: String,
-    @SerialName("colorId") val colorId: String,
+    @SerialName("colorId") val colorId: String? = null,
+    @SerialName("imagePath") val imagePath: String? = null,
     @SerialName("isMe") val isMe: Boolean? = null,
 )
 
@@ -45,7 +48,8 @@ data class GroupDetailMemberResponseDto(
     @SerialName("userId") val userId: Long,
     @SerialName("nickname") val nickname: String,
     @SerialName("role") val role: String,
-    @SerialName("color") val colorId: String,
+    @SerialName("colorId") val colorId: String? = null,
+    @SerialName("imagePath") val imagePath: String? = null,
 )
 
 @Serializable
@@ -57,4 +61,10 @@ data class GroupDetailResponseDto(
     @SerialName("monthlyEventCount") val monthlyEventCount: Int,
     @SerialName("myRole") val myRole: String,
     @SerialName("members") val members: List<GroupDetailMemberResponseDto>,
+)
+
+@Serializable
+data class NotificationResponseDto(
+    @SerialName("groupId") val groupId: Long,
+    @SerialName("notificationEnabled") val notificationEnabled: Boolean,
 )

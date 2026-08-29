@@ -115,6 +115,7 @@ private fun FamilyDetailMemberCard(
                     name = member.name,
                     roleRes = memberRoleOverrides[member.id] ?: member.roleRes,
                     profileColor = member.profileColor,
+                    profileImagePath = member.profileImagePath,
                     rowHeight = MoilGroupDetailDimension.MemberRowHeight,
                     avatarSize = MoilGroupDetailDimension.MemberAvatarSize,
                     horizontalPadding = MoilGroupDetailDimension.MemberRowHorizontalPadding,

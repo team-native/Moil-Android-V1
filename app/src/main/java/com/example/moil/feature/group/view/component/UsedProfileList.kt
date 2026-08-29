@@ -1,23 +1,18 @@
 package com.example.moil.feature.group.view
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.moil.R
+import com.example.moil.core.component.display.MoilRemoteAvatar
 import com.example.moil.feature.group.viewmodel.JoinGroupUsedProfileUiModel
 import com.example.moil.feature.group.viewmodel.avatarResourceForGroupColor
 import com.example.moil.ui.theme.MoilGroupCreateDimension
@@ -40,13 +35,11 @@ internal fun UsedProfileList(profiles: List<JoinGroupUsedProfileUiModel>) {
                     modifier = Modifier.alpha(if (profile.isUsed) 0.35f else 1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Image(
-                        painter = painterResource(avatarResourceForGroupColor(profile.color)),
+                    MoilRemoteAvatar(
+                        imagePath = profile.imagePath,
+                        fallbackAvatarRes = avatarResourceForGroupColor(profile.color),
                         contentDescription = profile.nickname,
-                        modifier = Modifier
-                            .size(MoilGroupCreateDimension.ProfileAvatarImageSize)
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop,
+                        size = MoilGroupCreateDimension.ProfileAvatarImageSize,
                     )
 
                     Text(

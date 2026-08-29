@@ -34,10 +34,27 @@ fun MoilAppRoute(
     onCurrentUserRoleChanged: (GroupMemberRole) -> Unit,
     sessionManager: SessionManager,
     currentUserProfileStore: CurrentUserProfileStore,
+    deepLinkUri: String? = null,
+    onDeepLinkConsumed: () -> Unit = {},
 ) {
     val sessionState by sessionManager.sessionState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
     var sessionExpirationCount by remember { mutableStateOf(0) }
+    var pendingJoinGroupId by remember { mutableStateOf<Long?>(null) }
+    val appDeepLink = androidx.compose.runtime.remember(deepLinkUri) {
+        AppDeepLinkParser.parse(deepLinkUri)
+    }
+
+    LaunchedEffect(appDeepLink) {
+        when (val parsedDeepLink = appDeepLink) {
+            is AppDeepLink.JoinGroup -> pendingJoinGroupId = parsedDeepLink.groupId
+            null -> Unit
+        }
+
+        if (deepLinkUri != null) {
+            onDeepLinkConsumed()
+        }
+    }
 
     LaunchedEffect(sessionState) {
         if (sessionState is SessionState.Unauthenticated) {
@@ -62,6 +79,8 @@ fun MoilAppRoute(
         onCurrentUserRoleChanged = onCurrentUserRoleChanged,
         isAuthenticated = sessionState is SessionState.Authenticated,
         sessionExpirationCount = sessionExpirationCount,
+        pendingJoinGroupId = pendingJoinGroupId,
+        onJoinGroupDeepLinkHandled = { pendingJoinGroupId = null },
     )
 }
 
@@ -73,6 +92,8 @@ private fun MoilAppNavigation(
     onCurrentUserRoleChanged: (GroupMemberRole) -> Unit,
     isAuthenticated: Boolean,
     sessionExpirationCount: Int,
+    pendingJoinGroupId: Long?,
+    onJoinGroupDeepLinkHandled: () -> Unit,
 ) {
     val destinationBackStack = remember {
         mutableStateListOf(if (isAuthenticated) MoilAppDestination.Main else MoilAppDestination.Login)
@@ -127,6 +148,8 @@ private fun MoilAppNavigation(
             onDarkThemeChanged = onDarkThemeChanged,
             currentUserRole = currentUserRole,
             onCurrentUserRoleChanged = onCurrentUserRoleChanged,
+            pendingJoinGroupId = pendingJoinGroupId,
+            onJoinGroupDeepLinkHandled = onJoinGroupDeepLinkHandled,
         )
     }
 }

@@ -19,20 +19,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import coil.compose.AsyncImage
 import com.example.moil.R
-import com.example.moil.core.component.MoilImageButton
 import com.example.moil.ui.theme.MoilGroupCreateDimension
 
 @Composable
 internal fun ProfileAvatarSelector(
     @androidx.annotation.StringRes labelRes: Int = R.string.group_profile_avatar_label,
-    selectedProfileAvatarRes: Int,
+    selectedProfileAvatarRes: Int?,
+    selectedProfileImageUri: String? = null,
     onProfileAvatarSelected: (Int) -> Unit,
+    onCustomProfileImageClick: () -> Unit = {},
+    showCustomProfileImage: Boolean = true,
     avatarResources: List<Int> = profileAvatarResources,
 ) {
     Column {
@@ -60,7 +64,12 @@ internal fun ProfileAvatarSelector(
                 )
             }
 
-            AddProfileAvatarOption()
+            if (showCustomProfileImage) {
+                AddProfileAvatarOption(
+                    selectedProfileImageUri = selectedProfileImageUri,
+                    onClick = onCustomProfileImageClick,
+                )
+            }
         }
     }
 }
@@ -109,17 +118,51 @@ private fun ProfileAvatarOption(
 }
 
 @Composable
-private fun AddProfileAvatarOption() {
+private fun AddProfileAvatarOption(
+    selectedProfileImageUri: String?,
+    onClick: () -> Unit,
+) {
     val addProfileAvatarContentDescription = stringResource(R.string.group_profile_avatar_add)
 
-    MoilImageButton(
-        imageRes = R.drawable.group_profile_avatar_add,
-        contentDescription = addProfileAvatarContentDescription,
-        onClick = {},
-        modifier = Modifier.size(MoilGroupCreateDimension.ProfileAvatarTouchTargetSize),
-        imageModifier = Modifier.fillMaxWidth(),
-        enabled = false,
-    )
+    Box(
+        modifier = Modifier
+            .size(MoilGroupCreateDimension.ProfileAvatarTouchTargetSize)
+            .then(
+                if (selectedProfileImageUri != null) {
+                    Modifier.border(
+                        width = MoilGroupCreateDimension.SelectedProfileAvatarOuterBorder,
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = CircleShape,
+                    )
+                } else {
+                    Modifier
+                },
+            )
+            .selectable(
+                selected = selectedProfileImageUri != null,
+                role = Role.RadioButton,
+                onClick = onClick,
+            )
+            .semantics { this.contentDescription = addProfileAvatarContentDescription },
+        contentAlignment = Alignment.Center,
+    ) {
+        if (selectedProfileImageUri == null) {
+            Image(
+                painter = painterResource(R.drawable.group_profile_avatar_add),
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        } else {
+            AsyncImage(
+                model = selectedProfileImageUri,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(MoilGroupCreateDimension.ProfileAvatarImageSize)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop,
+            )
+        }
+    }
 }
 
 internal val profileAvatarResources = listOf(

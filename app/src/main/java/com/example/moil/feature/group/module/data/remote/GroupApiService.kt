@@ -9,6 +9,7 @@ import com.example.moil.feature.group.module.data.dto.GroupSummaryResponseDto
 import com.example.moil.feature.group.module.data.dto.InviteVerificationResponseDto
 import com.example.moil.feature.group.module.data.dto.JoinGroupRequestDto
 import com.example.moil.feature.group.module.data.dto.NotificationRequestDto
+import com.example.moil.feature.group.module.data.dto.NotificationResponseDto
 import com.example.moil.feature.group.module.data.dto.RenameGroupRequestDto
 import com.example.moil.feature.group.module.data.dto.TransferAdminRequestDto
 import com.example.moil.feature.group.module.data.dto.UpdateMemberRolesRequestDto
@@ -51,7 +52,10 @@ interface GroupApiService {
     suspend fun getMembers(@Path("groupId") groupId: Long): Response<ApiEnvelopeDto<List<GroupMemberResponseDto>>>
 
     @PATCH("groups/{groupId}/notification")
-    suspend fun updateNotification(@Path("groupId") groupId: Long, @Body request: NotificationRequestDto): Response<ApiEnvelopeDto<Unit>>
+    suspend fun updateNotification(
+        @Path("groupId") groupId: Long,
+        @Body request: NotificationRequestDto,
+    ): Response<ApiEnvelopeDto<NotificationResponseDto>>
 
     @PATCH("groups/{groupId}")
     suspend fun renameGroup(@Path("groupId") groupId: Long, @Body request: RenameGroupRequestDto): Response<ApiEnvelopeDto<Unit>>

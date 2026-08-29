@@ -11,11 +11,14 @@ data class JoinGroupUiState(
     val usedProfiles: List<JoinGroupUsedProfileUiModel> = emptyList(),
     val availableProfileColors: List<GroupColor> = emptyList(),
     val selectedProfileColor: GroupColor? = null,
+    val selectedProfileImageUri: String? = null,
+    val pendingGroupId: Long? = null,
 )
 
 data class JoinGroupUsedProfileUiModel(
     val nickname: String,
     val color: GroupColor,
+    val imagePath: String? = null,
     val isUsed: Boolean = true,
 )
 

@@ -66,6 +66,19 @@ object MoilScheduleSheet {
     val SelectedMemberWhiteRing = 3.dp
     val SelectedMemberPrimaryRing = 2.dp
     val BottomPadding = 24.dp
+    val ListHeaderHeight = 72.dp
+    val ListItemHeight = 128.dp
+    val ListTimeWidth = 72.dp
+    val ListAddButtonSize = 48.dp
+    val ListEventDotSize = 12.dp
+    val ListAvatarSize = 28.dp
+    val ListAvatarSpacing = 4.dp
+    val ListVisibleAvatarCount = 4
+    val ListContentSpacing = 8.dp
+    val DetailTitleTopGap = 12.dp
+    val DetailSectionTopPadding = 18.dp
+    val DetailButtonHeight = 48.dp
+    val DetailButtonSpacing = 12.dp
 }
 
 object MoilTimePickerDimension {

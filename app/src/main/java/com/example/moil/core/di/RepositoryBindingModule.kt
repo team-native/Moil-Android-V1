@@ -8,6 +8,8 @@ import com.example.moil.feature.event.module.data.repository.EventRepositoryImpl
 import com.example.moil.feature.event.module.domain.repository.EventRepository
 import com.example.moil.feature.group.module.data.repository.GroupRepositoryImpl
 import com.example.moil.feature.group.module.domain.repository.GroupRepository
+import com.example.moil.feature.image.module.data.repository.ImageRepositoryImpl
+import com.example.moil.feature.image.module.domain.repository.ImageRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -29,4 +31,7 @@ abstract class RepositoryBindingModule {
 
     @Binds
     abstract fun bindEventRepository(implementation: EventRepositoryImpl): EventRepository
+
+    @Binds
+    abstract fun bindImageRepository(implementation: ImageRepositoryImpl): ImageRepository
 }

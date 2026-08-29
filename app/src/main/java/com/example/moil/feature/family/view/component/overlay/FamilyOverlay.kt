@@ -173,9 +173,11 @@ fun FamilyMemberPermissionsBottomSheet(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FamilyInviteShareBottomSheet(
-    inviteCode: String,
+    inviteLink: String,
     sheetState: SheetState,
     onDismissRequest: () -> Unit,
+    onShareClick: () -> Unit,
+    onCopyLinkClick: () -> Unit,
 ) {
     FamilyModalBottomSheet(
         sheetState = sheetState,
@@ -187,7 +189,7 @@ fun FamilyInviteShareBottomSheet(
         )
 
         Text(
-            text = stringResource(R.string.family_invite_share_link_format, inviteCode),
+            text = stringResource(R.string.family_invite_share_link_format, inviteLink),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodySmall,
         )
@@ -198,14 +200,17 @@ fun FamilyInviteShareBottomSheet(
             FamilyShareOption(
                 labelRes = R.string.family_share_kakao,
                 color = MaterialTheme.colorScheme.tertiary,
+                onClick = onShareClick,
             )
             FamilyShareOption(
                 labelRes = R.string.family_share_message,
                 color = LocalMoilExtraColors.current.memberCyan,
+                onClick = onShareClick,
             )
             FamilyShareOption(
                 labelRes = R.string.family_share_copy_link,
                 color = MaterialTheme.colorScheme.outlineVariant,
+                onClick = onCopyLinkClick,
             )
         }
     }
@@ -417,10 +422,13 @@ private fun FamilyRoleButton(
 private fun FamilyShareOption(
     @StringRes labelRes: Int,
     color: androidx.compose.ui.graphics.Color,
+    onClick: () -> Unit,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(MoilOverlayDimension.ShareOptionSize),
+        modifier = Modifier
+            .width(MoilOverlayDimension.ShareOptionSize)
+            .clickable(onClick = onClick),
     ) {
         Box(
             modifier = Modifier

@@ -10,6 +10,7 @@ import com.example.moil.feature.group.module.data.dto.GroupSummaryResponseDto
 import com.example.moil.feature.group.module.data.dto.InviteVerificationResponseDto
 import com.example.moil.feature.group.module.data.dto.JoinGroupRequestDto
 import com.example.moil.feature.group.module.data.dto.NotificationRequestDto
+import com.example.moil.feature.group.module.data.dto.NotificationResponseDto
 import com.example.moil.feature.group.module.data.dto.RenameGroupRequestDto
 import com.example.moil.feature.group.module.data.dto.TransferAdminRequestDto
 import com.example.moil.feature.group.module.data.dto.UpdateMemberRolesRequestDto
@@ -56,7 +57,7 @@ class GroupRemoteDataSourceImpl @Inject constructor(
         groupApiService.getMembers(groupId)
     }
 
-    override suspend fun updateNotification(groupId: Long, request: NotificationRequestDto): NetworkResult<Unit> = apiExecutor.executeVoid {
+    override suspend fun updateNotification(groupId: Long, request: NotificationRequestDto): NetworkResult<NotificationResponseDto> = apiExecutor.execute {
         groupApiService.updateNotification(groupId, request)
     }
 

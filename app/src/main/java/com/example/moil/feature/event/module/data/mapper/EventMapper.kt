@@ -11,12 +11,11 @@ import com.example.moil.feature.group.module.domain.model.toGroupColor
 internal fun EventResponseDto.toDomain(): GroupEvent = GroupEvent(
     id = eventId,
     title = title,
-    startDate = startDate,
-    endDate = endDate,
-    isAllDay = isAllDay,
+    date = date,
     startTime = startTime,
     endTime = endTime,
     location = location,
+    memo = memo,
     members = members.map(EventMemberResponseDto::toDomain),
 )
 
@@ -32,22 +31,20 @@ internal fun GroupEvent.toCreateRequest(
 ): EventRequestDto = EventRequestDto(
     groupId = groupId,
     title = title,
-    startDate = startDate,
-    endDate = endDate,
-    isAllDay = isAllDay,
+    date = date,
     startTime = startTime,
     endTime = endTime,
     location = location,
+    memo = memo,
     sharedMemberIds = memberIds,
 )
 
 internal fun GroupEvent.toUpdateRequest(memberIds: List<Long>): UpdateEventRequestDto = UpdateEventRequestDto(
     title = title,
-    startDate = startDate,
-    endDate = endDate,
-    isAllDay = isAllDay,
+    date = date,
     startTime = startTime,
     endTime = endTime,
     location = location,
+    memo = memo,
     sharedMemberIds = memberIds,
 )

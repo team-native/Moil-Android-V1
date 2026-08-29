@@ -47,8 +47,12 @@ internal fun CreateGroupScreenContent(
 
         ProfileAvatarSelector(
             selectedProfileAvatarRes = uiState.selectedProfileAvatarRes,
+            selectedProfileImageUri = uiState.selectedProfileImageUri,
             onProfileAvatarSelected = { avatarRes ->
                 onEvent(CreateGroupScreenEvent.ProfileAvatarSelected(avatarRes))
+            },
+            onCustomProfileImageClick = {
+                onEvent(CreateGroupScreenEvent.CustomProfileImageClicked)
             },
         )
 

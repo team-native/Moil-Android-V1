@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.annotation.StringRes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +20,7 @@ import com.example.moil.ui.theme.MoilScheduleSheet
 
 @Composable
 internal fun ScheduleSheetHeader(
+    @StringRes titleRes: Int,
     onDismiss: () -> Unit,
     onSave: () -> Unit,
 ) {
@@ -39,7 +41,7 @@ internal fun ScheduleSheetHeader(
             style = MaterialTheme.typography.bodyLarge,
         )
         Text(
-            text = stringResource(R.string.schedule_new),
+            text = stringResource(titleRes),
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.titleSmall,

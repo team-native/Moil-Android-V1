@@ -9,6 +9,11 @@ import javax.inject.Inject
 class JoinGroupUseCase @Inject constructor(
     private val repository: GroupRepository,
 ) {
-    suspend operator fun invoke(code: String, nickname: String, color: GroupColor): MoilResult<GroupSummary> =
-        repository.joinGroup(code, nickname, color)
+    // 그룹 가입 프로필의 색상 또는 이미지 경로를 서버에 전달합니다.
+    suspend operator fun invoke(
+        code: String,
+        nickname: String,
+        color: GroupColor?,
+        imagePath: String?,
+    ): MoilResult<GroupSummary> = repository.joinGroup(code, nickname, color, imagePath)
 }
