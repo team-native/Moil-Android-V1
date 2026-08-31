@@ -22,9 +22,9 @@ data class OAuthAuthorizationRequest(
 
 data class SocialLoginCallback(
     val provider: SocialLoginProvider,
-    val code: String,
     val state: String,
-    val user: String? = null,
+    val accessToken: String,
+    val refreshToken: String,
 )
 
 data class SocialLoginFailure(

@@ -17,6 +17,7 @@ import com.example.moil.core.network.SessionEvent
 import com.example.moil.core.network.SessionManager
 import com.example.moil.core.network.SessionState
 import com.example.moil.feature.auth.module.domain.model.SocialLoginCallback
+import com.example.moil.feature.auth.module.domain.model.SocialLoginFailure
 import com.example.moil.feature.auth.module.domain.model.SocialLoginProvider
 import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfileStore
 import com.example.moil.feature.auth.view.LoginRoute
@@ -44,7 +45,7 @@ fun MoilAppRoute(
     var sessionExpirationCount by remember { mutableStateOf(0) }
     var pendingJoinGroupId by remember { mutableStateOf<Long?>(null) }
     var pendingOAuthCallback by remember { mutableStateOf<SocialLoginCallback?>(null) }
-    var pendingOAuthFailure by remember { mutableStateOf(false) }
+    var pendingOAuthFailure by remember { mutableStateOf<SocialLoginFailure?>(null) }
     val appDeepLink = remember(deepLinkUri) {
         AppDeepLinkParser.parse(deepLinkUri)
     }
@@ -56,12 +57,18 @@ fun MoilAppRoute(
                 pendingOAuthCallback = SocialLoginCallback(
                     provider = SocialLoginProvider.fromWireValue(parsedDeepLink.provider)
                         ?: return@LaunchedEffect,
-                    code = parsedDeepLink.code,
                     state = parsedDeepLink.state,
-                    user = parsedDeepLink.user,
+                    accessToken = parsedDeepLink.accessToken,
+                    refreshToken = parsedDeepLink.refreshToken,
                 )
             }
-            is AppDeepLink.OAuthFailure -> pendingOAuthFailure = true
+            is AppDeepLink.OAuthFailure -> {
+                pendingOAuthFailure = SocialLoginFailure(
+                    provider = SocialLoginProvider.fromWireValue(parsedDeepLink.provider)
+                        ?: return@LaunchedEffect,
+                    state = parsedDeepLink.state,
+                )
+            }
             null -> Unit
         }
 
@@ -97,8 +104,8 @@ fun MoilAppRoute(
         onJoinGroupDeepLinkHandled = { pendingJoinGroupId = null },
         pendingOAuthCallback = pendingOAuthCallback,
         onOAuthCallbackConsumed = { pendingOAuthCallback = null },
-        hasPendingOAuthFailure = pendingOAuthFailure,
-        onOAuthFailureConsumed = { pendingOAuthFailure = false },
+        socialLoginFailure = pendingOAuthFailure,
+        onOAuthFailureConsumed = { pendingOAuthFailure = null },
     )
 }
 
@@ -114,7 +121,7 @@ private fun MoilAppNavigation(
     onJoinGroupDeepLinkHandled: () -> Unit,
     pendingOAuthCallback: SocialLoginCallback?,
     onOAuthCallbackConsumed: () -> Unit,
-    hasPendingOAuthFailure: Boolean,
+    socialLoginFailure: SocialLoginFailure?,
     onOAuthFailureConsumed: () -> Unit,
 ) {
     val destinationBackStack = remember {
@@ -145,7 +152,7 @@ private fun MoilAppNavigation(
                 initialEmail = registeredEmail,
                 socialLoginCallback = pendingOAuthCallback,
                 onSocialLoginCallbackConsumed = onOAuthCallbackConsumed,
-                hasSocialLoginFailure = hasPendingOAuthFailure,
+                socialLoginFailure = socialLoginFailure,
                 onSocialLoginFailureConsumed = onOAuthFailureConsumed,
                 onNavigateToSignUp = {
                     destinationBackStack += MoilAppDestination.SignUp

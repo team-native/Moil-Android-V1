@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.moil.core.domain.MoilResult
 import com.example.moil.feature.auth.module.domain.model.VerificationStep
 import com.example.moil.feature.auth.module.domain.model.SocialLoginCallback
+import com.example.moil.feature.auth.module.domain.model.SocialLoginFailure
 import com.example.moil.feature.auth.module.domain.model.SocialLoginProvider
 import com.example.moil.feature.auth.module.domain.usecase.CompleteSocialLoginUseCase
 import com.example.moil.feature.auth.module.domain.usecase.CancelSocialLoginUseCase
@@ -108,9 +109,9 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    /** Provider 취소·오류 callback에서 verifier를 폐기하고 안전한 재시도 메시지를 보여줍니다. */
-    fun handleSocialLoginFailure() {
-        cancelSocialLoginUseCase()
+    /** Provider 취소·오류 callback에서 일치하는 state의 시도만 폐기하고 재시도 메시지를 보여줍니다. */
+    fun handleSocialLoginFailure(failure: SocialLoginFailure) {
+        cancelSocialLoginUseCase(failure)
         mutableLoginUiState.value = mutableLoginUiState.value.copy(
             isLoading = false,
             errorMessage = "소셜 로그인이 취소되었거나 실패했습니다. 다시 시도해주세요.",

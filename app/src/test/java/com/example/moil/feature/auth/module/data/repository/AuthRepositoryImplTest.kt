@@ -11,7 +11,6 @@ import com.example.moil.feature.auth.module.data.dto.DeleteAccountRequestDto
 import com.example.moil.feature.auth.module.data.dto.LoginRequestDto
 import com.example.moil.feature.auth.module.data.dto.PasswordSessionRequestDto
 import com.example.moil.feature.auth.module.data.dto.SendCodeRequestDto
-import com.example.moil.feature.auth.module.data.dto.SocialLoginCallbackRequestDto
 import com.example.moil.feature.auth.module.data.dto.TokenResponseDto
 import com.example.moil.feature.auth.module.data.dto.UpdateProfileRequestDto
 import com.example.moil.feature.auth.module.data.dto.UserProfileResponseDto
@@ -20,6 +19,7 @@ import com.example.moil.feature.auth.module.data.dto.VerifiedSessionResponseDto
 import com.example.moil.feature.auth.module.data.dto.VerifyCodeRequestDto
 import com.example.moil.feature.auth.module.data.remote.AuthRemoteDataSource
 import com.example.moil.feature.auth.module.data.oauth.OAuthAttemptStore
+import com.example.moil.feature.auth.module.data.oauth.OAuthAttempt
 import com.example.moil.feature.auth.module.data.oauth.OAuthAuthorizationRequestFactory
 import com.example.moil.feature.auth.module.domain.model.OAuthAuthorizationRequest
 import com.example.moil.feature.auth.module.domain.model.SocialLoginCallback
@@ -77,6 +77,32 @@ class AuthRepositoryImplTest {
         assertEquals(null, profileStore.profile.value)
         assertTrue(sessionManager.isExpired)
     }
+
+    @Test
+    fun `일치하는 state의 소셜 로그인 콜백만 토큰 세션으로 저장한다`() = runBlocking {
+        val attemptStore = OAuthAttemptStore().apply {
+            replace(OAuthAttempt(SocialLoginProvider.Google, "oauth-state"))
+        }
+        val sessionManager = FakeSessionManager()
+        val repository = AuthRepositoryImpl(
+            authRemoteDataSource = FakeAuthRemoteDataSource(),
+            sessionManager = sessionManager,
+            currentUserProfileStore = FakeCurrentUserProfileStore(),
+            oauthAuthorizationRequestFactory = OAuthAuthorizationRequestFactory(attemptStore),
+        )
+
+        val result = repository.completeSocialLogin(
+            SocialLoginCallback(
+                provider = SocialLoginProvider.Google,
+                state = "oauth-state",
+                accessToken = "access-token",
+                refreshToken = "refresh-token",
+            ),
+        )
+
+        assertEquals(MoilResult.Success(AuthSession("access-token", "refresh-token")), result)
+        assertEquals(SessionTokens("access-token", "refresh-token"), sessionManager.savedTokens)
+    }
 }
 
 private class FakeAuthRemoteDataSource(
@@ -93,11 +119,6 @@ private class FakeAuthRemoteDataSource(
     override suspend fun changePassword(request: ChangePasswordRequestDto): NetworkResult<Unit> = unused()
     override suspend fun logout(): NetworkResult<Unit> = logoutResult
     override suspend fun deleteAccount(request: DeleteAccountRequestDto): NetworkResult<Unit> = unused()
-    override suspend fun completeSocialLogin(
-        socialLoginType: String,
-        request: SocialLoginCallbackRequestDto,
-    ): NetworkResult<TokenResponseDto> = unused()
-
     private fun <T> unused(): NetworkResult<T> = NetworkResult.NetworkError(IllegalStateException("not used"))
 }
 
@@ -121,12 +142,16 @@ private class FakeSessionManager : SessionManager {
 
     var isExpired = false
         private set
+    var savedTokens: SessionTokens? = null
+        private set
 
     override val sessionState: StateFlow<SessionState> = mutableSessionState
     override val sessionEvents: SharedFlow<SessionEvent> = mutableSessionEvents
 
     override fun currentTokens(): SessionTokens? = null
-    override fun save(tokens: SessionTokens) = Unit
+    override fun save(tokens: SessionTokens) {
+        savedTokens = tokens
+    }
 
     override fun expireSession() {
         isExpired = true

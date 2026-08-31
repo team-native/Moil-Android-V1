@@ -1,11 +1,19 @@
 package com.example.moil.feature.auth.view
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,103 +45,17 @@ internal fun LoginScreenContent(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(horizontal = MoilAuthDimension.ScreenHorizontalPadding)
-                .navigationBarsPadding(),
+                .navigationBarsPadding()
+                .imePadding()
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(modifier = Modifier.weight(1f))
-
+            // 시안의 상단 여백을 유지하고, 작은 화면에서는 스크롤로 모든 로그인 액션에 접근합니다.
+            Spacer(modifier = Modifier.height(96.dp))
             AuthBranding()
-
-            Spacer(modifier = Modifier.height(36.dp))
-
-            val isEmailInvalid = uiState.email.isNotBlank() && !emailRegex.matches(uiState.email)
-            val isPasswordTooShort = uiState.password.isNotBlank() && !passwordRegex.matches(uiState.password)
-
-            AuthTextField(
-                value = uiState.email,
-                onValueChange = { email ->
-                    onEvent(LoginScreenEvent.EmailChanged(email))
-                },
-                placeholder = stringResource(R.string.auth_email),
-                isError = isEmailInvalid,
-                keyboardType = KeyboardType.Email,
-            )
-
-            if (isEmailInvalid) {
-                AuthErrorText(text = stringResource(R.string.auth_invalid_email))
-            }
-
-            Spacer(modifier = Modifier.height(MoilAuthDimension.FieldSpacing))
-
-            AuthTextField(
-                value = uiState.password,
-                onValueChange = { password ->
-                    onEvent(LoginScreenEvent.PasswordChanged(password))
-                },
-                placeholder = stringResource(R.string.auth_password),
-                isError = isPasswordTooShort,
-                keyboardType = KeyboardType.Password,
-                isPassword = true,
-            )
-
-            if (isPasswordTooShort) {
-                AuthErrorText(text = stringResource(R.string.auth_password_length_error))
-            }
-
-            TextButton(
-                onClick = { onEvent(LoginScreenEvent.ForgotPasswordClicked) },
-                modifier = Modifier.align(Alignment.End),
-            ) {
-                Text(
-                    text = stringResource(R.string.auth_forgot_password),
-                    style = MaterialTheme.typography.labelMedium,
-                )
-            }
-
-            uiState.errorMessage?.let { errorMessage ->
-                AuthErrorText(text = errorMessage)
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            AuthPrimaryButton(
-                text = stringResource(R.string.auth_login),
-                enabled = uiState.canLogin(),
-                onClick = { onEvent(LoginScreenEvent.LoginClicked) },
-            )
-
-            Spacer(modifier = Modifier.height(MoilAuthDimension.FieldSpacing))
-
-            SocialLoginButton(
-                provider = SocialLoginProvider.Google,
-                enabled = !uiState.isLoading,
-                onClick = {
-                    onEvent(LoginScreenEvent.SocialLoginClicked(SocialLoginProvider.Google))
-                },
-            )
-
-            Spacer(modifier = Modifier.height(MoilAuthDimension.FieldSpacing))
-
-            SocialLoginButton(
-                provider = SocialLoginProvider.Kakao,
-                enabled = !uiState.isLoading,
-                onClick = {
-                    onEvent(LoginScreenEvent.SocialLoginClicked(SocialLoginProvider.Kakao))
-                },
-            )
-
-            Spacer(modifier = Modifier.height(MoilAuthDimension.FieldSpacing))
-
-            SocialLoginButton(
-                provider = SocialLoginProvider.Apple,
-                enabled = !uiState.isLoading,
-                onClick = {
-                    onEvent(LoginScreenEvent.SocialLoginClicked(SocialLoginProvider.Apple))
-                },
-            )
-
-            Spacer(modifier = Modifier.height(MoilAuthDimension.BottomActionSpacing))
-
+            Spacer(modifier = Modifier.height(32.dp))
+            LoginForm(uiState, onEvent, Modifier.widthIn(max = 440.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             AuthPrompt(
                 message = stringResource(R.string.auth_login_prompt),
                 action = stringResource(R.string.auth_signup),
@@ -142,5 +64,87 @@ internal fun LoginScreenContent(
 
             Spacer(modifier = Modifier.height(16.dp))
         }
+    }
+}
+
+@Composable
+private fun LoginForm(
+    uiState: LoginUiState,
+    onEvent: (LoginScreenEvent) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val isEmailInvalid = uiState.email.isNotBlank() && !emailRegex.matches(uiState.email)
+    val isPasswordTooShort = uiState.password.isNotBlank() && !passwordRegex.matches(uiState.password)
+
+    Column(modifier = modifier) {
+        AuthTextField(
+            value = uiState.email,
+            onValueChange = { onEvent(LoginScreenEvent.EmailChanged(it)) },
+            placeholder = stringResource(R.string.auth_email),
+            isError = isEmailInvalid,
+            keyboardType = KeyboardType.Email,
+        )
+        if (isEmailInvalid) AuthErrorText(stringResource(R.string.auth_invalid_email))
+
+        Spacer(modifier = Modifier.height(MoilAuthDimension.FieldSpacing))
+        AuthTextField(
+            value = uiState.password,
+            onValueChange = { onEvent(LoginScreenEvent.PasswordChanged(it)) },
+            placeholder = stringResource(R.string.auth_password),
+            isError = isPasswordTooShort,
+            keyboardType = KeyboardType.Password,
+            isPassword = true,
+        )
+        if (isPasswordTooShort) AuthErrorText(stringResource(R.string.auth_password_length_error))
+
+        TextButton(
+            onClick = { onEvent(LoginScreenEvent.ForgotPasswordClicked) },
+            modifier = Modifier.align(Alignment.End),
+        ) {
+            Text(stringResource(R.string.auth_forgot_password), style = MaterialTheme.typography.labelMedium)
+        }
+        uiState.errorMessage?.let { errorMessage -> AuthErrorText(errorMessage) }
+
+        Spacer(modifier = Modifier.height(24.dp))
+        SocialLoginDivider()
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            SocialLoginButton(SocialLoginProvider.Google, !uiState.isLoading) {
+                onEvent(LoginScreenEvent.SocialLoginClicked(SocialLoginProvider.Google))
+            }
+            SocialLoginButton(SocialLoginProvider.Apple, !uiState.isLoading) {
+                onEvent(LoginScreenEvent.SocialLoginClicked(SocialLoginProvider.Apple))
+            }
+            SocialLoginButton(SocialLoginProvider.Kakao, !uiState.isLoading) {
+                onEvent(LoginScreenEvent.SocialLoginClicked(SocialLoginProvider.Kakao))
+            }
+        }
+        Spacer(modifier = Modifier.height(24.dp))
+        AuthPrimaryButton(
+            text = stringResource(R.string.auth_login),
+            enabled = uiState.canLogin() && !uiState.isLoading,
+            onClick = { onEvent(LoginScreenEvent.LoginClicked) },
+        )
+    }
+}
+
+@Composable
+private fun SocialLoginDivider() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        HorizontalDivider(modifier = Modifier.weight(1f))
+        Text(
+            text = stringResource(R.string.auth_social_login),
+            modifier = Modifier.padding(horizontal = 12.dp),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.labelMedium,
+        )
+        HorizontalDivider(modifier = Modifier.weight(1f))
     }
 }

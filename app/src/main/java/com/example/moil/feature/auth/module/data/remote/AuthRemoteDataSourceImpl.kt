@@ -7,7 +7,6 @@ import com.example.moil.feature.auth.module.data.dto.DeleteAccountRequestDto
 import com.example.moil.feature.auth.module.data.dto.LoginRequestDto
 import com.example.moil.feature.auth.module.data.dto.PasswordSessionRequestDto
 import com.example.moil.feature.auth.module.data.dto.SendCodeRequestDto
-import com.example.moil.feature.auth.module.data.dto.SocialLoginCallbackRequestDto
 import com.example.moil.feature.auth.module.data.dto.TokenResponseDto
 import com.example.moil.feature.auth.module.data.dto.UpdateProfileRequestDto
 import com.example.moil.feature.auth.module.data.dto.UserProfileResponseDto
@@ -34,10 +33,4 @@ class AuthRemoteDataSourceImpl @Inject constructor(
     override suspend fun logout(): NetworkResult<Unit> = apiExecutor.executeVoid { authenticatedAuthApiService.logout() }
     override suspend fun deleteAccount(request: DeleteAccountRequestDto): NetworkResult<Unit> = apiExecutor.executeVoid { authenticatedAuthApiService.deleteAccount(request) }
 
-    override suspend fun completeSocialLogin(
-        socialLoginType: String,
-        request: SocialLoginCallbackRequestDto,
-    ): NetworkResult<TokenResponseDto> = apiExecutor.execute {
-        publicAuthApiService.completeSocialLogin(socialLoginType, request)
-    }
 }

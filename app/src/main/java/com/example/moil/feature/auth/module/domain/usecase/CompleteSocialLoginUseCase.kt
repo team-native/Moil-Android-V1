@@ -9,7 +9,7 @@ import javax.inject.Inject
 class CompleteSocialLoginUseCase @Inject constructor(
     private val authRepository: AuthRepository,
 ) {
-    // Provider callback의 code와 state를 서버 교환으로 연결하고 서비스 세션을 반환합니다.
+    // 서버가 딥링크로 반환한 토큰을 state 검증 후 서비스 세션으로 저장합니다.
     suspend operator fun invoke(callback: SocialLoginCallback): MoilResult<AuthSession> =
         authRepository.completeSocialLogin(callback)
 }
