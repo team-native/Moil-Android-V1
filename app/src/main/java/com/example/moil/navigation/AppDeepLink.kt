@@ -9,9 +9,9 @@ sealed interface AppDeepLink {
 
     data class OAuthCallback(
         val provider: String,
-        val code: String,
         val state: String,
-        val user: String?,
+        val accessToken: String,
+        val refreshToken: String,
     ) : AppDeepLink
 
     data class OAuthFailure(
@@ -62,14 +62,15 @@ object AppDeepLinkParser {
             return AppDeepLink.OAuthFailure(provider = provider, state = state)
         }
 
-        val code = uri.queryParameter("code")?.takeIf(String::isNotBlank) ?: return null
         val requiredState = state ?: return null
+        val accessToken = uri.queryParameter("accessToken")?.takeIf(String::isNotBlank) ?: return null
+        val refreshToken = uri.queryParameter("refreshToken")?.takeIf(String::isNotBlank) ?: return null
 
         return AppDeepLink.OAuthCallback(
             provider = provider,
-            code = code,
             state = requiredState,
-            user = uri.queryParameter("user"),
+            accessToken = accessToken,
+            refreshToken = refreshToken,
         )
     }
 

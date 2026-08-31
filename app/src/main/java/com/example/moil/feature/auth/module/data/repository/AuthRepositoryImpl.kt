@@ -15,7 +15,6 @@ import com.example.moil.feature.auth.module.data.mapper.toDomain
 import com.example.moil.feature.auth.module.data.mapper.toDto
 import com.example.moil.feature.auth.module.data.mapper.toUserProfileOrNull
 import com.example.moil.feature.auth.module.data.remote.AuthRemoteDataSource
-import com.example.moil.feature.auth.module.data.dto.SocialLoginCallbackRequestDto
 import com.example.moil.feature.auth.module.data.oauth.OAuthAuthorizationRequestFactory
 import com.example.moil.feature.auth.module.domain.model.AuthSession
 import com.example.moil.feature.auth.module.domain.model.UserProfile
@@ -91,34 +90,25 @@ class AuthRepositoryImpl @Inject constructor(
         oauthAuthorizationRequestFactory.create(provider)
 
     override suspend fun completeSocialLogin(callback: SocialLoginCallback): MoilResult<AuthSession> {
-        val codeVerifier = oauthAuthorizationRequestFactory.consumeCodeVerifier(callback)
-            ?: return MoilResult.Failure(
+        if (!oauthAuthorizationRequestFactory.consumeAttempt(callback.provider, callback.state)) {
+            return MoilResult.Failure(
                 com.example.moil.core.domain.MoilError.Configuration("소셜 로그인 요청을 확인할 수 없습니다."),
             )
-        val result = authRemoteDataSource
-            .completeSocialLogin(
-                socialLoginType = callback.provider.wireValue,
-                request = SocialLoginCallbackRequestDto(
-                    code = callback.code,
-                    state = callback.state,
-                    user = callback.user,
-                    codeVerifier = codeVerifier,
-                ),
-            )
-            .mapToDomain { response ->
-                AuthSession(
-                    accessToken = response.accessToken,
-                    refreshToken = response.refreshToken,
-                    profile = response.toUserProfileOrNull(),
-                )
-            }
+        }
+        // 서버가 provider code를 교환해 반환한 서비스 JWT만 로컬 암호화 세션에 저장합니다.
+        val result = MoilResult.Success(
+            AuthSession(
+                accessToken = callback.accessToken,
+                refreshToken = callback.refreshToken,
+            ),
+        )
         saveSessionIfSuccessful(result)
         return result
     }
 
-    // Provider 취소 또는 오류 callback 뒤에는 메모리의 1회성 verifier를 즉시 폐기합니다.
-    override fun cancelSocialLoginAttempt() {
-        oauthAuthorizationRequestFactory.discardAttempt()
+    // Provider 취소 또는 오류 callback 뒤에는 일치하는 state의 시도만 폐기합니다.
+    override fun cancelSocialLoginAttempt(provider: SocialLoginProvider, state: String?) {
+        oauthAuthorizationRequestFactory.discardAttempt(provider, state)
     }
 
     override suspend fun resetPassword(sessionId: String, password: String, passwordConfirmation: String): MoilResult<Unit> = authRemoteDataSource

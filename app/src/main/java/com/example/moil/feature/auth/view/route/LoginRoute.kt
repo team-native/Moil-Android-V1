@@ -12,13 +12,14 @@ import com.example.moil.feature.auth.viewmodel.AuthEffect
 import com.example.moil.feature.auth.viewmodel.AuthViewModel
 import com.example.moil.feature.auth.viewmodel.LoginScreenEvent
 import com.example.moil.feature.auth.module.domain.model.SocialLoginCallback
+import com.example.moil.feature.auth.module.domain.model.SocialLoginFailure
 
 @Composable
 fun LoginRoute(
     initialEmail: String,
     socialLoginCallback: SocialLoginCallback? = null,
     onSocialLoginCallbackConsumed: () -> Unit = {},
-    hasSocialLoginFailure: Boolean = false,
+    socialLoginFailure: SocialLoginFailure? = null,
     onSocialLoginFailureConsumed: () -> Unit = {},
     onNavigateToSignUp: () -> Unit,
     onLoginCompleted: () -> Unit,
@@ -48,10 +49,10 @@ fun LoginRoute(
         }
     }
 
-    LaunchedEffect(hasSocialLoginFailure) {
-        if (hasSocialLoginFailure) {
+    LaunchedEffect(socialLoginFailure) {
+        socialLoginFailure?.let { failure ->
             onSocialLoginFailureConsumed()
-            viewModel.handleSocialLoginFailure()
+            viewModel.handleSocialLoginFailure(failure)
         }
     }
 

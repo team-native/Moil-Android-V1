@@ -14,15 +14,17 @@ class AppDeepLinkParserTest {
     }
 
     @Test
-    fun `OAuth callback에서 code와 state를 추출한다`() {
+    fun `OAuth callback에서 서버 토큰과 state를 추출한다`() {
         assertEquals(
             AppDeepLink.OAuthCallback(
                 provider = "google",
-                code = "auth-code",
                 state = "state-1",
-                user = null,
+                accessToken = "access-token",
+                refreshToken = "refresh-token",
             ),
-            AppDeepLinkParser.parse("moil://oauth/google/callback?code=auth-code&state=state-1"),
+            AppDeepLinkParser.parse(
+                "moil://oauth/google/callback?accessToken=access-token&refreshToken=refresh-token&state=state-1",
+            ),
         )
     }
 
@@ -30,7 +32,8 @@ class AppDeepLinkParserTest {
     fun `scheme과 필수 값이 없으면 링크를 무시한다`() {
         assertNull(AppDeepLinkParser.parse("https://example.com/join/123"))
         assertNull(AppDeepLinkParser.parse("moil://join/0"))
-        assertNull(AppDeepLinkParser.parse("moil://oauth/google/callback?code=auth-code"))
+        assertNull(AppDeepLinkParser.parse("moil://oauth/google/callback?accessToken=access-token&refreshToken=refresh-token"))
+        assertNull(AppDeepLinkParser.parse("moil://oauth/google/callback?accessToken=access-token&state=state-1"))
         assertEquals(
             AppDeepLink.OAuthFailure(provider = "google", state = "state-1"),
             AppDeepLinkParser.parse("moil://oauth/google/callback?error=access_denied&state=state-1"),

@@ -6,7 +6,6 @@ import com.example.moil.core.domain.MoilResult
 import com.example.moil.feature.auth.module.domain.model.OAuthAuthorizationRequest
 import com.example.moil.feature.auth.module.domain.model.SocialLoginCallback
 import com.example.moil.feature.auth.module.domain.model.SocialLoginProvider
-import java.security.MessageDigest
 import java.security.SecureRandom
 import java.util.Base64
 import javax.inject.Inject
@@ -14,16 +13,13 @@ import javax.inject.Inject
 class OAuthAuthorizationRequestFactory @Inject constructor(
     private val oauthAttemptStore: OAuthAttemptStore,
 ) {
-    // Provider 로그인 화면을 열기 위한 URL을 만들고, callback 검증용 state/verifier를 메모리에 저장합니다.
+    // 서버 OAuth 시작 URL과 callback 위조 방지용 일회성 state를 만듭니다.
     fun create(provider: SocialLoginProvider): MoilResult<OAuthAuthorizationRequest> {
         val state = randomUrlSafeString(STATE_LENGTH)
-        val codeVerifier = randomUrlSafeString(CODE_VERIFIER_LENGTH)
-        val codeChallenge = sha256Base64Url(codeVerifier)
         oauthAttemptStore.replace(
             OAuthAttempt(
                 provider = provider,
                 state = state,
-                codeVerifier = codeVerifier,
             ),
         )
 
@@ -33,8 +29,6 @@ class OAuthAuthorizationRequestFactory @Inject constructor(
             .appendPath("oauth")
             .appendPath(provider.wireValue)
             .appendQueryParameter("state", state)
-            .appendQueryParameter("code_challenge", codeChallenge)
-            .appendQueryParameter("code_challenge_method", "S256")
             .build()
             .toString()
 
@@ -46,14 +40,13 @@ class OAuthAuthorizationRequestFactory @Inject constructor(
         )
     }
 
-    // callback state를 검증하고 성공한 시도에서만 백엔드 교환에 사용할 verifier를 꺼냅니다.
-    fun consumeCodeVerifier(callback: SocialLoginCallback): String? =
-        oauthAttemptStore.consume(callback.provider, callback.state)?.codeVerifier
+    // 서버 callback의 provider/state가 현재 인증 시도와 일치할 때만 토큰을 수용합니다.
+    fun consumeAttempt(provider: SocialLoginProvider, state: String): Boolean =
+        oauthAttemptStore.consume(provider, state)
 
-    // Provider가 취소·실패 callback을 반환했을 때 이전 로그인 시도를 재사용하지 못하게 폐기합니다.
-    fun discardAttempt() {
-        oauthAttemptStore.clear()
-    }
+    // 취소·실패 callback도 일치하는 시도만 폐기해 외부 링크가 진행 중인 인증을 취소하지 못하게 합니다.
+    fun discardAttempt(provider: SocialLoginProvider, state: String?): Boolean =
+        state != null && oauthAttemptStore.consume(provider, state)
 
     private fun randomUrlSafeString(length: Int): String {
         val randomBytes = ByteArray(length)
@@ -64,13 +57,8 @@ class OAuthAuthorizationRequestFactory @Inject constructor(
             .take(length)
     }
 
-    private fun sha256Base64Url(input: String): String = Base64.getUrlEncoder()
-        .withoutPadding()
-        .encodeToString(MessageDigest.getInstance("SHA-256").digest(input.toByteArray(Charsets.US_ASCII)))
-
     private companion object {
         const val STATE_LENGTH = 32
-        const val CODE_VERIFIER_LENGTH = 64
         val secureRandom = SecureRandom()
     }
 }
