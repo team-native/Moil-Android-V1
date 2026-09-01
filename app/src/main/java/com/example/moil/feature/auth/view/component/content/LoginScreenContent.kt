@@ -43,8 +43,8 @@ internal fun LoginScreenContent(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(horizontal = MoilAuthDimension.ScreenHorizontalPadding)
-                .imePadding()
-                .padding(bottom = MoilAuthDimension.ScreenBottomPadding), // 화면 하단 고정 여백
+                .navigationBarsPadding()
+                ,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 
@@ -53,7 +53,7 @@ internal fun LoginScreenContent(
 
             AuthBranding()
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
             LoginForm(uiState, onEvent, Modifier.widthIn(max = 440.dp))
 
@@ -106,7 +106,7 @@ private fun LoginForm(
         }
         uiState.errorMessage?.let { errorMessage -> AuthErrorText(errorMessage) }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(46.dp))
         SocialLoginDivider()
         Spacer(modifier = Modifier.height(16.dp))
         Row(
@@ -124,7 +124,7 @@ private fun LoginForm(
                 onEvent(LoginScreenEvent.SocialLoginClicked(SocialLoginProvider.Kakao))
             }
         }
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(45.dp))
         AuthPrimaryButton(
             text = stringResource(R.string.auth_login),
             enabled = uiState.canLogin() && !uiState.isLoading,

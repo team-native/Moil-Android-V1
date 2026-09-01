@@ -92,7 +92,6 @@ object MoilTimePickerDimension {
 
 object MoilAuthDimension {
     val ScreenHorizontalPadding = 24.dp
-    val ScreenBottomPadding = 16.dp
     val FieldHeight = 53.dp
     val PrimaryButtonHeight = 54.dp
     val FieldCornerRadius = 14.dp
