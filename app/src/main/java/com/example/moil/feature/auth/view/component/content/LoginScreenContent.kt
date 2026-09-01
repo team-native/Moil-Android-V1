@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -45,24 +43,27 @@ internal fun LoginScreenContent(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(horizontal = MoilAuthDimension.ScreenHorizontalPadding)
-                .navigationBarsPadding()
                 .imePadding()
-                .verticalScroll(rememberScrollState()),
+                .padding(bottom = MoilAuthDimension.ScreenBottomPadding), // 화면 하단 고정 여백
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // 시안의 상단 여백을 유지하고, 작은 화면에서는 스크롤로 모든 로그인 액션에 접근합니다.
-            Spacer(modifier = Modifier.height(96.dp))
+
+            // weight(1f)로 위쪽 남는 공간을 모두 차지해 아래 콘텐츠를 화면 하단으로 밀착시킵니다.
+            Spacer(modifier = Modifier.weight(1f))
+
             AuthBranding()
+
             Spacer(modifier = Modifier.height(32.dp))
+
             LoginForm(uiState, onEvent, Modifier.widthIn(max = 440.dp))
+
             Spacer(modifier = Modifier.height(20.dp))
+
             AuthPrompt(
                 message = stringResource(R.string.auth_login_prompt),
                 action = stringResource(R.string.auth_signup),
                 onClick = { onEvent(LoginScreenEvent.SignUpClicked) },
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
