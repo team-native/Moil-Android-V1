@@ -5,6 +5,18 @@ description: Jetpack Compose 다이얼로그가 열릴 때 배경 블러를 추�
 
 # Android Dialog Blur
 
+## 실행 Hook
+
+### `BeforeMutation`
+
+- Dialog·ModalBottomSheet가 실제 Window overlay인지 확인하고, 공용 blur Composable·Modifier 재사용 여부를 결정한다.
+- blur radius token과 Window API 경계를 먼저 확인한다.
+
+### `AfterChange`
+
+- `DisposableEffect`의 등록·해제 쌍과 `onDispose`의 Window 복원 동작을 점검한다.
+- `SideEffect`로 수명 관리하지 않았는지, 독립 backdrop마다 동일한 fallback Modifier가 적용되는지 확인한다.
+
 ## Rules
 
 - Create one reusable Window blur Composable in `core/component/overlay` instead of duplicating `DialogWindowProvider` casts in each dialog.

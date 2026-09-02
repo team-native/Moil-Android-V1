@@ -5,6 +5,26 @@ description: Android의 BuildConfig, product flavor, Retrofit, OkHttpClient, Int
 
 # Android Network and Build Environment
 
+## 실행 Hook
+
+### `BeforeWork`
+
+- flavor·BuildConfig·Retrofit·OkHttp·Interceptor·Authenticator의 현재 구성을 확인한다.
+- 인증·비인증 client 분리와 token 저장·갱신·종료 책임의 기존 단일 경로를 확인한다.
+
+### `BeforeMutation`
+
+- URL·Header·timeout·logging·인증 방식 변경 전 환경별 영향과 민감 정보 노출 여부를 확인한다.
+- Interceptor에서 DataStore·Repository·UseCase를 직접 호출하거나 `runBlocking`을 사용하지 않는 구조를 확정한다.
+
+### `AfterChange`
+
+- feature 하드코딩 URL/Header, 운영 body logging, 인증·비인증 Retrofit 오주입, token refresh 중복 정책을 검사한다.
+
+### `BeforeHandoff`
+
+- BuildConfig 환경별 값, Base URL trailing slash, Hilt provider, 인증 헤더와 운영 로그 설정을 검증한다.
+
 ## 가독성
 
 - 네트워크 설정, 인증 분기, 객체 생성을 한 줄로 압축하지 않는다. 보안 관련 조건과 설정값은 독립된 줄에 명시한다.

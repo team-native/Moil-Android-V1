@@ -9,6 +9,22 @@ description: Android에서 Coroutine, Flow, StateFlow, SharedFlow, Channel, 네�
 
 - `launch`, `when`, 오류 분기, 상태 갱신을 한 줄로 압축하지 않는다. 취소와 성공·실패 흐름이 드러나도록 각 분기를 줄바꿈한다.
 
+## 실행 Hook
+
+### `BeforeMutation`
+
+- Coroutine·Flow의 owner와 취소 시점, 로딩·성공·빈 결과·오류 상태를 먼저 결정한다.
+- 네트워크 호출은 공통 `ApiExecutor` 오류 정책과 중복되지 않도록 확인한다.
+
+### `AfterChange`
+
+- `CancellationException`이 보존되는지, 직접 만든 Scope에 종료 경로가 있는지 확인한다.
+- `MutableStateFlow`가 외부에 노출되지 않고 일회성 효과가 StateFlow와 섞이지 않았는지 확인한다.
+
+### `BeforeHandoff`
+
+- 성공·실패·취소·중복 호출 시나리오를 검토하고 관련 단위 테스트 결과를 기록한다.
+
 ## Coroutine 수명
 
 - ViewModel 작업은 `viewModelScope`를 우선한다.

@@ -5,6 +5,26 @@ description: Context를 필드에 저장하거나 Singleton, Listener, Callback,
 
 # Android Memory Safety Preflight
 
+## 실행 Hook
+
+### `BeforeWork`
+
+- Context 필드, Singleton, Listener, Callback, 직접 만든 CoroutineScope, 네트워크 연결 등 장기 수명 객체 추가 여부를 먼저 검색한다.
+- 대상·owner·종료 시점을 확인하고, 수명 분석이 끝나기 전에는 코드를 수정하지 않는다.
+
+### `BeforeMutation`
+
+- 장기 객체가 참조할 대상, 수명 불일치 가능성, 누수 원인, 해제 방법을 네 항목으로 기록한다.
+- 화면 객체·Activity Context·Composable lambda를 Application 수명 객체에 저장하지 않는 구조를 확정한다.
+
+### `AfterChange`
+
+- 등록과 해제, `DisposableEffect`의 `onDispose`, Coroutine 취소, `close`·`release` 경로가 모두 존재하는지 확인한다.
+
+### `BeforeHandoff`
+
+- Singleton이 Activity·View·NavController·화면 callback을 보관하지 않는지 최종 확인한다.
+
 ## 가독성
 
 - 등록·해제와 수명 분기를 한 줄로 압축하지 않아, 참조 생성과 해제 경로를 쉽게 검토할 수 있게 한다.
