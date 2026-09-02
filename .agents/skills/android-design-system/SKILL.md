@@ -5,9 +5,44 @@ description: Compose의 색상, MaterialTheme, Light·Dark·System 테마 모드
 
 # Android Design System and Resources
 
+## 명명 규칙
+
+디자인 시스템 코드도 공통 Android 명명 규칙을 따른다. 상세 규칙은 `android-code-naming` 스킬을 사용한다.
+
+| 대상 | 규칙 | 예시 |
+| --- | --- | --- |
+| 일반 변수/프로퍼티 | `camelCase`, 명사 또는 명사구 | `lightBackgroundColor`, `extraColors` |
+| 함수 | `camelCase`, 동사 또는 동사구 | `provideAppTheme()` |
+| 클래스/인터페이스·Composable | `PascalCase` | `AppExtraColors`, `BookOnTheme()` |
+| 상수 | `UPPER_SNAKE_CASE` | `DEFAULT_ANIMATION_DURATION` |
+| private backing property | `_` + 공개 프로퍼티 이름 | `_themeMode` → `themeMode` |
+| 파일 | 대표 공개 타입과 같은 `PascalCase` | `BookOnTheme.kt`, `AppTypography.kt` |
+| 패키지 | 모두 소문자, `_` 금지 | `core.designsystem` |
+
 ## 가독성
 
 - 토큰과 UI 리소스 선언의 객체 생성·조건 분기를 한 줄로 압축하지 않는다.
+
+## 실행 Hook
+
+### `BeforeWork`
+
+- 기존 `MaterialTheme` semantic slot, `strings.xml`, spacing·radius·typography token을 먼저 검색한다.
+- 동일한 역할의 token이 있으면 새 값을 만들지 않고 기존 token을 재사용한다.
+
+### `BeforeMutation`
+
+- 새 색상·문자열·반복 수치가 정말 디자인 시스템 책임인지와 Light/Dark/System 동작을 확정한다.
+- feature에서 직접 색상·문자열·반복 dimension을 추가하지 않을 경로를 정한다.
+
+### `AfterChange`
+
+- feature 하드코딩, resource 누락, semantic 역할 불일치, Light/Dark 대비 문제를 확인한다.
+- 새 public token의 파일명·명명과 기존 Theme provider 연결을 확인한다.
+
+### `BeforeHandoff`
+
+- 가능한 Preview 또는 screenshot 검증과 resource·theme 빌드 결과를 기록한다.
 
 ## 색상 구조
 

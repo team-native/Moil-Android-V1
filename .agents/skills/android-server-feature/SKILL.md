@@ -14,6 +14,29 @@ description: Android에서 새로운 Retrofit 서버 연동 기능을 추가하�
 새 서버 기능을 기존 프로젝트 규칙에 맞게 끝까지 연결한다.
 계층을 건너뛰지 않고, 서버 형식과 Domain 의미와 화면 상태를 분리한다.
 
+## 실행 Hook
+
+서버 기능 작업은 Hook을 통과한 계층만 다음 단계로 진행한다. 어느 한 단계라도 계약이 불명확하면 구현을 중단하고 확인한다.
+
+### `BeforeWork`
+
+- 모듈·패키지·공통 결과 타입·ApiExecutor·직렬화·Retrofit·Hilt·유사 기능을 조사한다.
+- 장기 수명 객체가 있으면 `android-memory-safety`를 먼저 적용한다.
+
+### `BeforeMutation`
+
+- Endpoint부터 Domain·Repository·UseCase·DTO·Mapper·RemoteDataSource·Presentation의 책임과 파일 위치를 확정한다.
+- 서버 계약이 불명확하거나 보안·성능 위험이 있으면 코드를 만들지 않고 확인한다.
+
+### `AfterChange`
+
+- ApiService 호출이 RemoteDataSourceImpl의 ApiExecutor 경로를 통과하는지 확인한다.
+- DTO·Retrofit 타입이 Domain/Presentation으로 노출되지 않고, 로딩·성공·빈 결과·오류 상태가 표현되는지 점검한다.
+
+### `BeforeHandoff`
+
+- Hilt binding·계층 경계·오류 변환·취소 보존·BuildConfig·하드코딩을 재검사하고 실제 검증 결과를 기록한다.
+
 ## 구현 전 조사
 
 코드를 만들기 전에 다음을 확인한다.
@@ -35,7 +58,7 @@ description: Android에서 새로운 Retrofit 서버 연동 기능을 추가하�
 
 ```text
 MainActivity
-→ AppNavigation / NavHost
+→ AppNavigation / NavDisplay (Navigation 3, `$android-navigation` 참고)
 → Route
 → Screen / UI
 → 사용자 이벤트
@@ -85,6 +108,51 @@ RepositoryImpl
 - `RepositoryImpl`은 RemoteDataSource만 주입받아 데이터 소스 선택·조합과 DTO → Domain 변환을 수행한다.
 - RemoteDataSource는 DTO 또는 프로젝트 공통 `NetworkResult<DTO>`까지만 반환하며 Domain Model과 UI 상태를 만들지 않는다.
 - Core 네트워크 기술 인프라(예: 인증 토큰 갱신)는 feature Repository 흐름과 별도일 수 있다. 이 경우에도 호출 위치와 공통 오류 처리 책임을 Core 계층에 한정한다.
+
+## 패키지 구조
+
+feature 패키지 최상위는 `view`, `viewmodel`, `module` 세 폴더로 나눈다. `module`은 다시 `domain`과 `data`로 나눈다.
+
+```text
+feature/<feature>/
+  view/
+    <Feature>Route.kt
+    <Feature>Screen.kt
+    component/
+      <Feature>SomeComponent.kt
+  viewmodel/
+    <Feature>ViewModel.kt
+    <Feature>UiState.kt
+    <Feature>ScreenEvent.kt
+    model/
+      <Feature>UiModel.kt
+      <Feature>UiMapper.kt
+  module/
+    domain/
+      model/
+        <Feature>.kt
+      repository/
+        <Feature>Repository.kt
+      usecase/
+        <UseCaseName>UseCase.kt
+    data/
+      dto/
+        <Feature>RequestDto.kt
+        <Feature>ResponseDto.kt
+      mapper/
+        <Feature>Mapper.kt
+      remote/
+        <Feature>RemoteDataSource.kt
+        <Feature>RemoteDataSourceImpl.kt
+      repository/
+        <Feature>RepositoryImpl.kt
+```
+
+- `view`에는 Route, Screen, feature 전용 Component만 둔다. ViewModel, UseCase, Repository를 참조하는 코드를 이 폴더에 두지 않는다.
+- `viewmodel`에는 ViewModel, UiState, ScreenEvent, UiModel, UI mapper를 둔다. DTO, ApiService, Retrofit 타입을 참조하지 않는다.
+- `module/domain`에는 Domain Model, Repository Interface, UseCase를 둔다. Android Framework와 Data 계층 구현을 참조하지 않는다.
+- `module/data`에는 DTO, Mapper, ApiService 호출을 감싼 RemoteDataSource, RepositoryImpl을 둔다. `module/domain`의 Interface를 구현하되 Presentation을 참조하지 않는다.
+- 파일이 어느 폴더에도 명확히 속하지 않으면 새 폴더를 만들지 말고 가장 가까운 책임의 폴더에 둔다.
 
 ## 파일 생성 순서
 
@@ -318,4 +386,5 @@ suspend operator fun invoke(): List<Project> {
 - Hilt binding이 모두 연결되어 있다.
 - 서버 주소와 로그 설정이 feature 코드에 하드코딩되어 있지 않다.
 - 화면이 로딩, 성공, 빈 결과, 오류 상태를 표현한다.
+- 각 파일이 view / viewmodel / module(domain, data) 폴더 규칙에 맞게 배치되어 있다.
 - 가능한 검증을 실행하고 결과를 보고한다.
