@@ -43,6 +43,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 import com.example.moil.R
 import com.example.moil.core.component.display.MoilRemoteAvatar
 import com.example.moil.feature.calendar.viewmodel.CalendarScheduleSheetMode
@@ -209,7 +210,7 @@ private fun ScheduleListHeader(
 
         Box(
             modifier = Modifier
-                .size(MoilScheduleSheet.ListAddButtonSize)
+                .size(MoilScheduleSheet.ListCreateButtonSize)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.surfaceVariant)
                 .clickable(
@@ -221,10 +222,15 @@ private fun ScheduleListHeader(
                 },
             contentAlignment = Alignment.Center,
         ) {
+            // 버튼(60dp)만 커진 만큼 "+" 심볼도 같은 비율(25%)로 이 버튼 안에서만 확대한다.
+            // headlineMedium 자체는 다른 화면에서도 공용으로 쓰이므로 건드리지 않는다.
             Text(
                 text = stringResource(R.string.schedule_add_symbol),
                 color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontSize = 25.sp,
+                    lineHeight = 32.5.sp,
+                ),
                 fontWeight = FontWeight.Light,
             )
         }

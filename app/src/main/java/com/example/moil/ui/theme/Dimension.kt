@@ -21,6 +21,7 @@ object MoilCalendarDimension {
     val EventBadgeOuterHorizontalPadding = 2.dp
     val EventBadgeHorizontalPadding = 6.dp
     val EventBadgeVerticalPadding = 4.dp
+    val GroupMenuBackgroundBlur = 20.dp
 }
 
 object MoilComponentSize {
@@ -70,6 +71,7 @@ object MoilScheduleSheet {
     val ListItemHeight = 128.dp
     val ListTimeWidth = 72.dp
     val ListAddButtonSize = 48.dp
+    val ListCreateButtonSize = 60.dp
     val ListEventDotSize = 12.dp
     val ListAvatarSize = 28.dp
     val ListAvatarSpacing = 4.dp
