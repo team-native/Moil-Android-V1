@@ -16,11 +16,16 @@ import androidx.compose.ui.Modifier
 import com.example.moil.R
 import com.example.moil.ui.theme.MoilSpacing
 
+/**
+ * 하단 탭바에 표시되는 항목의 UI 메타데이터다.
+ *
+ * 탐색 자체는 `MoilMainDestination`이 담당하며, 여기서는 라벨·아이콘만 정의한다.
+ * 탭바에 나오지 않는 화면(그룹 상세, 프로필 편집, 그룹 생성)은 이 enum에 두지 않는다.
+ */
 enum class MoilNavigationDestination(
     @param:StringRes val labelRes: Int,
     @param:DrawableRes val selectedIconRes: Int,
     @param:DrawableRes val unselectedIconRes: Int,
-    val isBottomNavigationItem: Boolean = true,
 ) {
     Calendar(
         labelRes = R.string.calendar_tab,
@@ -32,12 +37,6 @@ enum class MoilNavigationDestination(
         selectedIconRes = R.drawable.family_tab_selected,
         unselectedIconRes = R.drawable.family_tab_unselected,
     ),
-    GroupDetail(
-        labelRes = R.string.family_tab,
-        selectedIconRes = R.drawable.family_tab_selected,
-        unselectedIconRes = R.drawable.family_tab_unselected,
-        isBottomNavigationItem = false,
-    ),
     JoinGroup(
         labelRes = R.string.group_join,
         selectedIconRes = R.drawable.common_add_selected,
@@ -47,18 +46,6 @@ enum class MoilNavigationDestination(
         labelRes = R.string.profile_tab,
         selectedIconRes = R.drawable.profile_tab_selected,
         unselectedIconRes = R.drawable.profile_tab_unselected,
-    ),
-    ProfileEdit(
-        labelRes = R.string.profile_account,
-        selectedIconRes = R.drawable.profile_tab_selected,
-        unselectedIconRes = R.drawable.profile_tab_unselected,
-        isBottomNavigationItem = false,
-    ),
-    CreateGroup(
-        labelRes = R.string.group_create,
-        selectedIconRes = R.drawable.common_add_selected,
-        unselectedIconRes = R.drawable.common_add_unselected,
-        isBottomNavigationItem = false,
     ),
 }
 
@@ -81,9 +68,7 @@ fun MoilBottomNavigation(
                     .navigationBarsPadding(),
                 horizontalArrangement = Arrangement.SpaceAround,
             ) {
-                MoilNavigationDestination.entries
-                    .filter { destination -> destination.isBottomNavigationItem }
-                    .forEach { destination ->
+                MoilNavigationDestination.entries.forEach { destination ->
                     val isSelected = destination == selectedDestination
                     MoilBottomNavigationItem(
                         iconRes = if (isSelected) {
