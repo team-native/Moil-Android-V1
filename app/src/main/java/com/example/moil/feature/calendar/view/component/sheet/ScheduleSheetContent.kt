@@ -8,26 +8,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -53,18 +47,20 @@ import com.example.moil.feature.calendar.viewmodel.CalendarScreenEvent
 import com.example.moil.feature.calendar.viewmodel.CalendarUiState
 import com.example.moil.ui.theme.LocalMoilExtraColors
 import com.example.moil.ui.theme.LocalMoilExtraTypography
-import com.example.moil.ui.theme.MoilRadius
 import com.example.moil.ui.theme.MoilScheduleSheet
 import com.example.moil.ui.theme.MoilTheme
 import java.time.LocalDate
 import java.time.LocalTime
 
-/** 일정 목록·생성·수정·상세를 하나의 ModalBottomSheet 안에서 전환합니다. */
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * 일정 목록·생성·수정·상세를 하나의 시트 안에서 전환합니다.
+ *
+ * 바텀시트 컨테이너는 Navigation 3 overlay scene(`MoilBottomSheetSceneStrategy`)이 제공하므로
+ * 여기서는 시트 안에 들어가는 내용만 구성합니다.
+ */
 @Composable
-internal fun ScheduleBottomSheet(
+internal fun ScheduleSheetContent(
     uiState: CalendarUiState,
-    sheetState: SheetState,
     selectedSchedule: CalendarScheduleUiModel?,
     isSelectedEventLoading: Boolean,
     isMutationLoading: Boolean,
@@ -72,46 +68,34 @@ internal fun ScheduleBottomSheet(
     hasMutationError: Boolean,
     onEvent: (CalendarScreenEvent) -> Unit,
 ) {
-    ModalBottomSheet(
-        onDismissRequest = { onEvent(CalendarScreenEvent.ScheduleSheetDismissed) },
-        sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surface,
-        shape = RoundedCornerShape(
-            topStart = MoilRadius.ScheduleSheet,
-            topEnd = MoilRadius.ScheduleSheet,
-        ),
-        dragHandle = null,
-        contentWindowInsets = { WindowInsets.statusBars },
-    ) {
-        when (uiState.scheduleSheetMode) {
-            CalendarScheduleSheetMode.List -> ScheduleListContent(
-                selectedDate = uiState.selectedDate,
-                schedules = uiState.schedules,
-                onCreateClick = {
-                    onEvent(CalendarScreenEvent.ScheduleCreateClicked)
-                },
-                onScheduleClick = { eventId ->
-                    onEvent(CalendarScreenEvent.ScheduleItemClicked(eventId))
-                },
-            )
+    when (uiState.scheduleSheetMode) {
+        CalendarScheduleSheetMode.List -> ScheduleListContent(
+            selectedDate = uiState.selectedDate,
+            schedules = uiState.schedules,
+            onCreateClick = {
+                onEvent(CalendarScreenEvent.ScheduleCreateClicked)
+            },
+            onScheduleClick = { eventId ->
+                onEvent(CalendarScreenEvent.ScheduleItemClicked(eventId))
+            },
+        )
 
-            CalendarScheduleSheetMode.Create,
-            CalendarScheduleSheetMode.Edit -> ScheduleFormContent(
-                uiState = uiState,
-                isEditMode = uiState.scheduleSheetMode == CalendarScheduleSheetMode.Edit,
-                isMutationLoading = isMutationLoading,
-                hasMutationError = hasMutationError,
-                onEvent = onEvent,
-            )
+        CalendarScheduleSheetMode.Create,
+        CalendarScheduleSheetMode.Edit -> ScheduleFormContent(
+            uiState = uiState,
+            isEditMode = uiState.scheduleSheetMode == CalendarScheduleSheetMode.Edit,
+            isMutationLoading = isMutationLoading,
+            hasMutationError = hasMutationError,
+            onEvent = onEvent,
+        )
 
-            CalendarScheduleSheetMode.Detail -> ScheduleDetailContent(
-                schedule = selectedSchedule,
-                isLoading = isSelectedEventLoading,
-                hasError = hasSelectedEventError,
-                hasMutationError = hasMutationError,
-                onEvent = onEvent,
-            )
-        }
+        CalendarScheduleSheetMode.Detail -> ScheduleDetailContent(
+            schedule = selectedSchedule,
+            isLoading = isSelectedEventLoading,
+            hasError = hasSelectedEventError,
+            hasMutationError = hasMutationError,
+            onEvent = onEvent,
+        )
     }
 }
 
@@ -740,7 +724,7 @@ private fun ScheduleParticipantAvatars(
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 844)
 @Composable
-private fun ScheduleBottomSheetPreview() {
+private fun ScheduleSheetListPreview() {
     MoilTheme(darkTheme = false) {
         ScheduleListContent(
             selectedDate = LocalDate.of(2026, 7, 15),
