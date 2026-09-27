@@ -157,6 +157,9 @@ private fun MemberGroupContent(
                 onInviteLinkShareClick = {
                     onEvent(FamilyScreenEvent.InviteLinkShareClicked)
                 },
+                onMyProfileClick = {
+                    onEvent(FamilyScreenEvent.MyGroupProfileClicked)
+                },
                 onLeaveClick = {
                     onEvent(FamilyScreenEvent.LeaveGroupClicked)
                 },
@@ -167,6 +170,9 @@ private fun MemberGroupContent(
                 isNotificationToggleEnabled = uiState.isNotificationToggleEnabled,
                 onNotificationsChanged = { isEnabled ->
                     onEvent(FamilyScreenEvent.NotificationsChanged(isEnabled))
+                },
+                onMyProfileClick = {
+                    onEvent(FamilyScreenEvent.MyGroupProfileClicked)
                 },
                 onLeaveClick = {
                     onEvent(FamilyScreenEvent.LeaveGroupClicked)
@@ -239,9 +245,17 @@ internal fun FamilyMemberSettingsContent(
     notificationsEnabled: Boolean,
     isNotificationToggleEnabled: Boolean,
     onNotificationsChanged: (Boolean) -> Unit,
+    onMyProfileClick: () -> Unit,
     onLeaveClick: () -> Unit,
 ) {
     FamilySettingsCard {
+        FamilyActionSettingRow(
+            label = stringResource(R.string.family_group_my_profile),
+            onClick = onMyProfileClick,
+        )
+
+        FamilySettingDivider()
+
         FamilyNotificationSettingRow(
             notificationsEnabled = notificationsEnabled,
             isToggleEnabled = isNotificationToggleEnabled,
@@ -259,12 +273,20 @@ internal fun FamilyAdministratorSettingsContent(
     notificationsEnabled: Boolean,
     isNotificationToggleEnabled: Boolean,
     onNotificationsChanged: (Boolean) -> Unit,
+    onMyProfileClick: () -> Unit,
     onGroupNameChangeClick: () -> Unit,
     onMemberPermissionsClick: () -> Unit,
     onInviteLinkShareClick: () -> Unit,
     onLeaveClick: () -> Unit,
 ) {
     FamilySettingsCard {
+        FamilyActionSettingRow(
+            label = stringResource(R.string.family_group_my_profile),
+            onClick = onMyProfileClick,
+        )
+
+        FamilySettingDivider()
+
         FamilyNotificationSettingRow(
             notificationsEnabled = notificationsEnabled,
             isToggleEnabled = isNotificationToggleEnabled,
@@ -399,6 +421,7 @@ private fun FamilyMemberSettingsContentPreview() {
             notificationsEnabled = true,
             isNotificationToggleEnabled = true,
             onNotificationsChanged = {},
+            onMyProfileClick = {},
             onLeaveClick = {},
         )
     }
@@ -412,6 +435,7 @@ private fun FamilyAdministratorSettingsContentPreview() {
             notificationsEnabled = true,
             isNotificationToggleEnabled = true,
             onNotificationsChanged = {},
+            onMyProfileClick = {},
             onGroupNameChangeClick = {},
             onMemberPermissionsClick = {},
             onInviteLinkShareClick = {},

@@ -14,4 +14,5 @@ sealed interface FamilyScreenEvent {
     data object InviteCodeCopyClicked : FamilyScreenEvent
     data object InviteLinkShareClicked : FamilyScreenEvent
     data object LeaveGroupClicked : FamilyScreenEvent
+    data object MyGroupProfileClicked : FamilyScreenEvent
 }

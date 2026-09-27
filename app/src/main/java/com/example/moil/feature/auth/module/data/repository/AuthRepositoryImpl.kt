@@ -22,6 +22,7 @@ import com.example.moil.feature.auth.module.domain.model.Verification
 import com.example.moil.feature.auth.module.domain.model.VerificationStep
 import com.example.moil.feature.auth.module.domain.model.VerifiedSession
 import com.example.moil.feature.auth.module.domain.model.OAuthAuthorizationRequest
+import com.example.moil.feature.auth.module.domain.model.SignInMethod
 import com.example.moil.feature.auth.module.domain.model.SocialLoginCallback
 import com.example.moil.feature.auth.module.domain.model.SocialLoginProvider
 import com.example.moil.feature.auth.module.domain.repository.AuthRepository
@@ -69,7 +70,7 @@ class AuthRepositoryImpl @Inject constructor(
                     profile = response.toUserProfileOrNull(fallbackName = userName),
                 )
             }
-        saveSessionIfSuccessful(result)
+        saveSessionIfSuccessful(result, SignInMethod.Email)
         return result
     }
 
@@ -82,7 +83,7 @@ class AuthRepositoryImpl @Inject constructor(
                     profile = response.toUserProfileOrNull(),
                 )
             }
-        saveSessionIfSuccessful(result)
+        saveSessionIfSuccessful(result, SignInMethod.Email)
         return result
     }
 
@@ -102,7 +103,7 @@ class AuthRepositoryImpl @Inject constructor(
                 refreshToken = callback.refreshToken,
             ),
         )
-        saveSessionIfSuccessful(result)
+        saveSessionIfSuccessful(result, SignInMethod.Social)
         return result
     }
 
@@ -140,8 +141,13 @@ class AuthRepositoryImpl @Inject constructor(
         return result
     }
 
-    private fun saveSessionIfSuccessful(result: MoilResult<AuthSession>) {
+    // 로그인 성공 시 토큰·프로필과 함께 로그인 방식을 저장해 계정 관리 화면이 지원 여부를 판단하게 한다.
+    private fun saveSessionIfSuccessful(
+        result: MoilResult<AuthSession>,
+        signInMethod: SignInMethod,
+    ) {
         if (result is MoilResult.Success) {
+            currentUserProfileStore.saveSignInMethod(signInMethod)
             sessionManager.save(
                 tokens = SessionTokens(
                     accessToken = result.value.accessToken,

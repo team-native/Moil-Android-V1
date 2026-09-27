@@ -2,6 +2,7 @@ package com.example.moil.feature.group.viewmodel
 
 import com.example.moil.core.domain.MoilError
 import com.example.moil.core.domain.MoilResult
+import com.example.moil.feature.auth.module.domain.model.SignInMethod
 import com.example.moil.feature.auth.module.domain.model.UserProfile
 import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfileStore
 import com.example.moil.feature.group.module.domain.model.GroupColor
@@ -22,6 +23,7 @@ import com.example.moil.feature.group.module.domain.usecase.RenameGroupUseCase
 import com.example.moil.feature.group.module.domain.usecase.TransferAdminUseCase
 import com.example.moil.feature.group.module.domain.usecase.UpdateGroupNotificationUseCase
 import com.example.moil.feature.group.module.domain.usecase.UpdateMemberRolesUseCase
+import com.example.moil.feature.group.module.domain.usecase.UpdateMyGroupProfileUseCase
 import com.example.moil.feature.group.module.domain.usecase.VerifyInviteUseCase
 import com.example.moil.feature.image.module.domain.model.UploadedProfileImage
 import com.example.moil.feature.image.module.domain.repository.ImageRepository
@@ -231,6 +233,64 @@ class GroupViewModelTest {
         assertEquals(true, viewModel.uiState.value.selectedGroupNotificationEnabled)
     }
 
+    @Test
+    fun `그룹 프로필을 색으로 바꾸면 색만 보내고 사진 경로는 보내지 않는다`() = runTest {
+        val repository = FakeGroupRepository()
+        val viewModel = createViewModel(repository)
+        val effect = async(start = CoroutineStart.UNDISPATCHED) { viewModel.effects.first() }
+
+        viewModel.updateMyGroupProfile(
+            groupId = GROUP_ID,
+            nickname = "새 이름",
+            color = GroupColor.Green,
+            selectedImageUri = null,
+            currentImagePath = "/images/old",
+        )
+
+        assertEquals(GroupEffect.MyGroupProfileUpdated, effect.await())
+        assertEquals(listOf(Triple("새 이름", GroupColor.Green, null)), repository.profileUpdateRequests)
+    }
+
+    @Test
+    fun `사진을 바꾸지 않고 이름만 바꾸면 기존 사진 경로를 유지한다`() = runTest {
+        val repository = FakeGroupRepository()
+        val viewModel = createViewModel(repository)
+
+        viewModel.updateMyGroupProfile(
+            groupId = GROUP_ID,
+            nickname = "새 이름",
+            color = null,
+            selectedImageUri = null,
+            currentImagePath = "/images/old",
+        )
+
+        assertEquals(listOf(Triple("새 이름", null, "/images/old")), repository.profileUpdateRequests)
+    }
+
+    @Test
+    fun `그룹 프로필 편집 초기 상태는 다른 멤버가 쓰는 색을 제외하고 내 색은 남긴다`() {
+        val group = GroupSummary(
+            id = GROUP_ID,
+            name = GROUP_NAME,
+            inviteCode = null,
+            myRole = GroupRole.Member,
+            myNickname = "나",
+            myColor = GroupColor.Sky,
+            memberCount = 2,
+        )
+        val members = listOf(
+            member(userId = 1L, role = GroupRole.Member, isMe = true),
+            member(userId = 2L, role = GroupRole.Admin, isMe = false).copy(color = GroupColor.Red),
+        )
+
+        val editState = group.toGroupProfileEditUiState(members)
+
+        assertTrue(GroupColor.Sky in editState.availableProfileColors)
+        assertFalse(GroupColor.Red in editState.availableProfileColors)
+        assertEquals(GroupColor.Sky, editState.selectedProfileColor)
+        assertFalse(editState.canSave)
+    }
+
     private fun createViewModel(repository: FakeGroupRepository): GroupViewModel = GroupViewModel(
         getMyGroupsUseCase = GetMyGroupsUseCase(repository),
         createGroupUseCase = CreateGroupUseCase(repository),
@@ -243,6 +303,7 @@ class GroupViewModelTest {
         updateMemberRolesUseCase = UpdateMemberRolesUseCase(repository),
         transferAdminUseCase = TransferAdminUseCase(repository),
         leaveGroupUseCase = LeaveGroupUseCase(repository),
+        updateMyGroupProfileUseCase = UpdateMyGroupProfileUseCase(repository),
         uploadProfileImageUseCase = UploadProfileImageUseCase(UnusedImageRepository),
         currentUserProfileStore = FakeCurrentUserProfileStore(),
     )
@@ -282,6 +343,7 @@ private class FakeGroupRepository(
     val leftGroupIds = mutableListOf<Long>()
     val transferTargetIds = mutableListOf<Long>()
     val requestedRoleChanges = mutableListOf<Map<Long, GroupRole>>()
+    val profileUpdateRequests = mutableListOf<Triple<String, GroupColor?, String?>>()
 
     private val group = GroupSummary(
         id = 7L,
@@ -354,7 +416,18 @@ private class FakeGroupRepository(
         nickname: String,
         color: GroupColor?,
         imagePath: String?,
-    ): MoilResult<GroupMemberProfile> = unused()
+    ): MoilResult<GroupMemberProfile> {
+        profileUpdateRequests += Triple(nickname, color, imagePath)
+        return MoilResult.Success(
+            GroupMemberProfile(
+                groupId = groupId,
+                userId = 1L,
+                nickname = nickname,
+                color = color ?: GroupColor.Unknown,
+                imagePath = imagePath,
+            ),
+        )
+    }
 
     private fun unused(): Nothing = error("이 테스트에서 사용하지 않는 요청입니다.")
 }
@@ -369,8 +442,16 @@ private class FakeCurrentUserProfileStore : CurrentUserProfileStore {
 
     override val profile: StateFlow<UserProfile?> = mutableProfile
 
+    private val mutableSignInMethod = MutableStateFlow<SignInMethod?>(null)
+
+    override val signInMethod: StateFlow<SignInMethod?> = mutableSignInMethod
+
     override fun save(profile: UserProfile) {
         mutableProfile.value = profile
+    }
+
+    override fun saveSignInMethod(signInMethod: SignInMethod) {
+        mutableSignInMethod.value = signInMethod
     }
 
     override fun clear() {

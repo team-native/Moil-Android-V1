@@ -9,4 +9,6 @@ sealed interface ProfileScreenEvent {
     data object CreateGroupClicked : ProfileScreenEvent
     data object ProfileImageClicked : ProfileScreenEvent
     data object LogoutClicked : ProfileScreenEvent
+    data object ChangePasswordClicked : ProfileScreenEvent
+    data object DeleteAccountClicked : ProfileScreenEvent
 }

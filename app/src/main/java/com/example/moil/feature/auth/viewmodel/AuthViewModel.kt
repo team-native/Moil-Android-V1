@@ -62,6 +62,7 @@ class AuthViewModel @Inject constructor(
             is LoginScreenEvent.EmailChanged -> mutableLoginUiState.value = mutableLoginUiState.value.copy(email = event.email, errorMessage = null)
             is LoginScreenEvent.PasswordChanged -> mutableLoginUiState.value = mutableLoginUiState.value.copy(password = event.password, errorMessage = null)
             LoginScreenEvent.LoginClicked -> login()
+            // 화면 이동 이벤트는 LoginRoute가 back stack에 목적지를 추가해 처리한다.
             LoginScreenEvent.ForgotPasswordClicked, LoginScreenEvent.SignUpClicked -> Unit
             is LoginScreenEvent.SocialLoginClicked -> startSocialLogin(event.provider)
         }

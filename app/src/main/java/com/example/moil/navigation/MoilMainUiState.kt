@@ -10,7 +10,10 @@ import androidx.compose.runtime.setValue
 import com.example.moil.feature.calendar.viewmodel.CalendarUiState
 import com.example.moil.feature.family.viewmodel.FamilyUiState
 import com.example.moil.feature.group.viewmodel.CreateGroupUiState
+import com.example.moil.feature.group.viewmodel.GroupProfileEditUiState
 import com.example.moil.feature.group.viewmodel.JoinGroupUiState
+import com.example.moil.feature.profile.viewmodel.ChangePasswordUiState
+import com.example.moil.feature.profile.viewmodel.DeleteAccountUiState
 import com.example.moil.feature.profile.viewmodel.ProfileEditUiState
 import com.example.moil.feature.profile.viewmodel.ProfileUiState
 import java.time.LocalDate
@@ -40,9 +43,15 @@ internal class MoilMainUiState(initialIsDarkTheme: Boolean) {
 
     var profileEditUiState: ProfileEditUiState by mutableStateOf(ProfileEditUiState())
 
+    var changePasswordUiState: ChangePasswordUiState by mutableStateOf(ChangePasswordUiState())
+
+    var deleteAccountUiState: DeleteAccountUiState by mutableStateOf(DeleteAccountUiState())
+
     var createGroupUiState: CreateGroupUiState by mutableStateOf(CreateGroupUiState())
 
     var joinGroupUiState: JoinGroupUiState by mutableStateOf(JoinGroupUiState())
+
+    var groupProfileEditUiState: GroupProfileEditUiState by mutableStateOf(GroupProfileEditUiState())
 
     /** 작업 실패·완료 같은 일회성 안내를 메인 플로우 어느 화면에서든 같은 자리에 보여준다. */
     val snackbarHostState = SnackbarHostState()

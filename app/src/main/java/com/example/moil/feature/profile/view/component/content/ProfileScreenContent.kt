@@ -72,10 +72,28 @@ internal fun ProfileScreenContent(
                 },
             )
 
+            if (uiState.canChangePassword) {
+                Spacer(modifier = Modifier.height(MoilProfileDimension.SettingsLabelTopPadding))
+
+                ProfileSectionLabel(text = stringResource(R.string.profile_account_label))
+
+                Spacer(modifier = Modifier.height(MoilProfileDimension.SettingsLabelBottomPadding))
+
+                ProfileAccountCard(
+                    onChangePasswordClick = {
+                        onEvent(ProfileScreenEvent.ChangePasswordClicked)
+                    },
+                )
+            }
+
             Spacer(modifier = Modifier.height(MoilProfileDimension.LogoutTopPadding))
 
             ProfileLogoutButton(
                 onClick = { onEvent(ProfileScreenEvent.LogoutClicked) },
+            )
+
+            ProfileDeleteAccountButton(
+                onClick = { onEvent(ProfileScreenEvent.DeleteAccountClicked) },
             )
         }
     }

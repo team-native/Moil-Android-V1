@@ -3,6 +3,7 @@ package com.example.moil.feature.auth.module.data.repository
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.example.moil.feature.auth.module.domain.model.SignInMethod
 import com.example.moil.feature.auth.module.domain.model.UserProfile
 import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfileStore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -34,6 +35,10 @@ class DefaultCurrentUserProfileStore @Inject constructor(
 
     override val profile: StateFlow<UserProfile?> = mutableProfile.asStateFlow()
 
+    private val mutableSignInMethod = MutableStateFlow(readSignInMethod())
+
+    override val signInMethod: StateFlow<SignInMethod?> = mutableSignInMethod.asStateFlow()
+
     override fun save(profile: UserProfile) {
         encryptedPreferences.edit()
             .putLong(USER_ID_KEY, profile.userId)
@@ -43,9 +48,23 @@ class DefaultCurrentUserProfileStore @Inject constructor(
         mutableProfile.value = profile
     }
 
+    override fun saveSignInMethod(signInMethod: SignInMethod) {
+        encryptedPreferences.edit()
+            .putString(SIGN_IN_METHOD_KEY, signInMethod.name)
+            .apply()
+        mutableSignInMethod.value = signInMethod
+    }
+
     override fun clear() {
         encryptedPreferences.edit().clear().apply()
         mutableProfile.value = null
+        mutableSignInMethod.value = null
+    }
+
+    private fun readSignInMethod(): SignInMethod? {
+        val storedValue = encryptedPreferences.getString(SIGN_IN_METHOD_KEY, null)
+
+        return SignInMethod.entries.firstOrNull { signInMethod -> signInMethod.name == storedValue }
     }
 
     private fun readProfile(): UserProfile? {
@@ -65,6 +84,7 @@ class DefaultCurrentUserProfileStore @Inject constructor(
         const val USER_ID_KEY = "user_id"
         const val NAME_KEY = "name"
         const val EMAIL_KEY = "email"
+        const val SIGN_IN_METHOD_KEY = "sign_in_method"
         const val MISSING_USER_ID = -1L
     }
 }

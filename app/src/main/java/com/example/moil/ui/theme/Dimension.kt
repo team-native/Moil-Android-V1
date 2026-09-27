@@ -111,6 +111,10 @@ object MoilAuthDimension {
     val VerificationCodeCellHeight = 54.dp
     val VerificationCodeCellSpacing = 8.dp
     val ErrorBorderWidth = 1.dp
+    val DescriptionBottomSpacing = 28.dp
+    val VerificationTimerTopSpacing = 14.dp
+    val SectionSpacing = 18.dp
+    val ActionMinTouchTarget = 48.dp
 }
 
 object MoilMemberDimension {

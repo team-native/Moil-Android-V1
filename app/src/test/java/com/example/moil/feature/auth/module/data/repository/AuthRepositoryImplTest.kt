@@ -25,6 +25,7 @@ import com.example.moil.feature.auth.module.domain.model.OAuthAuthorizationReque
 import com.example.moil.feature.auth.module.domain.model.SocialLoginCallback
 import com.example.moil.feature.auth.module.domain.model.SocialLoginProvider
 import com.example.moil.feature.auth.module.domain.model.AuthSession
+import com.example.moil.feature.auth.module.domain.model.SignInMethod
 import com.example.moil.feature.auth.module.domain.model.UserProfile
 import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfileStore
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -147,8 +148,16 @@ private class FakeCurrentUserProfileStore(initialProfile: UserProfile? = null) :
 
     override val profile: StateFlow<UserProfile?> = mutableProfile
 
+    private val mutableSignInMethod = MutableStateFlow<SignInMethod?>(null)
+
+    override val signInMethod: StateFlow<SignInMethod?> = mutableSignInMethod
+
     override fun save(profile: UserProfile) {
         mutableProfile.value = profile
+    }
+
+    override fun saveSignInMethod(signInMethod: SignInMethod) {
+        mutableSignInMethod.value = signInMethod
     }
 
     override fun clear() {

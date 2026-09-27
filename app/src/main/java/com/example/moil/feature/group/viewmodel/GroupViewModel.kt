@@ -18,6 +18,7 @@ import com.example.moil.feature.group.module.domain.usecase.RenameGroupUseCase
 import com.example.moil.feature.group.module.domain.usecase.TransferAdminUseCase
 import com.example.moil.feature.group.module.domain.usecase.UpdateGroupNotificationUseCase
 import com.example.moil.feature.group.module.domain.usecase.UpdateMemberRolesUseCase
+import com.example.moil.feature.group.module.domain.usecase.UpdateMyGroupProfileUseCase
 import com.example.moil.feature.group.module.domain.usecase.VerifyInviteUseCase
 import com.example.moil.feature.image.module.domain.usecase.UploadProfileImageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -47,6 +48,9 @@ sealed interface GroupEffect {
         val groupName: String,
     ) : GroupEffect
 
+    /** 그룹 안의 내 프로필 변경이 서버에 반영됐다. */
+    data object MyGroupProfileUpdated : GroupEffect
+
     /** 개별 작업이 실패했다. 화면 전체 오류가 아니라 한 번만 안내한다. */
     data class OperationFailed(val error: MoilError) : GroupEffect
 }
@@ -64,6 +68,7 @@ class GroupViewModel @Inject constructor(
     private val updateMemberRolesUseCase: UpdateMemberRolesUseCase,
     private val transferAdminUseCase: TransferAdminUseCase,
     private val leaveGroupUseCase: LeaveGroupUseCase,
+    private val updateMyGroupProfileUseCase: UpdateMyGroupProfileUseCase,
     private val uploadProfileImageUseCase: UploadProfileImageUseCase,
     private val currentUserProfileStore: CurrentUserProfileStore,
 ) : ViewModel() {
@@ -318,6 +323,57 @@ class GroupViewModel @Inject constructor(
             }
 
             is MoilResult.Failure -> mutableEffects.emit(GroupEffect.OperationFailed(result.error))
+        }
+    }
+
+    /**
+     * 그룹 프로필 변경 화면의 저장 버튼에서 호출됩니다.
+     * 새 사진을 골랐으면 먼저 업로드해 경로를 받고, 서버 규칙대로 색과 사진 중 하나만 보냅니다.
+     * 사진을 바꾸지 않고 기존 사진을 유지하면 [currentImagePath]를 그대로 보냅니다.
+     * 성공하면 멤버 목록을 다시 불러오고 화면을 닫도록 [GroupEffect.MyGroupProfileUpdated]를 보냅니다.
+     */
+    fun updateMyGroupProfile(
+        groupId: Long,
+        nickname: String,
+        color: GroupColor?,
+        selectedImageUri: String?,
+        currentImagePath: String?,
+    ) = viewModelScope.launch {
+        if (mutableUiState.value.isSubmitting) {
+            return@launch
+        }
+
+        mutableUiState.value = mutableUiState.value.copy(isSubmitting = true)
+
+        val imagePathResult = when {
+            selectedImageUri != null -> uploadSelectedImage(selectedImageUri)
+            color != null -> MoilResult.Success(null)
+            else -> MoilResult.Success(currentImagePath)
+        }
+
+        when (imagePathResult) {
+            is MoilResult.Failure -> failSubmission(imagePathResult.error)
+
+            is MoilResult.Success -> {
+                val imagePath = imagePathResult.value
+
+                when (
+                    val result = updateMyGroupProfileUseCase(
+                        groupId = groupId,
+                        nickname = nickname,
+                        color = if (imagePath == null) color else null,
+                        imagePath = imagePath,
+                    )
+                ) {
+                    is MoilResult.Success -> {
+                        mutableUiState.value = mutableUiState.value.copy(isSubmitting = false)
+                        loadGroups(preferredGroupId = groupId)
+                        mutableEffects.emit(GroupEffect.MyGroupProfileUpdated)
+                    }
+
+                    is MoilResult.Failure -> failSubmission(result.error)
+                }
+            }
         }
     }
 

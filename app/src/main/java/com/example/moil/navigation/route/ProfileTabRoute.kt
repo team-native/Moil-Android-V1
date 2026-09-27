@@ -2,6 +2,8 @@ package com.example.moil.navigation.route
 
 import androidx.compose.runtime.Composable
 import com.example.moil.feature.profile.view.ProfileScreen
+import com.example.moil.feature.profile.viewmodel.ChangePasswordUiState
+import com.example.moil.feature.profile.viewmodel.DeleteAccountUiState
 import com.example.moil.feature.profile.viewmodel.ProfileGroupIndicator
 import com.example.moil.feature.profile.viewmodel.ProfileGroupUiModel
 import com.example.moil.feature.profile.viewmodel.ProfileScreenEvent
@@ -67,6 +69,21 @@ internal fun ProfileTabRoute(
                 }
 
                 ProfileScreenEvent.LogoutClicked -> mainTabViewModel.logout()
+
+                ProfileScreenEvent.ChangePasswordClicked -> {
+                    // 이전에 입력하다 만 비밀번호가 남지 않도록 들어올 때마다 새 입력 상태로 시작한다.
+                    mainTabViewModel.clearAccountActionErrors()
+                    mainUiState.changePasswordUiState = ChangePasswordUiState()
+                    navigator.push(MoilMainDestination.ChangePassword)
+                }
+
+                ProfileScreenEvent.DeleteAccountClicked -> {
+                    mainTabViewModel.clearAccountActionErrors()
+                    mainUiState.deleteAccountUiState = DeleteAccountUiState(
+                        isSocialAccount = !mainUiState.profileUiState.canChangePassword,
+                    )
+                    navigator.push(MoilMainDestination.DeleteAccount)
+                }
             }
         },
     )
