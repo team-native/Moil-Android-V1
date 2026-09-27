@@ -1,19 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample data extraction rules file; uncomment and customize as necessary.
-   See https://developer.android.com/about/versions/12/backup-restore#xml-changes
-   for details.
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Android 12 이상 백업·기기 이전 규칙.
+   Keystore 키로 암호화한 인증 토큰과 현재 사용자 프로필은 다른 기기에서 복호화할 수 없으므로 제외한다.
 -->
 <data-extraction-rules>
     <cloud-backup>
-        <!-- TODO: Use <include> and <exclude> to control what is backed up.
-        <include .../>
-        <exclude .../>
-        -->
+        <exclude domain="sharedpref" path="moil_auth_tokens.xml" />
+        <exclude domain="sharedpref" path="moil_current_user_profile.xml" />
     </cloud-backup>
-    <!--
     <device-transfer>
-        <include .../>
-        <exclude .../>
+        <exclude domain="sharedpref" path="moil_auth_tokens.xml" />
+        <exclude domain="sharedpref" path="moil_current_user_profile.xml" />
     </device-transfer>
-    -->
 </data-extraction-rules>

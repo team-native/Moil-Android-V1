@@ -33,6 +33,8 @@ data class MoilExtraColors(
     val profileGroupPrimaryIndicator: Color,
     val profileGroupSecondaryIndicator: Color,
     val profileLogout: Color,
+    // 나가기·삭제·탈퇴처럼 되돌릴 수 없는 동작의 강조색이다. primary와 구분되도록 별도 역할로 둔다.
+    val destructive: Color,
 )
 
 val LocalMoilExtraColors = staticCompositionLocalOf<MoilExtraColors> {
@@ -194,6 +196,7 @@ private val moilExtraColors = MoilExtraColors(
     profileGroupPrimaryIndicator = profileGroupPrimaryIndicatorColor,
     profileGroupSecondaryIndicator = profileGroupSecondaryIndicatorColor,
     profileLogout = profileLogoutColor,
+    destructive = profileLogoutColor,
 )
 
 private val darkMoilExtraColors = MoilExtraColors(
@@ -218,6 +221,7 @@ private val darkMoilExtraColors = MoilExtraColors(
     profileGroupPrimaryIndicator = profileGroupPrimaryIndicatorColor,
     profileGroupSecondaryIndicator = profileGroupSecondaryIndicatorColor,
     profileLogout = profileLogoutColor,
+    destructive = profileLogoutColor,
 )
 
 @Composable

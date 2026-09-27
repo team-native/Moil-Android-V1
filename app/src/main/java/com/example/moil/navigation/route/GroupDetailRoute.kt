@@ -13,6 +13,7 @@ import com.example.moil.navigation.MoilMainUiState
  *
  * Navigation 3의 NavKey 생성자 값은 `SavedStateHandle`에 자동으로 채워지지 않으므로,
  * 선택 그룹은 Route가 [LaunchedEffect]로 ViewModel에 직접 전달한다.
+ * 상세 화면은 뒤로가기와 그룹 나가기 이벤트만 보낸다.
  */
 @Composable
 internal fun GroupDetailRoute(
@@ -30,7 +31,21 @@ internal fun GroupDetailRoute(
         onEvent = { event ->
             when (event) {
                 FamilyScreenEvent.BackClicked -> navigator.goBack()
-                else -> Unit
+
+                FamilyScreenEvent.LeaveGroupClicked -> {
+                    navigator.openLeaveGroupFlow(mainUiState.familyUiState.leavePolicy)
+                }
+
+                is FamilyScreenEvent.DestinationClicked,
+                is FamilyScreenEvent.GroupClicked,
+                is FamilyScreenEvent.NotificationsChanged,
+                FamilyScreenEvent.EmptyGroupJoinClicked,
+                FamilyScreenEvent.EmptyGroupCreateClicked,
+                FamilyScreenEvent.GroupNameChangeClicked,
+                FamilyScreenEvent.MemberPermissionsClicked,
+                FamilyScreenEvent.InviteCodeCopyClicked,
+                FamilyScreenEvent.InviteLinkShareClicked,
+                -> Unit
             }
         },
     )

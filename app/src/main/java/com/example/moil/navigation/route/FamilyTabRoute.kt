@@ -48,9 +48,7 @@ internal fun FamilyTabRoute(
                 }
 
                 is FamilyScreenEvent.NotificationsChanged -> {
-                    mainUiState.familyUiState = mainUiState.familyUiState.copy(
-                        notificationsEnabled = event.isEnabled,
-                    )
+                    groupViewModel.updateNotification(event.isEnabled)
                 }
 
                 FamilyScreenEvent.GroupNameChangeClicked -> {
@@ -76,8 +74,8 @@ internal fun FamilyTabRoute(
                     navigator.push(MoilMainDestination.InviteShare)
                 }
 
-                FamilyScreenEvent.AdministratorTransferClicked -> {
-                    navigator.push(MoilMainDestination.AdministratorTransfer)
+                FamilyScreenEvent.LeaveGroupClicked -> {
+                    navigator.openLeaveGroupFlow(mainUiState.familyUiState.leavePolicy)
                 }
             }
         },

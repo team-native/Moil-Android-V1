@@ -3,7 +3,10 @@ package com.example.moil.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.moil.R
+import com.example.moil.core.component.toUserMessage
 import com.example.moil.core.model.GroupMemberRole
 import com.example.moil.feature.calendar.viewmodel.CalendarEffect
 import com.example.moil.feature.calendar.viewmodel.CalendarScheduleSheetMode
@@ -25,6 +28,7 @@ import com.example.moil.feature.group.viewmodel.JoinGroupStep
 import com.example.moil.feature.group.viewmodel.JoinGroupUiState
 import com.example.moil.feature.group.viewmodel.toJoinGroupProfileOptions
 import com.example.moil.feature.profile.viewmodel.toUpdatedProfileUiState
+import kotlinx.coroutines.launch
 
 /**
  * 메인 플로우에서 여러 화면이 공유하는 상태를 ViewModel 흐름과 연결한다.
@@ -49,6 +53,7 @@ internal fun MoilMainUiStateEffects(
     val isJoinGroupTabActive = navigationState.topLevelRoute == MoilMainDestination.JoinGroup
     val isCreateGroupVisible = navigator.isOnCurrentBackStack(MoilMainDestination.CreateGroup)
     val isScheduleSheetOpen = navigator.isOnAnyBackStack(MoilMainDestination.ScheduleSheet)
+    val resources = LocalContext.current.resources
 
     // 일정 시트는 스크림 탭·스와이프·시스템 뒤로가기로도 닫히고 이 경로는 CalendarScreenEvent를 거치지 않는다.
     // back stack에서 사라진 뒤에도 달력이 딤 처리된 채로 남지 않도록 시트 관련 상태를 함께 되돌린다.
@@ -104,6 +109,29 @@ internal fun MoilMainUiStateEffects(
                     navigator.close(MoilMainDestination.CreateGroup)
                     navigator.navigateToTab(MoilMainDestination.Calendar)
                 }
+
+                GroupEffect.GroupRenamed -> navigator.close(MoilMainDestination.GroupRename)
+
+                GroupEffect.MemberRolesUpdated -> navigator.close(MoilMainDestination.MemberPermissions)
+
+                is GroupEffect.GroupLeft -> {
+                    // 나간 그룹을 보여주던 확인 다이얼로그와 그룹 상세를 모두 걷어내 남은 그룹 화면으로 돌아간다.
+                    navigator.close(MoilMainDestination.LeaveGroupConfirmation)
+                    navigator.close(MoilMainDestination.LeaveGroupAdministratorTransfer)
+                    navigator.close(MoilMainDestination.GroupDetail(effect.groupId))
+                    // 스낵바가 떠 있는 동안에도 다음 효과를 바로 처리하도록 별도 코루틴에서 보여준다.
+                    launch {
+                        mainUiState.snackbarHostState.showSnackbar(
+                            resources.getString(R.string.family_group_left_message, effect.groupName),
+                        )
+                    }
+                }
+
+                is GroupEffect.OperationFailed -> {
+                    launch {
+                        mainUiState.snackbarHostState.showSnackbar(effect.error.toUserMessage(resources))
+                    }
+                }
             }
         }
     }
@@ -113,14 +141,17 @@ internal fun MoilMainUiStateEffects(
         groupUiState.selectedGroupId,
         groupUiState.members,
         groupUiState.isLoading,
-        groupUiState.error,
+        groupUiState.loadError,
+        groupUiState.selectedGroupDetail,
+        groupUiState.isNotificationUpdating,
+        groupUiState.isManagementInProgress,
     ) {
         mainUiState.calendarUiState = mainUiState.calendarUiState.copy(
             groups = groupUiState.groups.toCalendarGroups(),
             selectedGroupId = groupUiState.selectedGroupId,
             members = groupUiState.members.toCalendarMembers(),
             isGroupsLoading = groupUiState.isLoading,
-            groupLoadError = groupUiState.error,
+            groupLoadError = groupUiState.loadError,
             events = if (groupUiState.selectedGroupId == null) {
                 emptyList()
             } else {
@@ -140,7 +171,11 @@ internal fun MoilMainUiStateEffects(
             ),
             selectedGroupId = groupUiState.selectedGroupId?.toString(),
             isGroupsLoading = groupUiState.isLoading,
-            hasGroupLoadError = groupUiState.error != null,
+            hasGroupLoadError = groupUiState.loadError != null,
+            notificationsEnabled = groupUiState.selectedGroupNotificationEnabled,
+            isNotificationUpdating = groupUiState.isNotificationUpdating,
+            isManagementInProgress = groupUiState.isManagementInProgress,
+            leavePolicy = groupUiState.leavePolicy,
             currentUserRole = groupUiState.selectedGroup
                 ?.myRole
                 ?.toFamilyMemberRole()

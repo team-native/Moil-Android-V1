@@ -67,10 +67,7 @@ internal fun FamilyScreenContent(
 
             Spacer(modifier = Modifier.height(MoilGroupDetailDimension.SectionLabelBottomSpacing))
 
-            FamilyDetailMemberCard(
-                members = selectedGroup.members,
-                memberRoleOverrides = uiState.memberRoleOverrides,
-            )
+            FamilyDetailMemberCard(members = selectedGroup.members)
 
             Spacer(modifier = Modifier.height(MoilGroupDetailDimension.ScheduleSectionTopSpacing))
 
@@ -89,7 +86,9 @@ internal fun FamilyScreenContent(
                 text = stringResource(R.string.family_group_leave),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onEvent(FamilyScreenEvent.BackClicked) }
+                    .clickable(enabled = !uiState.isManagementInProgress) {
+                        onEvent(FamilyScreenEvent.LeaveGroupClicked)
+                    }
                     .padding(vertical = MoilGroupDetailDimension.LeaveActionVerticalPadding),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.titleSmall,
@@ -102,7 +101,6 @@ internal fun FamilyScreenContent(
 @Composable
 private fun FamilyDetailMemberCard(
     members: List<FamilyMemberUiModel>,
-    memberRoleOverrides: Map<Long, Int>,
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -113,7 +111,7 @@ private fun FamilyDetailMemberCard(
             members.forEachIndexed { index, member ->
                 FamilyMemberRow(
                     name = member.name,
-                    roleRes = memberRoleOverrides[member.id] ?: member.roleRes,
+                    roleRes = member.roleRes,
                     profileColor = member.profileColor,
                     profileImagePath = member.profileImagePath,
                     rowHeight = MoilGroupDetailDimension.MemberRowHeight,

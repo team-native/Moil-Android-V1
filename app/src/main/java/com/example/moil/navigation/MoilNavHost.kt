@@ -3,6 +3,11 @@ package com.example.moil.navigation
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -13,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.HasDefaultViewModelProviderFactory
@@ -27,6 +33,8 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.scene.SinglePaneSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import com.example.moil.core.component.MoilBottomSheetStyle
@@ -50,17 +58,19 @@ import com.example.moil.feature.calendar.viewmodel.CalendarScreenEvent
 import com.example.moil.feature.calendar.viewmodel.CalendarViewModel
 import com.example.moil.feature.group.viewmodel.GroupViewModel
 import com.example.moil.feature.group.viewmodel.JoinGroupUiState
-import com.example.moil.navigation.route.AdministratorTransferRoute
 import com.example.moil.navigation.route.CreateGroupRoute
 import com.example.moil.navigation.route.FamilyTabRoute
 import com.example.moil.navigation.route.GroupDetailRoute
 import com.example.moil.navigation.route.GroupRenameRoute
 import com.example.moil.navigation.route.InviteShareRoute
 import com.example.moil.navigation.route.JoinGroupTabRoute
+import com.example.moil.navigation.route.LeaveGroupAdministratorTransferRoute
+import com.example.moil.navigation.route.LeaveGroupConfirmationRoute
 import com.example.moil.navigation.route.MemberPermissionsRoute
 import com.example.moil.navigation.route.ProfileEditRoute
 import com.example.moil.navigation.route.ProfileTabRoute
 import com.example.moil.navigation.route.ScheduleSheetRoute
+import com.example.moil.ui.theme.MoilSpacing
 import com.example.moil.ui.theme.MoilTimePickerDimension
 import java.time.LocalTime
 
@@ -176,6 +186,12 @@ private fun MoilAuthNavDisplay(
     NavDisplay(
         backStack = backStack,
         onBack = { backStack.removeLastOrNull() },
+        // 인증 화면의 ViewModel을 Activity가 아니라 각 목적지에 묶는다. 화면이 back stack에서 빠지거나
+        // 로그인 후 인증 그래프가 사라지면 입력한 비밀번호·인증 세션 ID가 담긴 ViewModel도 함께 정리된다.
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator(),
+        ),
         transitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
         popTransitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
         predictivePopTransitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
@@ -269,6 +285,7 @@ private fun MoilMainNavDisplay(
         }
     }
 
+    Box(modifier = Modifier.fillMaxSize()) {
     NavDisplay(
         entries = navigationState.toEntries(
             entryProvider {
@@ -399,7 +416,7 @@ private fun MoilMainNavDisplay(
                 ) {
                     MemberPermissionsRoute(
                         mainUiState = mainUiState,
-                        navigator = navigator,
+                        groupViewModel = groupViewModel,
                     )
                 }
 
@@ -412,10 +429,20 @@ private fun MoilMainNavDisplay(
                     )
                 }
 
-                entry<MoilMainDestination.AdministratorTransfer>(
+                entry<MoilMainDestination.LeaveGroupAdministratorTransfer>(
                     metadata = MoilDialogSceneStrategy.dialog(),
                 ) {
-                    AdministratorTransferRoute(
+                    LeaveGroupAdministratorTransferRoute(
+                        mainUiState = mainUiState,
+                        groupViewModel = groupViewModel,
+                        navigator = navigator,
+                    )
+                }
+
+                entry<MoilMainDestination.LeaveGroupConfirmation>(
+                    metadata = MoilDialogSceneStrategy.dialog(),
+                ) {
+                    LeaveGroupConfirmationRoute(
                         mainUiState = mainUiState,
                         groupViewModel = groupViewModel,
                         navigator = navigator,
@@ -462,6 +489,16 @@ private fun MoilMainNavDisplay(
         popTransitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
         predictivePopTransitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
     )
+
+    // 하단 탭바를 가리지 않도록 탭바 높이만큼 띄워 표시한다.
+    SnackbarHost(
+        hostState = mainUiState.snackbarHostState,
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .navigationBarsPadding()
+            .padding(bottom = MoilSpacing.SnackbarBottomOffset),
+    )
+    }
 }
 
 /**

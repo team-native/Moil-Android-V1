@@ -119,15 +119,14 @@ class AuthRepositoryImpl @Inject constructor(
         .changePassword(ChangePasswordRequestDto(origin, newPassword, passwordConfirmation))
         .mapToDomain { Unit }
 
+    // 서버 로그아웃이 실패해도(네트워크 끊김 등) 사용자는 로그아웃을 의도했으므로 로컬 세션은 항상 정리한다.
     override suspend fun logout(): MoilResult<Unit> {
         val result = authRemoteDataSource
             .logout()
             .mapToDomain { Unit }
 
-        if (result is MoilResult.Success) {
-            currentUserProfileStore.clear()
-            sessionManager.expireSession()
-        }
+        currentUserProfileStore.clear()
+        sessionManager.expireSession()
 
         return result
     }

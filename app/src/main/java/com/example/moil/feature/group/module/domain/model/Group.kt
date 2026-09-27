@@ -43,6 +43,7 @@ data class GroupDetail(
     val monthlyEventCount: Int,
     val myRole: GroupRole,
     val members: List<GroupMember>,
+    val notificationEnabled: Boolean? = null,
 )
 
 fun String.toGroupRole(): GroupRole = when (uppercase()) {
@@ -50,13 +51,6 @@ fun String.toGroupRole(): GroupRole = when (uppercase()) {
     "ADMIN" -> GroupRole.Admin
     "MEMBER" -> GroupRole.Member
     else -> GroupRole.Unknown
-}
-
-fun GroupRole.toWireValue(): String = when (this) {
-    GroupRole.Owner -> "OWNER"
-    GroupRole.Admin -> "ADMIN"
-    GroupRole.Member -> "MEMBER"
-    GroupRole.Unknown -> error("알 수 없는 역할은 권한 요청에 사용할 수 없습니다.")
 }
 
 fun String.toGroupColor(): GroupColor = when (uppercase()) {

@@ -9,6 +9,9 @@ object MoilSpacing {
     val CalendarRow = 12.dp
     val BottomNavigationTop = 8.dp
     val BottomNavigationBottom = 4.dp
+
+    /** 메인 플로우 스낵바가 하단 탭바를 가리지 않도록 띄우는 거리다. */
+    val SnackbarBottomOffset = 72.dp
 }
 
 object MoilIconSize {
@@ -30,6 +33,9 @@ object MoilComponentSize {
     val SwitchHeight = 25.dp
     val SwitchThumbSize = 21.dp
     val SwitchThumbPadding = 2.dp
+
+    /** 비활성 컨트롤을 흐리게 표시하는 불투명도다. */
+    const val DisabledContentAlpha = 0.38f
 }
 
 object MoilTextFieldDimension {
@@ -197,6 +203,8 @@ object MoilOverlayDimension {
     val DialogActionTopPadding = 18.dp
     val DialogActionHeight = 50.dp
     val DialogActionSpacing = 10.dp
+    val DialogProgressSize = 20.dp
+    val DialogProgressStrokeWidth = 2.dp
     val GroupNameDialogBackgroundBlur = 20.dp
     val SheetHorizontalPadding = 24.dp
     val SheetTopPadding = 18.dp

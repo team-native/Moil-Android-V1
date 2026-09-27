@@ -32,4 +32,5 @@ sealed interface CalendarScreenEvent {
     data class ScheduleMemoChanged(val memo: String) : CalendarScreenEvent
     data class SharedMemberClicked(val memberId: Long) : CalendarScreenEvent
     data object ScheduleDeleteConfirmed : CalendarScreenEvent
+    data class ScheduleMapClicked(val location: String) : CalendarScreenEvent
 }

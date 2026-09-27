@@ -62,12 +62,14 @@ internal fun GroupDetailResponseDto.toDomain(): GroupDetail = GroupDetail(
             imagePath = member.imagePath,
         )
     },
+    notificationEnabled = notificationEnabled,
 )
 
-internal fun GroupRole.toMemberRoleRequestDto(): MemberRoleRequestDto = when (this) {
+// 권한 변경 API는 admin/member만 받으므로 그 밖의 역할은 null로 돌려 호출부가 실패로 처리하게 한다.
+internal fun GroupRole.toMemberRoleRequestDtoOrNull(): MemberRoleRequestDto? = when (this) {
     GroupRole.Admin -> MemberRoleRequestDto.Admin
     GroupRole.Member -> MemberRoleRequestDto.Member
     GroupRole.Owner,
     GroupRole.Unknown,
-    -> error("관리자 또는 일반 멤버 역할만 변경 요청에 사용할 수 있습니다.")
+    -> null
 }

@@ -1,5 +1,6 @@
 package com.example.moil.feature.group.module.data.repository
 
+import com.example.moil.core.domain.MoilError
 import com.example.moil.core.domain.MoilResult
 import com.example.moil.core.domain.mapToDomain
 import com.example.moil.feature.group.module.data.dto.CreateGroupRequestDto
@@ -15,7 +16,7 @@ import com.example.moil.feature.group.module.data.dto.UpdateMemberRolesRequestDt
 import com.example.moil.feature.group.module.data.dto.UpdateMyGroupProfileRequestDto
 import com.example.moil.feature.group.module.data.dto.VerifyInviteRequestDto
 import com.example.moil.feature.group.module.data.mapper.toDomain
-import com.example.moil.feature.group.module.data.mapper.toMemberRoleRequestDto
+import com.example.moil.feature.group.module.data.mapper.toMemberRoleRequestDtoOrNull
 import com.example.moil.feature.group.module.data.remote.GroupRemoteDataSource
 import com.example.moil.feature.group.module.domain.model.GroupColor
 import com.example.moil.feature.group.module.domain.model.GroupDetail
@@ -90,17 +91,26 @@ class GroupRepositoryImpl @Inject constructor(
         )
         .mapToDomain { response -> response.toDomain() }
 
-    override suspend fun updateNotification(groupId: Long, enabled: Boolean): MoilResult<Unit> = groupRemoteDataSource
+    // 서버가 확정한 알림 수신 여부를 돌려줘 화면이 요청값이 아닌 실제 저장값을 표시하게 한다.
+    override suspend fun updateNotification(groupId: Long, enabled: Boolean): MoilResult<Boolean> = groupRemoteDataSource
         .updateNotification(groupId, NotificationRequestDto(enabled))
-        .mapToDomain { Unit }
+        .mapToDomain { response -> response.notificationEnabled }
 
     override suspend fun renameGroup(groupId: Long, name: String): MoilResult<Unit> = groupRemoteDataSource
         .renameGroup(groupId, RenameGroupRequestDto(name))
         .mapToDomain { Unit }
+
+    // 전송할 수 없는 역할이 섞여 있으면 요청을 보내지 않고 실패로 돌려 앱이 종료되지 않게 한다.
     override suspend fun updateMemberRoles(groupId: Long, roles: Map<Long, GroupRole>): MoilResult<Unit> {
         val changes = roles.map { (userId, role) ->
-            MemberRoleChangeDto(userId, role.toMemberRoleRequestDto())
+            val requestRole = role.toMemberRoleRequestDtoOrNull()
+                ?: return MoilResult.Failure(
+                    MoilError.Configuration("관리자 또는 일반 멤버 역할만 변경할 수 있습니다."),
+                )
+
+            MemberRoleChangeDto(userId, requestRole)
         }
+
         return groupRemoteDataSource
             .updateMemberRoles(groupId, UpdateMemberRolesRequestDto(changes))
             .mapToDomain { Unit }

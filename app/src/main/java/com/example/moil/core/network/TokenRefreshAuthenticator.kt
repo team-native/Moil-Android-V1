@@ -13,6 +13,12 @@ class TokenRefreshAuthenticator @Inject constructor(
     private val refreshAuthApiService: dagger.Lazy<RefreshAuthApiService>,
 ) : Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
+        // 회원 탈퇴는 입력한 이메일·비밀번호가 틀려도 401을 준다. 이는 세션 만료가 아니므로
+        // 토큰 갱신·강제 로그아웃 없이 호출부가 인증 실패로 처리하게 그대로 돌려준다.
+        if (response.request.url.encodedPath.endsWith(DELETE_ACCOUNT_PATH)) {
+            return null
+        }
+
         if (responseCount(response) >= MAX_AUTH_ATTEMPTS) {
             return clearSession()
         }
@@ -75,5 +81,6 @@ class TokenRefreshAuthenticator @Inject constructor(
 
     private companion object {
         const val MAX_AUTH_ATTEMPTS = 2
+        const val DELETE_ACCOUNT_PATH = "auth/delete-account"
     }
 }

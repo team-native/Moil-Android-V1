@@ -41,7 +41,15 @@ private fun GroupMember.toFamilyMember(): FamilyMemberUiModel = FamilyMemberUiMo
     profileColor = color,
     profileImagePath = imagePath,
     isCurrentUser = isMe == true,
+    role = role.toFamilyMemberRole(),
+    isRoleEditable = role == GroupRole.Admin || role == GroupRole.Member,
 )
+
+/** 권한 설정 시트에서 고른 화면 역할을 권한 변경 요청용 도메인 역할로 바꾼다. */
+internal fun GroupMemberRole.toGroupRole(): GroupRole = when (this) {
+    GroupMemberRole.Administrator -> GroupRole.Admin
+    GroupMemberRole.Member -> GroupRole.Member
+}
 
 private fun GroupRole.toFamilyRoleRes(): Int = when (this) {
     GroupRole.Owner,

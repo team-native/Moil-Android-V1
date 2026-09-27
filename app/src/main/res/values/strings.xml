@@ -79,6 +79,8 @@
     <string name="schedule_type_value">일정</string>
     <string name="schedule_detail_date_value">%1$04d.%2$02d.%3$02d (%4$s)</string>
     <string name="schedule_map">지도</string>
+    <string name="schedule_map_content_description">지도 앱에서 위치 열기</string>
+    <string name="schedule_map_unavailable">위치를 열 수 있는 지도 앱이 없어요.</string>
     <string name="schedule_no_location">위치 없음</string>
     <string name="schedule_no_memo">메모 없음</string>
     <string name="schedule_edit">수정</string>
@@ -130,6 +132,17 @@
     <string name="family_admin_transfer_title">관리자 권한을 넘겨주세요</string>
     <string name="family_admin_transfer_description">넘겨줄 멤버를 선택해주세요</string>
     <string name="family_admin_transfer_confirm">권한 넘기기</string>
+    <string name="family_admin_transfer_leave_description">그룹을 나가기 전에 관리자 권한을 넘길 멤버를 선택해주세요</string>
+    <string name="family_admin_transfer_leave_confirm">넘기고 나가기</string>
+    <string name="family_leave_confirm_title">\'%1$s\'에서 나갈까요?</string>
+    <string name="family_leave_confirm_description">나가면 이 그룹의 일정을 더 볼 수 없어요. 다시 들어오려면 초대 코드가 필요해요.</string>
+    <string name="family_leave_confirm_action">나가기</string>
+    <string name="family_leave_last_member_title">그룹을 나가면 그룹이 삭제돼요</string>
+    <string name="family_leave_last_member_description">\'%1$s\'에 남은 멤버가 없어 그룹과 모든 일정이 함께 삭제되고 되돌릴 수 없어요.</string>
+    <string name="family_leave_last_member_action">삭제하고 나가기</string>
+    <string name="family_group_left_message">\'%1$s\'에서 나왔어요</string>
+    <string name="common_error_network">네트워크 연결을 확인해주세요.</string>
+    <string name="common_error_unknown">요청을 처리하지 못했어요. 다시 시도해주세요.</string>
     <string name="family_group_college">대학 동기</string>
     <string name="family_group_work">회사 팀</string>
     <string name="add_schedule_title">일정 만들기</string>
