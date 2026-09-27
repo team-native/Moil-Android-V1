@@ -79,6 +79,26 @@ class AuthRepositoryImplTest {
     }
 
     @Test
+    fun `서버 로그아웃이 실패해도 로컬 프로필과 인증 세션은 정리한다`() = runBlocking {
+        val profileStore = FakeCurrentUserProfileStore(UserProfile(1L, "네이티브", "native@example.com"))
+        val sessionManager = FakeSessionManager()
+        val repository = AuthRepositoryImpl(
+            authRemoteDataSource = FakeAuthRemoteDataSource(
+                logoutResult = NetworkResult.NetworkError(IllegalStateException("offline")),
+            ),
+            sessionManager = sessionManager,
+            currentUserProfileStore = profileStore,
+            oauthAuthorizationRequestFactory = OAuthAuthorizationRequestFactory(OAuthAttemptStore()),
+        )
+
+        val result = repository.logout()
+
+        assertTrue(result is MoilResult.Failure)
+        assertEquals(null, profileStore.profile.value)
+        assertTrue(sessionManager.isExpired)
+    }
+
+    @Test
     fun `일치하는 state의 소셜 로그인 콜백만 토큰 세션으로 저장한다`() = runBlocking {
         val attemptStore = OAuthAttemptStore().apply {
             replace(OAuthAttempt(SocialLoginProvider.Google, "oauth-state"))

@@ -73,8 +73,13 @@ sealed interface MoilMainDestination : NavKey {
     @Serializable
     data object InviteShare : MoilMainDestination
 
+    /** 유일한 관리자가 그룹을 나가기 전에 관리자 권한을 넘길 멤버를 고르는 다이얼로그다. */
     @Serializable
-    data object AdministratorTransfer : MoilMainDestination
+    data object LeaveGroupAdministratorTransfer : MoilMainDestination
+
+    /** 그룹 나가기(마지막 멤버면 그룹 삭제 경고) 확인 다이얼로그다. */
+    @Serializable
+    data object LeaveGroupConfirmation : MoilMainDestination
 }
 
 /** 하단 탭에 표시되는 최상위 목적지 4개를 탭바 표시 순서대로 제공한다. */

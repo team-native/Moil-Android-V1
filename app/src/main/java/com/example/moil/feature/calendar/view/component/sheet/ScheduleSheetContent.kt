@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -46,6 +47,7 @@ import com.example.moil.feature.calendar.viewmodel.CalendarScheduleUiModel
 import com.example.moil.feature.calendar.viewmodel.CalendarScreenEvent
 import com.example.moil.feature.calendar.viewmodel.CalendarUiState
 import com.example.moil.ui.theme.LocalMoilExtraColors
+import com.example.moil.ui.theme.MoilComponentSize
 import com.example.moil.ui.theme.LocalMoilExtraTypography
 import com.example.moil.ui.theme.MoilScheduleSheet
 import com.example.moil.ui.theme.MoilTheme
@@ -507,7 +509,11 @@ private fun ScheduleDetailContent(
                 label = stringResource(R.string.schedule_location),
                 value = schedule.location?.takeIf(String::isNotBlank)
                     ?: stringResource(R.string.schedule_no_location),
-                showMapAction = !schedule.location.isNullOrBlank(),
+                onMapClick = schedule.location
+                    ?.takeIf(String::isNotBlank)
+                    ?.let { location ->
+                        { onEvent(CalendarScreenEvent.ScheduleMapClicked(location)) }
+                    },
             )
 
             HorizontalDivider(
@@ -636,7 +642,8 @@ private fun ScheduleDetailCloseButton(onClick: () -> Unit) {
 private fun ScheduleDetailInfoRow(
     label: String,
     value: String,
-    showMapAction: Boolean = false,
+    // null이 아니면 값 옆에 지도 버튼을 보여주고 누르면 호출한다.
+    onMapClick: (() -> Unit)? = null,
 ) {
     Row(
         modifier = Modifier
@@ -654,10 +661,22 @@ private fun ScheduleDetailInfoRow(
             text = value,
             style = MaterialTheme.typography.bodySmall,
         )
-        if (showMapAction) {
+        if (onMapClick != null) {
+            val mapContentDescription = stringResource(R.string.schedule_map_content_description)
+
             Text(
                 text = stringResource(R.string.schedule_map),
-                modifier = Modifier.padding(start = MoilScheduleSheet.ListContentSpacing),
+                modifier = Modifier
+                    .padding(start = MoilScheduleSheet.ListContentSpacing)
+                    .defaultMinSize(minHeight = MoilComponentSize.TopBarItem)
+                    .wrapContentSize(Alignment.Center)
+                    .clickable(
+                        role = Role.Button,
+                        onClick = onMapClick,
+                    )
+                    .semantics {
+                        contentDescription = mapContentDescription
+                    },
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.labelSmall,
             )

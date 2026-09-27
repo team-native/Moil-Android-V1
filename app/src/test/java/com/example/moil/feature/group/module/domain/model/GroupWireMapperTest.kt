@@ -1,7 +1,9 @@
 package com.example.moil.feature.group.module.domain.model
 
+import com.example.moil.feature.group.module.data.dto.MemberRoleRequestDto
+import com.example.moil.feature.group.module.data.mapper.toMemberRoleRequestDtoOrNull
 import org.junit.Assert.assertEquals
-import org.junit.Assert.fail
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class GroupWireMapperTest {
@@ -21,12 +23,11 @@ class GroupWireMapperTest {
     }
 
     @Test
-    fun `알 수 없는 역할은 권한 변경 요청에 사용할 수 없다`() {
-        try {
-            GroupRole.Unknown.toWireValue()
-            fail("Unknown 역할은 wire 값으로 변환되면 안 됩니다.")
-        } catch (_: IllegalStateException) {
-        }
+    fun `권한 변경 요청에는 관리자와 일반 멤버만 변환되고 나머지는 예외 없이 null이 된다`() {
+        assertEquals(MemberRoleRequestDto.Admin, GroupRole.Admin.toMemberRoleRequestDtoOrNull())
+        assertEquals(MemberRoleRequestDto.Member, GroupRole.Member.toMemberRoleRequestDtoOrNull())
+        assertNull(GroupRole.Owner.toMemberRoleRequestDtoOrNull())
+        assertNull(GroupRole.Unknown.toMemberRoleRequestDtoOrNull())
     }
 
     @Test

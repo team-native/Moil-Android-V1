@@ -108,6 +108,22 @@ class TokenRefreshAuthenticatorTest {
         assertEquals(2, mockWebServer.requestCount)
     }
 
+    @Test
+    fun `회원 탈퇴의 401은 계정 정보 불일치이므로 토큰을 갱신하거나 세션을 지우지 않는다`() {
+        mockWebServer.enqueue(MockResponse.Builder().code(401).body(errorEnvelope).build())
+
+        val response = authenticatedClient().newCall(
+            Request.Builder()
+                .url(mockWebServer.url("/auth/delete-account"))
+                .build(),
+        ).execute()
+
+        assertEquals(401, response.code)
+        response.close()
+        assertEquals(SessionTokens("expired-access", "refresh-token"), sessionManager.currentTokens())
+        assertEquals(1, mockWebServer.requestCount)
+    }
+
     private fun authenticatedClient(): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(AuthorizationInterceptor(sessionManager))
         .authenticator(TokenRefreshAuthenticator(sessionManager, Lazy { refreshApiService() }))

@@ -31,7 +31,8 @@ internal fun CalendarTopBarSection(
             isGroupIndicatorExpanded = isGroupMenuVisible || isScheduleSheetVisible,
             searchContentDescription = stringResource(R.string.calendar_search),
             onGroupClick = onGroupClick,
-            onSearchClick = {},
+            // 명세에 일정 검색 API가 없어 검색 버튼은 숨긴다. 검색 사양이 정해지면 이벤트를 연결한다.
+            onSearchClick = null,
             modifier = Modifier.padding(top = MoilSpacing.HeaderTop),
         )
 

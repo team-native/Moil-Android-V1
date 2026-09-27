@@ -14,7 +14,6 @@ import com.example.moil.ui.theme.MoilMemberDimension
 @Composable
 internal fun FamilyMemberCard(
     members: List<FamilyMemberUiModel>,
-    memberRoleOverrides: Map<Long, Int>,
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -25,7 +24,7 @@ internal fun FamilyMemberCard(
             members.forEachIndexed { index, member ->
                 FamilyMemberRow(
                     name = member.name,
-                    roleRes = memberRoleOverrides[member.id] ?: member.roleRes,
+                    roleRes = member.roleRes,
                     profileColor = member.profileColor,
                     profileImagePath = member.profileImagePath,
                 )

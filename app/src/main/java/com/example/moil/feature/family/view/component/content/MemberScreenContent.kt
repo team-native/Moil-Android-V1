@@ -118,10 +118,7 @@ private fun MemberGroupContent(
 
         Spacer(modifier = Modifier.height(MoilMemberDimension.SectionLabelBottomSpacing))
 
-        FamilyMemberCard(
-            members = selectedGroup.members,
-            memberRoleOverrides = uiState.memberRoleOverrides,
-        )
+        FamilyMemberCard(members = selectedGroup.members)
 
         Spacer(modifier = Modifier.height(MoilMemberDimension.SectionSpacing))
 
@@ -146,7 +143,8 @@ private fun MemberGroupContent(
 
         if (uiState.selectedGroupCurrentUserRole == GroupMemberRole.Administrator) {
             FamilyAdministratorSettingsContent(
-                notificationsEnabled = uiState.notificationsEnabled,
+                notificationsEnabled = uiState.notificationsEnabled == true,
+                isNotificationToggleEnabled = uiState.isNotificationToggleEnabled,
                 onNotificationsChanged = { isEnabled ->
                     onEvent(FamilyScreenEvent.NotificationsChanged(isEnabled))
                 },
@@ -160,17 +158,18 @@ private fun MemberGroupContent(
                     onEvent(FamilyScreenEvent.InviteLinkShareClicked)
                 },
                 onLeaveClick = {
-                    onEvent(FamilyScreenEvent.BackClicked)
+                    onEvent(FamilyScreenEvent.LeaveGroupClicked)
                 },
             )
         } else {
             FamilyMemberSettingsContent(
-                notificationsEnabled = uiState.notificationsEnabled,
+                notificationsEnabled = uiState.notificationsEnabled == true,
+                isNotificationToggleEnabled = uiState.isNotificationToggleEnabled,
                 onNotificationsChanged = { isEnabled ->
                     onEvent(FamilyScreenEvent.NotificationsChanged(isEnabled))
                 },
                 onLeaveClick = {
-                    onEvent(FamilyScreenEvent.BackClicked)
+                    onEvent(FamilyScreenEvent.LeaveGroupClicked)
                 },
             )
         }
@@ -238,12 +237,14 @@ private fun FamilyInviteCodeCard(
 @Composable
 internal fun FamilyMemberSettingsContent(
     notificationsEnabled: Boolean,
+    isNotificationToggleEnabled: Boolean,
     onNotificationsChanged: (Boolean) -> Unit,
     onLeaveClick: () -> Unit,
 ) {
     FamilySettingsCard {
         FamilyNotificationSettingRow(
             notificationsEnabled = notificationsEnabled,
+            isToggleEnabled = isNotificationToggleEnabled,
             onNotificationsChanged = onNotificationsChanged,
         )
 
@@ -256,6 +257,7 @@ internal fun FamilyMemberSettingsContent(
 @Composable
 internal fun FamilyAdministratorSettingsContent(
     notificationsEnabled: Boolean,
+    isNotificationToggleEnabled: Boolean,
     onNotificationsChanged: (Boolean) -> Unit,
     onGroupNameChangeClick: () -> Unit,
     onMemberPermissionsClick: () -> Unit,
@@ -265,6 +267,7 @@ internal fun FamilyAdministratorSettingsContent(
     FamilySettingsCard {
         FamilyNotificationSettingRow(
             notificationsEnabled = notificationsEnabled,
+            isToggleEnabled = isNotificationToggleEnabled,
             onNotificationsChanged = onNotificationsChanged,
         )
 
@@ -312,6 +315,7 @@ private fun memberGroupDisplayName(group: GroupUiModel): String = group.name
 @Composable
 private fun FamilyNotificationSettingRow(
     notificationsEnabled: Boolean,
+    isToggleEnabled: Boolean,
     onNotificationsChanged: (Boolean) -> Unit,
 ) {
     Row(
@@ -330,6 +334,7 @@ private fun FamilyNotificationSettingRow(
         MoilSwitch(
             checked = notificationsEnabled,
             onCheckedChange = onNotificationsChanged,
+            enabled = isToggleEnabled,
         )
     }
 }
@@ -392,6 +397,7 @@ private fun FamilyMemberSettingsContentPreview() {
     MoilTheme(darkTheme = false) {
         FamilyMemberSettingsContent(
             notificationsEnabled = true,
+            isNotificationToggleEnabled = true,
             onNotificationsChanged = {},
             onLeaveClick = {},
         )
@@ -404,6 +410,7 @@ private fun FamilyAdministratorSettingsContentPreview() {
     MoilTheme(darkTheme = false) {
         FamilyAdministratorSettingsContent(
             notificationsEnabled = true,
+            isNotificationToggleEnabled = true,
             onNotificationsChanged = {},
             onGroupNameChangeClick = {},
             onMemberPermissionsClick = {},

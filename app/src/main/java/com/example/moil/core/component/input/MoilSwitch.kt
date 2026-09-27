@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
@@ -27,12 +28,14 @@ fun MoilSwitch(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     val switchDescription = stringResource(R.string.common_switch)
     val thumbAlignment = if (checked) Alignment.CenterEnd else Alignment.CenterStart
 
     Box(
         modifier = modifier
+            .alpha(if (enabled) 1f else MoilComponentSize.DisabledContentAlpha)
             .size(
                 width = MoilComponentSize.SwitchWidth,
                 height = MoilComponentSize.SwitchHeight,
@@ -50,6 +53,7 @@ fun MoilSwitch(
             }
             .toggleable(
                 value = checked,
+                enabled = enabled,
                 role = Role.Switch,
                 onValueChange = onCheckedChange,
             ),

@@ -18,7 +18,7 @@ interface GroupRepository {
     suspend fun getMembers(groupId: Long): MoilResult<List<GroupMember>>
     suspend fun leaveGroup(groupId: Long): MoilResult<Unit>
     suspend fun updateMyGroupProfile(groupId: Long, nickname: String, color: GroupColor?, imagePath: String?): MoilResult<GroupMemberProfile>
-    suspend fun updateNotification(groupId: Long, enabled: Boolean): MoilResult<Unit>
+    suspend fun updateNotification(groupId: Long, enabled: Boolean): MoilResult<Boolean>
     suspend fun renameGroup(groupId: Long, name: String): MoilResult<Unit>
     suspend fun updateMemberRoles(groupId: Long, roles: Map<Long, GroupRole>): MoilResult<Unit>
     suspend fun transferAdmin(groupId: Long, targetUserId: Long): MoilResult<Unit>

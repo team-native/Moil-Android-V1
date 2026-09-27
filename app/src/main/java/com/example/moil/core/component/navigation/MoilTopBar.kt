@@ -20,8 +20,9 @@ fun MoilTopBar(
     isGroupIndicatorExpanded: Boolean,
     searchContentDescription: String,
     onGroupClick: () -> Unit,
-    onSearchClick: () -> Unit,
     modifier: Modifier = Modifier,
+    // null이면 검색 버튼을 그리지 않는다. 검색 기능이 없는 화면에서 눌러도 반응 없는 버튼을 노출하지 않기 위함이다.
+    onSearchClick: (() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -37,10 +38,12 @@ fun MoilTopBar(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        MoilSearchButton(
-            contentDescription = searchContentDescription,
-            onClick = onSearchClick,
-        )
+        if (onSearchClick != null) {
+            MoilSearchButton(
+                contentDescription = searchContentDescription,
+                onClick = onSearchClick,
+            )
+        }
     }
 }
 

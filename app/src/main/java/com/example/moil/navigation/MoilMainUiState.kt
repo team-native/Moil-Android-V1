@@ -1,5 +1,6 @@
 package com.example.moil.navigation
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -42,6 +43,9 @@ internal class MoilMainUiState(initialIsDarkTheme: Boolean) {
     var createGroupUiState: CreateGroupUiState by mutableStateOf(CreateGroupUiState())
 
     var joinGroupUiState: JoinGroupUiState by mutableStateOf(JoinGroupUiState())
+
+    /** 작업 실패·완료 같은 일회성 안내를 메인 플로우 어느 화면에서든 같은 자리에 보여준다. */
+    val snackbarHostState = SnackbarHostState()
 }
 
 @Composable

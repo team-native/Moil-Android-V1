@@ -21,6 +21,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.moil.R
 import com.example.moil.core.component.MoilOverlayDialog
+import com.example.moil.core.model.GroupMemberRole
 import com.example.moil.feature.family.viewmodel.FamilyMemberUiModel
 import com.example.moil.ui.theme.LocalMoilExtraColors
 import com.example.moil.ui.theme.MoilOverlayDimension
@@ -118,13 +120,19 @@ fun FamilyGroupNameDialog(
     }
 }
 
+/**
+ * 관리자가 멤버별 관리자/멤버 역할을 고르는 바텀시트다.
+ * 서버가 관리하는 역할(Owner 등)은 변경할 수 없으므로 목록에서 제외한다.
+ */
 @Composable
 fun FamilyMemberPermissionsBottomSheet(
     members: List<FamilyMemberUiModel>,
-    onConfirmClick: (Map<Long, Int>) -> Unit,
+    isInProgress: Boolean,
+    onConfirmClick: (Map<Long, GroupMemberRole>) -> Unit,
 ) {
-    val memberRoles = remember(members) {
-        mutableStateOf(members.associate { member -> member.id to member.roleRes })
+    val editableMembers = members.filter(FamilyMemberUiModel::isRoleEditable)
+    val memberRoles = remember(editableMembers) {
+        mutableStateOf(editableMembers.associate { member -> member.id to member.role })
     }
 
     FamilySheetLayout {
@@ -135,14 +143,15 @@ fun FamilyMemberPermissionsBottomSheet(
 
         Spacer(modifier = Modifier.height(MoilOverlayDimension.SheetTitleBottomPadding))
 
-        members.forEach { member ->
-            val selectedRoleRes = memberRoles.value.getValue(member.id)
+        editableMembers.forEach { member ->
+            val selectedRole = memberRoles.value.getValue(member.id)
 
             FamilyMemberRoleRow(
                 member = member,
-                selectedRoleRes = selectedRoleRes,
-                onRoleClick = { roleRes ->
-                memberRoles.value = memberRoles.value + (member.id to roleRes)
+                selectedRole = selectedRole,
+                isEnabled = !isInProgress,
+                onRoleClick = { role ->
+                    memberRoles.value = memberRoles.value + (member.id to role)
                 },
             )
         }
@@ -151,12 +160,20 @@ fun FamilyMemberPermissionsBottomSheet(
 
         Button(
             onClick = { onConfirmClick(memberRoles.value) },
+            enabled = !isInProgress,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(MoilOverlayDimension.DialogActionHeight),
             shape = RoundedCornerShape(MoilRadius.DialogButton),
         ) {
-            Text(text = stringResource(R.string.family_member_permissions_confirm))
+            if (isInProgress) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(MoilOverlayDimension.DialogProgressSize),
+                    strokeWidth = MoilOverlayDimension.DialogProgressStrokeWidth,
+                )
+            } else {
+                Text(text = stringResource(R.string.family_member_permissions_confirm))
+            }
         }
     }
 }
@@ -201,9 +218,16 @@ fun FamilyInviteShareBottomSheet(
     }
 }
 
+/**
+ * 관리자 권한을 넘길 멤버를 고르는 다이얼로그다.
+ * 그룹 나가기 흐름에서는 설명과 확인 문구를 바꿔 "넘기고 나가기"로 쓴다.
+ */
 @Composable
 fun FamilyAdministratorTransferDialog(
     members: List<FamilyMemberUiModel>,
+    @StringRes descriptionRes: Int,
+    @StringRes confirmLabelRes: Int,
+    isInProgress: Boolean,
     onDismissRequest: () -> Unit,
     onConfirmClick: (FamilyMemberUiModel) -> Unit,
 ) {
@@ -213,7 +237,13 @@ fun FamilyAdministratorTransferDialog(
         member.id == selectedMemberId
     }
 
-    MoilOverlayDialog(onDismissRequest = onDismissRequest) {
+    MoilOverlayDialog(
+        onDismissRequest = {
+            if (!isInProgress) {
+                onDismissRequest()
+            }
+        },
+    ) {
         Column(
             modifier = Modifier.padding(MoilOverlayDimension.DialogContentPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -227,7 +257,7 @@ fun FamilyAdministratorTransferDialog(
             Spacer(modifier = Modifier.height(MoilOverlayDimension.DialogDescriptionTopSpacing))
 
             Text(
-                text = stringResource(R.string.family_admin_transfer_description),
+                text = stringResource(descriptionRes),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
@@ -239,7 +269,11 @@ fun FamilyAdministratorTransferDialog(
                 FamilyTransferCandidateRow(
                     member = member,
                     isSelected = member.id == selectedMemberId,
-                    onClick = { selectedMemberId = member.id },
+                    onClick = {
+                        if (!isInProgress) {
+                            selectedMemberId = member.id
+                        }
+                    },
                 )
             }
 
@@ -247,7 +281,7 @@ fun FamilyAdministratorTransferDialog(
 
             Button(
                 onClick = { selectedMember?.let(onConfirmClick) },
-                enabled = selectedMember != null,
+                enabled = selectedMember != null && !isInProgress,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(MoilOverlayDimension.DialogActionHeight),
@@ -257,13 +291,21 @@ fun FamilyAdministratorTransferDialog(
                     disabledContentColor = LocalMoilExtraColors.current.scheduleMutedText,
                 ),
             ) {
-                Text(text = stringResource(R.string.family_admin_transfer_confirm))
+                if (isInProgress) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(MoilOverlayDimension.DialogProgressSize),
+                        strokeWidth = MoilOverlayDimension.DialogProgressStrokeWidth,
+                    )
+                } else {
+                    Text(text = stringResource(confirmLabelRes))
+                }
             }
 
             Spacer(modifier = Modifier.height(MoilOverlayDimension.DialogActionSpacing))
 
             OutlinedButton(
                 onClick = onDismissRequest,
+                enabled = !isInProgress,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(MoilOverlayDimension.DialogActionHeight),
@@ -320,8 +362,9 @@ private fun FamilySheetLayout(content: @Composable () -> Unit) {
 @Composable
 private fun FamilyMemberRoleRow(
     member: FamilyMemberUiModel,
-    @StringRes selectedRoleRes: Int,
-    onRoleClick: (Int) -> Unit,
+    selectedRole: GroupMemberRole,
+    isEnabled: Boolean,
+    onRoleClick: (GroupMemberRole) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -346,16 +389,18 @@ private fun FamilyMemberRoleRow(
 
         FamilyRoleButton(
             labelRes = R.string.family_member_administrator,
-            isSelected = selectedRoleRes == R.string.family_member_administrator,
-            onClick = { onRoleClick(R.string.family_member_administrator) },
+            isSelected = selectedRole == GroupMemberRole.Administrator,
+            isEnabled = isEnabled,
+            onClick = { onRoleClick(GroupMemberRole.Administrator) },
         )
 
         Spacer(modifier = Modifier.width(6.dp))
 
         FamilyRoleButton(
             labelRes = R.string.family_member_role,
-            isSelected = selectedRoleRes == R.string.family_member_role,
-            onClick = { onRoleClick(R.string.family_member_role) },
+            isSelected = selectedRole == GroupMemberRole.Member,
+            isEnabled = isEnabled,
+            onClick = { onRoleClick(GroupMemberRole.Member) },
         )
     }
 }
@@ -364,13 +409,19 @@ private fun FamilyMemberRoleRow(
 private fun FamilyRoleButton(
     @StringRes labelRes: Int,
     isSelected: Boolean,
+    isEnabled: Boolean,
     onClick: () -> Unit,
 ) {
     Surface(
         modifier = Modifier
             .width(MoilOverlayDimension.RoleButtonWidth)
             .height(MoilOverlayDimension.RoleButtonHeight)
-            .clickable(onClick = onClick),
+            .selectable(
+                selected = isSelected,
+                enabled = isEnabled,
+                role = Role.RadioButton,
+                onClick = onClick,
+            ),
         shape = RoundedCornerShape(MoilRadius.DialogField),
         color = if (isSelected) {
             MaterialTheme.colorScheme.primary

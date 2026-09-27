@@ -2,6 +2,7 @@ package com.example.moil.feature.group.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.moil.core.domain.MoilError
 import com.example.moil.core.domain.MoilResult
 import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfileStore
 import com.example.moil.feature.group.module.domain.model.GroupColor
@@ -21,8 +22,9 @@ import com.example.moil.feature.group.module.domain.usecase.VerifyInviteUseCase
 import com.example.moil.feature.image.module.domain.usecase.UploadProfileImageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -30,7 +32,23 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 sealed interface GroupEffect {
+    /** 그룹 생성·가입이 끝나 캘린더 탭으로 이동해야 한다. */
     data class GroupOperationCompleted(val groupId: Long) : GroupEffect
+
+    /** 그룹 이름 변경이 서버에 반영됐다. */
+    data object GroupRenamed : GroupEffect
+
+    /** 멤버 권한 변경이 서버에 반영됐다. */
+    data object MemberRolesUpdated : GroupEffect
+
+    /** 선택 그룹에서 나갔다. 그룹 상세 등 해당 그룹 화면을 닫아야 한다. */
+    data class GroupLeft(
+        val groupId: Long,
+        val groupName: String,
+    ) : GroupEffect
+
+    /** 개별 작업이 실패했다. 화면 전체 오류가 아니라 한 번만 안내한다. */
+    data class OperationFailed(val error: MoilError) : GroupEffect
 }
 
 @HiltViewModel
@@ -54,6 +72,9 @@ class GroupViewModel @Inject constructor(
     private val mutableEffects = MutableSharedFlow<GroupEffect>()
     val effects: SharedFlow<GroupEffect> = mutableEffects.asSharedFlow()
 
+    // 그룹을 빠르게 바꿀 때 이전 그룹의 늦은 응답이 현재 선택을 덮어쓰지 않도록 진행 중인 로드를 취소한다.
+    private var selectedGroupLoadJob: Job? = null
+
     init {
         loadGroups()
     }
@@ -63,8 +84,9 @@ class GroupViewModel @Inject constructor(
         mutableUiState.value = mutableUiState.value.copy(
             isLoading = true,
             isCurrentUserNameMissing = false,
-            error = null,
+            loadError = null,
         )
+
         when (val result = getMyGroupsUseCase()) {
             is MoilResult.Success -> {
                 val selectedGroupId = preferredGroupId
@@ -72,36 +94,80 @@ class GroupViewModel @Inject constructor(
                     ?: mutableUiState.value.selectedGroupId
                         ?.takeIf { candidateId -> result.value.any { group -> group.id == candidateId } }
                     ?: result.value.firstOrNull()?.id
+                val isSelectionChanged = selectedGroupId != mutableUiState.value.selectedGroupId
 
                 mutableUiState.value = mutableUiState.value.copy(
                     isLoading = false,
                     groups = result.value,
                     selectedGroupId = selectedGroupId,
-                    members = if (selectedGroupId == null) emptyList() else mutableUiState.value.members,
+                    members = if (selectedGroupId == null || isSelectionChanged) {
+                        emptyList()
+                    } else {
+                        mutableUiState.value.members
+                    },
+                    selectedGroupDetail = if (selectedGroupId == null || isSelectionChanged) {
+                        null
+                    } else {
+                        mutableUiState.value.selectedGroupDetail
+                    },
                 )
 
                 if (selectedGroupId != null) {
-                    loadGroupDetail(selectedGroupId)
-                    loadMembers(selectedGroupId)
+                    loadSelectedGroup(selectedGroupId)
                 }
             }
-            is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(isLoading = false, error = result.error)
+
+            is MoilResult.Failure -> {
+                mutableUiState.value = mutableUiState.value.copy(
+                    isLoading = false,
+                    loadError = result.error,
+                )
+            }
         }
     }
 
-    /** 그룹 선택 이벤트에서 선택 그룹의 멤버 목록을 로드합니다. */
+    /** 그룹 선택 이벤트에서 선택 그룹의 상세와 멤버 목록을 새로 로드합니다. */
     fun selectGroup(groupId: Long) {
-        mutableUiState.value = mutableUiState.value.copy(selectedGroupId = groupId, members = emptyList(), error = null)
-        loadGroupDetail(groupId)
-        loadMembers(groupId)
+        mutableUiState.value = mutableUiState.value.copy(
+            selectedGroupId = groupId,
+            selectedGroupDetail = null,
+            members = emptyList(),
+            loadError = null,
+        )
+        loadSelectedGroup(groupId)
     }
 
-    /** 그룹 설정의 알림 스위치 이벤트에서 서버 값을 갱신하며 실패 시 오류 상태만 갱신합니다. */
+    /**
+     * 그룹 설정의 알림 스위치 이벤트에서 호출됩니다.
+     * 성공하면 서버가 확정한 값으로 상세 상태를 갱신하고, 실패하면 이전 값을 유지한 채 실패만 알립니다.
+     */
     fun updateNotification(enabled: Boolean) = viewModelScope.launch {
-        val groupId = mutableUiState.value.selectedGroupId ?: return@launch
+        val currentState = mutableUiState.value
+        val groupId = currentState.selectedGroupId ?: return@launch
+
+        if (currentState.isNotificationUpdating) {
+            return@launch
+        }
+
+        mutableUiState.value = currentState.copy(isNotificationUpdating = true)
+
         when (val result = updateGroupNotificationUseCase(groupId, enabled)) {
-            is MoilResult.Success -> Unit
-            is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(error = result.error)
+            is MoilResult.Success -> {
+                val latestState = mutableUiState.value
+                val updatedDetail = latestState.selectedGroupDetail
+                    ?.takeIf { detail -> detail.id == groupId }
+                    ?.copy(notificationEnabled = result.value)
+
+                mutableUiState.value = latestState.copy(
+                    isNotificationUpdating = false,
+                    selectedGroupDetail = updatedDetail ?: latestState.selectedGroupDetail,
+                )
+            }
+
+            is MoilResult.Failure -> {
+                mutableUiState.value = mutableUiState.value.copy(isNotificationUpdating = false)
+                mutableEffects.emit(GroupEffect.OperationFailed(result.error))
+            }
         }
     }
 
@@ -118,23 +184,15 @@ class GroupViewModel @Inject constructor(
         val nickname = currentUserProfileStore.profile.value?.name
 
         if (nickname == null) {
-            mutableUiState.value = mutableUiState.value.copy(
-                isCurrentUserNameMissing = true,
-                error = null,
-            )
+            mutableUiState.value = mutableUiState.value.copy(isCurrentUserNameMissing = true)
             return@launch
         }
 
-        mutableUiState.value = mutableUiState.value.copy(
-            isSubmitting = true,
-            error = null,
-        )
+        mutableUiState.value = mutableUiState.value.copy(isSubmitting = true)
 
         when (val imageResult = uploadSelectedImage(selectedImageUri)) {
-            is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(
-                isSubmitting = false,
-                error = imageResult.error,
-            )
+            is MoilResult.Failure -> failSubmission(imageResult.error)
+
             is MoilResult.Success -> when (
                 val result = createGroupUseCase(
                     name = name,
@@ -148,10 +206,8 @@ class GroupViewModel @Inject constructor(
                     loadGroups(preferredGroupId = result.value.id)
                     mutableEffects.emit(GroupEffect.GroupOperationCompleted(result.value.id))
                 }
-                is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(
-                    isSubmitting = false,
-                    error = result.error,
-                )
+
+                is MoilResult.Failure -> failSubmission(result.error)
             }
         }
     }
@@ -162,28 +218,25 @@ class GroupViewModel @Inject constructor(
         mutableUiState.value = mutableUiState.value.copy(
             inviteVerification = null,
             joinGroupMembers = emptyList(),
-            error = null,
         )
 
         when (val result = verifyInviteUseCase(inviteCode)) {
             is MoilResult.Success -> loadJoinGroupProfile(result.value)
-            is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(
-                error = result.error,
-            )
+            is MoilResult.Failure -> mutableEffects.emit(GroupEffect.OperationFailed(result.error))
         }
     }
 
     // 초대 검증 성공 뒤 호출되어 그룹 상세의 실제 구성원 목록을 가입 프로필 UI 상태로 제공합니다.
     private suspend fun loadJoinGroupProfile(inviteVerification: InviteVerification) {
         when (val result = getGroupUseCase(inviteVerification.groupId)) {
-            is MoilResult.Success -> mutableUiState.value = mutableUiState.value.copy(
-                inviteVerification = inviteVerification,
-                joinGroupMembers = result.value.members,
-                error = null,
-            )
-            is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(
-                error = result.error,
-            )
+            is MoilResult.Success -> {
+                mutableUiState.value = mutableUiState.value.copy(
+                    inviteVerification = inviteVerification,
+                    joinGroupMembers = result.value.members,
+                )
+            }
+
+            is MoilResult.Failure -> mutableEffects.emit(GroupEffect.OperationFailed(result.error))
         }
     }
 
@@ -198,16 +251,11 @@ class GroupViewModel @Inject constructor(
             return@launch
         }
 
-        mutableUiState.value = mutableUiState.value.copy(
-            isSubmitting = true,
-            error = null,
-        )
+        mutableUiState.value = mutableUiState.value.copy(isSubmitting = true)
 
         when (val imageResult = uploadSelectedImage(selectedImageUri)) {
-            is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(
-                isSubmitting = false,
-                error = imageResult.error,
-            )
+            is MoilResult.Failure -> failSubmission(imageResult.error)
+
             is MoilResult.Success -> when (
                 val result = joinGroupUseCase(
                     code = inviteCode,
@@ -221,57 +269,166 @@ class GroupViewModel @Inject constructor(
                     loadGroups(preferredGroupId = result.value.id)
                     mutableEffects.emit(GroupEffect.GroupOperationCompleted(result.value.id))
                 }
-                is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(
-                    isSubmitting = false,
-                    error = result.error,
-                )
+
+                is MoilResult.Failure -> failSubmission(result.error)
             }
         }
     }
 
-    fun renameSelectedGroup(name: String) = viewModelScope.launch {
-        val groupId = mutableUiState.value.selectedGroupId ?: return@launch
+    /**
+     * 그룹 이름 변경 다이얼로그의 저장 이벤트에서 호출됩니다.
+     * 성공하면 목록을 다시 불러오고 다이얼로그를 닫도록 [GroupEffect.GroupRenamed]를 보냅니다.
+     */
+    fun renameSelectedGroup(name: String) = runManagementOperation { groupId ->
         when (val result = renameGroupUseCase(groupId, name)) {
-            is MoilResult.Success -> loadGroups()
-            is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(error = result.error)
+            is MoilResult.Success -> {
+                loadGroups(preferredGroupId = groupId)
+                mutableEffects.emit(GroupEffect.GroupRenamed)
+            }
+
+            is MoilResult.Failure -> mutableEffects.emit(GroupEffect.OperationFailed(result.error))
         }
     }
 
-    fun updateSelectedMemberRoles(roles: Map<Long, GroupRole>) = viewModelScope.launch {
-        val groupId = mutableUiState.value.selectedGroupId ?: return@launch
-        when (val result = updateMemberRolesUseCase(groupId, roles)) {
-            is MoilResult.Success -> loadMembers(groupId)
-            is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(error = result.error)
+    /**
+     * 멤버 권한 설정 시트의 완료 이벤트에서 호출됩니다.
+     * 현재 역할과 달라진 관리자/멤버 변경만 서버에 보내며, 변경이 없으면 요청 없이 완료로 처리합니다.
+     * 서버가 관리하는 Owner와 알 수 없는 역할은 요청에서 제외합니다.
+     */
+    fun updateSelectedMemberRoles(requestedRoles: Map<Long, GroupRole>) = runManagementOperation { groupId ->
+        val currentRoles = mutableUiState.value.members.associate { member -> member.userId to member.role }
+        val changedRoles = requestedRoles.filter { (userId, requestedRole) ->
+            val currentRole = currentRoles[userId]
+
+            currentRole != null &&
+                currentRole.isEditableRole() &&
+                requestedRole.isEditableRole() &&
+                currentRole != requestedRole
+        }
+
+        if (changedRoles.isEmpty()) {
+            mutableEffects.emit(GroupEffect.MemberRolesUpdated)
+            return@runManagementOperation
+        }
+
+        when (val result = updateMemberRolesUseCase(groupId, changedRoles)) {
+            is MoilResult.Success -> {
+                loadGroups(preferredGroupId = groupId)
+                mutableEffects.emit(GroupEffect.MemberRolesUpdated)
+            }
+
+            is MoilResult.Failure -> mutableEffects.emit(GroupEffect.OperationFailed(result.error))
         }
     }
 
-    fun transferAdmin(targetUserId: Long) = viewModelScope.launch {
-        val groupId = mutableUiState.value.selectedGroupId ?: return@launch
-        when (val result = transferAdminUseCase(groupId, targetUserId)) {
-            is MoilResult.Success -> selectGroup(groupId)
-            is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(error = result.error)
+    /** 그룹 나가기 확인 다이얼로그에서 호출되어 선택 그룹에서 나갑니다. */
+    fun leaveSelectedGroup() = runManagementOperation { groupId ->
+        leaveGroup(groupId)
+    }
+
+    /**
+     * 유일한 관리자가 그룹을 나갈 때 호출됩니다.
+     * 관리자 권한을 먼저 넘기고 성공한 경우에만 나가기를 요청합니다.
+     * 양도만 성공하고 나가기가 실패하면 일반 멤버로 남으므로 목록을 다시 불러와 역할을 갱신합니다.
+     */
+    fun transferAdminAndLeaveSelectedGroup(targetUserId: Long) = runManagementOperation { groupId ->
+        when (val transferResult = transferAdminUseCase(groupId, targetUserId)) {
+            is MoilResult.Success -> {
+                val isLeft = leaveGroup(groupId)
+
+                if (!isLeft) {
+                    loadGroups(preferredGroupId = groupId)
+                }
+            }
+
+            is MoilResult.Failure -> mutableEffects.emit(GroupEffect.OperationFailed(transferResult.error))
         }
     }
 
-    fun leaveSelectedGroup() = viewModelScope.launch {
-        val groupId = mutableUiState.value.selectedGroupId ?: return@launch
-        when (val result = leaveGroupUseCase(groupId)) {
-            is MoilResult.Success -> loadGroups()
-            is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(error = result.error)
+    // 나가기 요청을 보내고 결과 효과를 알린다. 성공 여부를 돌려줘 연속 작업이 후속 처리를 결정하게 한다.
+    private suspend fun leaveGroup(groupId: Long): Boolean {
+        val groupName = mutableUiState.value.groups
+            .firstOrNull { group -> group.id == groupId }
+            ?.name
+            .orEmpty()
+
+        return when (val result = leaveGroupUseCase(groupId)) {
+            is MoilResult.Success -> {
+                loadGroups()
+                mutableEffects.emit(
+                    GroupEffect.GroupLeft(
+                        groupId = groupId,
+                        groupName = groupName,
+                    ),
+                )
+                true
+            }
+
+            is MoilResult.Failure -> {
+                mutableEffects.emit(GroupEffect.OperationFailed(result.error))
+                false
+            }
         }
     }
 
-    private fun loadMembers(groupId: Long) = viewModelScope.launch {
-        when (val result = getGroupMembersUseCase(groupId)) {
-            is MoilResult.Success -> mutableUiState.value = mutableUiState.value.copy(members = result.value)
-            is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(error = result.error)
+    // 선택 그룹 관리 작업을 한 번에 하나만 실행하고, 끝나면 진행 상태를 해제한다.
+    private fun runManagementOperation(
+        operation: suspend (groupId: Long) -> Unit,
+    ) = viewModelScope.launch {
+        val currentState = mutableUiState.value
+        val groupId = currentState.selectedGroupId ?: return@launch
+
+        if (currentState.isManagementInProgress) {
+            return@launch
+        }
+
+        mutableUiState.value = currentState.copy(isManagementInProgress = true)
+
+        try {
+            operation(groupId)
+        } finally {
+            mutableUiState.value = mutableUiState.value.copy(isManagementInProgress = false)
         }
     }
 
-    private fun loadGroupDetail(groupId: Long) = viewModelScope.launch {
-        when (val result = getGroupUseCase(groupId)) {
-            is MoilResult.Success -> mutableUiState.value = mutableUiState.value.copy(selectedGroupDetail = result.value)
-            is MoilResult.Failure -> mutableUiState.value = mutableUiState.value.copy(error = result.error)
+    // 생성·가입 제출 실패를 폼 진행 상태 해제와 일회성 안내로 처리한다.
+    private suspend fun failSubmission(error: MoilError) {
+        mutableUiState.value = mutableUiState.value.copy(isSubmitting = false)
+        mutableEffects.emit(GroupEffect.OperationFailed(error))
+    }
+
+    // 선택 그룹의 상세와 멤버를 함께 불러오며, 응답이 도착했을 때 선택이 바뀌었으면 반영하지 않는다.
+    private fun loadSelectedGroup(groupId: Long) {
+        selectedGroupLoadJob?.cancel()
+        selectedGroupLoadJob = viewModelScope.launch {
+            launch { loadGroupDetail(groupId) }
+            launch { loadMembers(groupId) }
+        }
+    }
+
+    private suspend fun loadMembers(groupId: Long) {
+        val result = getGroupMembersUseCase(groupId)
+
+        if (mutableUiState.value.selectedGroupId != groupId) {
+            return
+        }
+
+        mutableUiState.value = when (result) {
+            is MoilResult.Success -> mutableUiState.value.copy(members = result.value)
+            is MoilResult.Failure -> mutableUiState.value.copy(loadError = result.error)
+        }
+    }
+
+    private suspend fun loadGroupDetail(groupId: Long) {
+        val result = getGroupUseCase(groupId)
+
+        if (mutableUiState.value.selectedGroupId != groupId) {
+            return
+        }
+
+        mutableUiState.value = when (result) {
+            is MoilResult.Success -> mutableUiState.value.copy(selectedGroupDetail = result.value)
+            is MoilResult.Failure -> mutableUiState.value.copy(loadError = result.error)
         }
     }
 
@@ -286,3 +443,6 @@ class GroupViewModel @Inject constructor(
         }
     }
 }
+
+// 권한 변경 API가 다룰 수 있는 역할인지 판단한다.
+private fun GroupRole.isEditableRole(): Boolean = this == GroupRole.Admin || this == GroupRole.Member

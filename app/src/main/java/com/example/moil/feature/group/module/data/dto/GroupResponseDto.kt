@@ -61,6 +61,8 @@ data class GroupDetailResponseDto(
     @SerialName("monthlyEventCount") val monthlyEventCount: Int,
     @SerialName("myRole") val myRole: String,
     @SerialName("members") val members: List<GroupDetailMemberResponseDto>,
+    // 명세서에는 아직 없는 필드다. 서버가 내려주기 전까지는 null이며, 이때 알림 토글은 비활성으로 둔다.
+    @SerialName("notificationEnabled") val notificationEnabled: Boolean? = null,
 )
 
 @Serializable

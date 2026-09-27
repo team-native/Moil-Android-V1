@@ -117,6 +117,9 @@ internal class CalendarScreenEventHandler(
                 }
             }
 
+            // 외부 지도 앱 실행은 Context가 필요해 일정 시트 Route가 직접 처리한다.
+            is CalendarScreenEvent.ScheduleMapClicked -> Unit
+
             CalendarScreenEvent.PreviousMonthClicked,
             CalendarScreenEvent.NextMonthClicked -> {
                 mainUiState.calendarUiState = mainUiState.calendarUiState.reduce(event)

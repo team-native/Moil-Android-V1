@@ -1,13 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample backup rules file; uncomment and customize as necessary.
-   See https://developer.android.com/guide/topics/data/autobackup
-   for details.
-   Note: This file is ignored for devices older than API 31
-   See https://developer.android.com/about/versions/12/backup-restore
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Android 11 이하 자동 백업 규칙.
+   암호화 저장소(EncryptedSharedPreferences)는 기기 Keystore 키로 암호화되므로 다른 기기로 복원하면 복호화할 수 없어
+   앱 시작 시 실패한다. 인증 토큰과 현재 사용자 프로필은 백업에서 제외한다.
 -->
 <full-backup-content>
-    <!--
-   <include domain="sharedpref" path="."/>
-   <exclude domain="sharedpref" path="device.xml"/>
--->
+    <exclude domain="sharedpref" path="moil_auth_tokens.xml" />
+    <exclude domain="sharedpref" path="moil_current_user_profile.xml" />
 </full-backup-content>
