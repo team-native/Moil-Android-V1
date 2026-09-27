@@ -13,6 +13,21 @@ class ApiExecutor @Inject constructor(
     suspend fun <T> execute(
         request: suspend () -> Response<ApiEnvelopeDto<T>>,
     ): NetworkResult<T> {
+        return when (val result = executeNullable(request)) {
+            is NetworkResult.Success -> result.data?.let { data -> NetworkResult.Success(data) }
+                ?: NetworkResult.NetworkError(
+                    cause = IllegalStateException("성공 응답에 data가 없습니다."),
+                )
+
+            is NetworkResult.ServerError -> result
+            is NetworkResult.HttpError -> result
+            is NetworkResult.NetworkError -> result
+        }
+    }
+
+    suspend fun <T> executeNullable(
+        request: suspend () -> Response<ApiEnvelopeDto<T>>,
+    ): NetworkResult<T?> {
         return try {
             val response = request()
             val envelope = response.body()
@@ -27,10 +42,6 @@ class ApiExecutor @Inject constructor(
                 NetworkResult.ServerError(
                     status = envelope.status,
                     message = envelope.message,
-                )
-            } else if (envelope.data == null) {
-                NetworkResult.NetworkError(
-                    cause = IllegalStateException("성공 응답에 data가 없습니다."),
                 )
             } else {
                 NetworkResult.Success(envelope.data)

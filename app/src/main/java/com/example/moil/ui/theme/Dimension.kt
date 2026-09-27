@@ -89,6 +89,20 @@ object MoilScheduleSheet {
     val DetailButtonSpacing = 12.dp
 }
 
+object MoilAvailabilityDimension {
+    val ScreenHorizontalPadding = 20.dp
+    val SectionSpacing = 16.dp
+    val TabHeight = 40.dp
+    val TabCornerRadius = 12.dp
+    val SummaryCornerRadius = 18.dp
+    val SummaryPadding = 16.dp
+    val SlotRowHeight = 44.dp
+    val TimeLabelWidth = 56.dp
+    val CellCornerRadius = 8.dp
+    val CellGap = 4.dp
+    val CellBorderWidth = 2.dp
+}
+
 object MoilTimePickerDimension {
     val TimeValueWidth = 74.dp
     val TimeValueHeight = 72.dp

@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.example.moil.feature.calendar.viewmodel.CalendarUiState
+import com.example.moil.feature.calendar.viewmodel.EventAvailabilityUiState
 import com.example.moil.feature.family.viewmodel.FamilyUiState
 import com.example.moil.feature.group.viewmodel.CreateGroupUiState
 import com.example.moil.feature.group.viewmodel.GroupProfileEditUiState
@@ -52,6 +53,8 @@ internal class MoilMainUiState(initialIsDarkTheme: Boolean) {
     var joinGroupUiState: JoinGroupUiState by mutableStateOf(JoinGroupUiState())
 
     var groupProfileEditUiState: GroupProfileEditUiState by mutableStateOf(GroupProfileEditUiState())
+
+    var eventAvailabilityUiState: EventAvailabilityUiState by mutableStateOf(EventAvailabilityUiState())
 
     /** 작업 실패·완료 같은 일회성 안내를 메인 플로우 어느 화면에서든 같은 자리에 보여준다. */
     val snackbarHostState = SnackbarHostState()

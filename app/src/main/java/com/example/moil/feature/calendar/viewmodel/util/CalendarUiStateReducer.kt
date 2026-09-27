@@ -61,7 +61,12 @@ internal fun CalendarUiState.reduce(event: CalendarScreenEvent): CalendarUiState
     )
     CalendarScreenEvent.ScheduleDetailDeleteClicked,
     CalendarScreenEvent.ScheduleDeleteConfirmed -> this
-    is CalendarScreenEvent.ScheduleMapClicked -> this
+    is CalendarScreenEvent.ScheduleMapClicked,
+    is CalendarScreenEvent.AttendanceChoiceClicked,
+    CalendarScreenEvent.AttendanceCancelClicked,
+    CalendarScreenEvent.AttendanceRetryClicked,
+    CalendarScreenEvent.AvailabilityClicked,
+    -> this
     CalendarScreenEvent.ScheduleSaveClicked -> this
     is CalendarScreenEvent.ScheduleTitleChanged -> copy(scheduleTitle = event.title)
     CalendarScreenEvent.ScheduleDateClicked,

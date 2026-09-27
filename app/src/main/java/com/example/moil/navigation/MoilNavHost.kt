@@ -38,7 +38,6 @@ import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDe
 import androidx.navigation3.scene.SinglePaneSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import com.example.moil.core.component.MoilBottomSheetStyle
-import com.example.moil.core.component.applyDialogBackdropBlur
 import com.example.moil.core.network.SessionEvent
 import com.example.moil.core.network.SessionManager
 import com.example.moil.core.network.SessionState
@@ -49,7 +48,6 @@ import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfile
 import com.example.moil.feature.auth.view.LoginRoute
 import com.example.moil.feature.auth.view.PasswordResetRoute
 import com.example.moil.feature.auth.view.SignUpRoute
-import com.example.moil.feature.calendar.view.CalendarScreen
 import com.example.moil.feature.calendar.view.ScheduleDatePickerDialog
 import com.example.moil.feature.calendar.view.ScheduleDeleteConfirmationDialog
 import com.example.moil.feature.calendar.view.ScheduleLocationDialog
@@ -59,10 +57,13 @@ import com.example.moil.feature.calendar.viewmodel.CalendarScreenEvent
 import com.example.moil.feature.calendar.viewmodel.CalendarViewModel
 import com.example.moil.feature.group.viewmodel.GroupViewModel
 import com.example.moil.feature.group.viewmodel.JoinGroupUiState
+import com.example.moil.navigation.route.CalendarRoute
 import com.example.moil.navigation.route.ChangePasswordRoute
 import com.example.moil.navigation.route.CreateGroupRoute
 import com.example.moil.navigation.route.DeleteAccountConfirmationRoute
 import com.example.moil.navigation.route.DeleteAccountRoute
+import com.example.moil.navigation.route.EventAvailabilityClearConfirmationRoute
+import com.example.moil.navigation.route.EventAvailabilityRoute
 import com.example.moil.navigation.route.FamilyTabRoute
 import com.example.moil.navigation.route.GroupDetailRoute
 import com.example.moil.navigation.route.GroupProfileEditRoute
@@ -76,7 +77,6 @@ import com.example.moil.navigation.route.ProfileEditRoute
 import com.example.moil.navigation.route.ProfileTabRoute
 import com.example.moil.navigation.route.ScheduleSheetRoute
 import com.example.moil.ui.theme.MoilSpacing
-import com.example.moil.ui.theme.MoilTimePickerDimension
 import java.time.LocalTime
 
 /** 인증 전·후 탐색 그래프를 세션 상태에 따라 하나만 구성하는 앱 전체 진입점이다. */
@@ -310,17 +310,10 @@ private fun MoilMainNavDisplay(
         entries = navigationState.toEntries(
             entryProvider {
                 entry<MoilMainDestination.Calendar> {
-                    // 시간 선택 다이얼로그는 창 배경 블러가 막힌 기기를 대비해 달력 자체도 흐리게 만든다.
-                    val isTimePickerOpen = navigator
-                        .isOnAnyBackStack(MoilMainDestination.ScheduleTimePicker)
-
-                    CalendarScreen(
-                        uiState = mainUiState.calendarUiState,
-                        onEvent = calendarScreenEventHandler::handle,
-                        modifier = Modifier.applyDialogBackdropBlur(
-                            shouldBlur = isTimePickerOpen,
-                            blurRadius = MoilTimePickerDimension.BackgroundBlur,
-                        ),
+                    CalendarRoute(
+                        mainUiState = mainUiState,
+                        calendarScreenEventHandler = calendarScreenEventHandler,
+                        navigator = navigator,
                     )
                 }
 
@@ -401,6 +394,24 @@ private fun MoilMainNavDisplay(
                                 .handle(CalendarScreenEvent.ScheduleDeleteConfirmed)
                         },
                         onDismiss = navigator::goBack,
+                    )
+                }
+
+                entry<MoilMainDestination.EventAvailability> {
+                    EventAvailabilityRoute(
+                        mainUiState = mainUiState,
+                        calendarViewModel = calendarViewModel,
+                        navigator = navigator,
+                    )
+                }
+
+                entry<MoilMainDestination.EventAvailabilityClearConfirmation>(
+                    metadata = MoilDialogSceneStrategy.dialog(),
+                ) {
+                    EventAvailabilityClearConfirmationRoute(
+                        mainUiState = mainUiState,
+                        calendarViewModel = calendarViewModel,
+                        navigator = navigator,
                     )
                 }
 

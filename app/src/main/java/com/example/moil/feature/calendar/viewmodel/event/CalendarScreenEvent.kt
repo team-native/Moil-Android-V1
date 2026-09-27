@@ -1,6 +1,7 @@
 package com.example.moil.feature.calendar.viewmodel
 
 import com.example.moil.core.component.MoilNavigationDestination
+import com.example.moil.feature.event.module.domain.model.EventAttendanceChoice
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -33,4 +34,8 @@ sealed interface CalendarScreenEvent {
     data class SharedMemberClicked(val memberId: Long) : CalendarScreenEvent
     data object ScheduleDeleteConfirmed : CalendarScreenEvent
     data class ScheduleMapClicked(val location: String) : CalendarScreenEvent
+    data class AttendanceChoiceClicked(val choice: EventAttendanceChoice) : CalendarScreenEvent
+    data object AttendanceCancelClicked : CalendarScreenEvent
+    data object AttendanceRetryClicked : CalendarScreenEvent
+    data object AvailabilityClicked : CalendarScreenEvent
 }
