@@ -15,6 +15,8 @@ import com.example.moil.R
 import com.example.moil.feature.calendar.view.ScheduleSheetContent
 import com.example.moil.feature.calendar.viewmodel.CalendarScreenEvent
 import com.example.moil.feature.calendar.viewmodel.CalendarViewModel
+import com.example.moil.feature.calendar.viewmodel.EventAttendanceUiModel
+import com.example.moil.feature.calendar.viewmodel.toEventAttendanceUiModel
 import com.example.moil.feature.calendar.viewmodel.toCalendarScheduleUiModel
 import com.example.moil.feature.group.module.domain.model.GroupColor
 import com.example.moil.feature.group.viewmodel.GroupViewModel
@@ -51,6 +53,9 @@ internal fun ScheduleSheetRoute(
         isMutationLoading = calendarRemoteUiState.isMutationLoading,
         hasSelectedEventError = calendarRemoteUiState.selectedEventError != null,
         hasMutationError = calendarRemoteUiState.mutationError != null,
+        attendance = mainUiState.calendarUiState.selectedEventId
+            ?.let(calendarRemoteUiState::toEventAttendanceUiModel)
+            ?: EventAttendanceUiModel(),
         onEvent = { event ->
             if (event is CalendarScreenEvent.ScheduleMapClicked) {
                 val isMapOpened = context.openLocationInMap(event.location)

@@ -4,6 +4,7 @@ import com.example.moil.feature.calendar.viewmodel.CalendarScheduleSheetMode
 import com.example.moil.feature.calendar.viewmodel.CalendarScreenEvent
 import com.example.moil.feature.calendar.viewmodel.CalendarUiState
 import com.example.moil.feature.calendar.viewmodel.CalendarViewModel
+import com.example.moil.feature.calendar.viewmodel.EventAvailabilityUiState
 import com.example.moil.feature.calendar.viewmodel.reduce
 import com.example.moil.feature.event.module.domain.model.EventMember
 import com.example.moil.feature.event.module.domain.model.GroupEvent
@@ -120,6 +121,22 @@ internal class CalendarScreenEventHandler(
             // 외부 지도 앱 실행은 Context가 필요해 일정 시트 Route가 직접 처리한다.
             is CalendarScreenEvent.ScheduleMapClicked -> Unit
 
+            is CalendarScreenEvent.AttendanceChoiceClicked -> {
+                mainUiState.calendarUiState.selectedEventId?.let { eventId ->
+                    calendarViewModel.updateEventAttendance(eventId, event.choice)
+                }
+            }
+
+            CalendarScreenEvent.AttendanceCancelClicked -> {
+                mainUiState.calendarUiState.selectedEventId?.let(calendarViewModel::deleteEventAttendance)
+            }
+
+            CalendarScreenEvent.AttendanceRetryClicked -> {
+                mainUiState.calendarUiState.selectedEventId?.let(calendarViewModel::loadEventAttendance)
+            }
+
+            CalendarScreenEvent.AvailabilityClicked -> openAvailability()
+
             CalendarScreenEvent.PreviousMonthClicked,
             CalendarScreenEvent.NextMonthClicked -> {
                 mainUiState.calendarUiState = mainUiState.calendarUiState.reduce(event)
@@ -128,6 +145,21 @@ internal class CalendarScreenEventHandler(
 
             else -> mainUiState.calendarUiState = mainUiState.calendarUiState.reduce(event)
         }
+    }
+
+    // 일정 상세의 "가능 시간 입력·확인"에서 호출되어 선택 일정 날짜의 가능 시간 화면을 연다.
+    // 들어올 때마다 이전 입력을 버리고, 서버의 내 응답이 도착하면 화면이 한 번 채운다.
+    private fun openAvailability() {
+        val selectedEvent = calendarViewModel.uiState.value.selectedEvent ?: return
+        val eventDate = runCatching { LocalDate.parse(selectedEvent.date) }.getOrNull() ?: return
+
+        mainUiState.eventAvailabilityUiState = EventAvailabilityUiState(
+            eventId = selectedEvent.id,
+            eventTitle = selectedEvent.title,
+            date = eventDate,
+        )
+        calendarViewModel.loadEventAvailability(selectedEvent.id, selectedEvent.date)
+        navigator.push(MoilMainDestination.EventAvailability)
     }
 
     // 일정 시트의 저장 버튼에서 호출되어 생성/수정 요청을 만든다.

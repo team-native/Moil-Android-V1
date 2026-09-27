@@ -1,6 +1,10 @@
 package com.example.moil.feature.group.module.data.remote
 
+import com.example.moil.feature.event.module.data.dto.EventAttendanceRequestStatus
+import com.example.moil.feature.event.module.data.dto.EventAvailabilityTimeSlotDto
 import com.example.moil.feature.event.module.data.dto.EventRequestDto
+import com.example.moil.feature.event.module.data.dto.UpdateEventAttendanceRequestDto
+import com.example.moil.feature.event.module.data.dto.UpdateEventAvailabilityRequestDto
 import com.example.moil.feature.event.module.data.dto.UpdateEventRequestDto
 import com.example.moil.feature.event.module.data.remote.EventApiService
 import com.example.moil.feature.group.module.data.dto.CreateGroupRequestDto
@@ -134,6 +138,54 @@ class GroupAndEventApiServiceContractTest {
         assertRequest("DELETE", "/events/5")
     }
 
+    @Test
+    fun `참석과 가능 시간대 endpoint는 명세의 method path query body를 사용한다`() = runBlocking {
+        enqueue(attendanceJson)
+        val attendanceResponse = eventApiService.getEventAttendance(5)
+        assertEquals("ATTENDING", attendanceResponse.body()?.data?.myStatus)
+        assertRequest("GET", "/events/5/attendance")
+
+        enqueue(attendanceUpdateJson)
+        eventApiService.updateEventAttendance(
+            eventId = 5,
+            request = UpdateEventAttendanceRequestDto(EventAttendanceRequestStatus.Attending),
+        )
+        assertRequest("PUT", "/events/5/attendance", "\"status\":\"ATTENDING\"")
+
+        enqueue("null")
+        eventApiService.deleteEventAttendance(5)
+        assertRequest("DELETE", "/events/5/attendance")
+
+        enqueue("null")
+        val myAvailabilityResponse = eventApiService.getMyEventAvailability(5, "2026-09-27")
+        assertNull(myAvailabilityResponse.body()?.data)
+        assertRequest("GET", "/events/5/availability/me?date=2026-09-27")
+
+        enqueue(eventAvailabilityJson)
+        val availabilityResponse = eventApiService.getEventAvailability(5, "2026-09-27")
+        assertEquals("가족", availabilityResponse.body()?.data?.members?.single()?.nickname)
+        assertRequest("GET", "/events/5/availability?date=2026-09-27")
+
+        enqueue(availabilitySummaryJson)
+        val summaryResponse = eventApiService.getEventAvailabilitySummary(5, "2026-09-27")
+        assertEquals(true, summaryResponse.body()?.data?.timeSlots?.single()?.isAvailableForEveryone)
+        assertRequest("GET", "/events/5/availability/summary?date=2026-09-27")
+
+        enqueue("null")
+        eventApiService.updateMyEventAvailability(
+            eventId = 5,
+            request = UpdateEventAvailabilityRequestDto(
+                date = "2026-09-27",
+                timeSlots = listOf(EventAvailabilityTimeSlotDto("09:30", "10:15")),
+            ),
+        )
+        assertRequest("PUT", "/events/5/availability", "\"startTime\":\"09:30\"")
+
+        enqueue("null")
+        eventApiService.deleteMyEventAvailability(5, "2026-09-27")
+        assertRequest("DELETE", "/events/5/availability?date=2026-09-27")
+    }
+
     private fun enqueue(data: String) {
         mockWebServer.enqueue(MockResponse.Builder().code(200).body("{\"success\":true,\"status\":0,\"message\":\"ok\",\"data\":$data}").build())
     }
@@ -150,5 +202,9 @@ class GroupAndEventApiServiceContractTest {
         const val groupJoinJson = "{\"groupId\":1,\"name\":\"우리 가족\",\"myRole\":\"member\",\"myNickname\":\"모일\",\"myColor\":\"SKY\",\"myImagePath\":\"/image/joined\"}"
         const val groupDetailJson = "{\"groupId\":1,\"name\":\"우리 가족\",\"inviteCode\":\"FAM-1\",\"memberCount\":1,\"monthlyEventCount\":0,\"myRole\":\"admin\",\"members\":[{\"userId\":1,\"nickname\":\"모일\",\"role\":\"admin\",\"colorId\":\"RED\",\"imagePath\":null}]}"
         const val eventJson = "{\"eventId\":5,\"title\":\"식사\",\"date\":\"2026-07-22\",\"startTime\":\"18:00\",\"endTime\":\"20:00\",\"location\":\"서울\",\"memo\":\"메모\",\"members\":[]}"
+        const val attendanceJson = "{\"myStatus\":\"ATTENDING\",\"participantCount\":2,\"attendingCount\":1,\"declinedCount\":0,\"members\":[]}"
+        const val attendanceUpdateJson = "{\"status\":\"ATTENDING\",\"updatedAt\":\"2026-09-27T09:00:00Z\"}"
+        const val eventAvailabilityJson = "{\"eventId\":5,\"date\":\"2026-09-27\",\"members\":[{\"userId\":2,\"nickname\":\"가족\",\"colorId\":null,\"timeSlots\":[]}]}"
+        const val availabilitySummaryJson = "{\"eventId\":5,\"date\":\"2026-09-27\",\"participantCount\":2,\"respondedCount\":2,\"timeSlots\":[{\"startTime\":\"09:30\",\"endTime\":\"10:15\",\"availableCount\":2,\"availableMemberIds\":[1,2],\"isAvailableForEveryone\":true}]}"
     }
 }

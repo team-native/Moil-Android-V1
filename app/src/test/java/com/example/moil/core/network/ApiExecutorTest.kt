@@ -57,4 +57,22 @@ class ApiExecutorTest {
 
         assertEquals(NetworkResult.Success("result"), result)
     }
+
+    @Test
+    fun `nullable 성공 envelope의 null data를 보존한다`() = runBlocking {
+        val result = apiExecutor.executeNullable<String> {
+            Response.success(ApiEnvelopeDto(success = true, status = 0, message = "ok", data = null))
+        }
+
+        assertEquals(NetworkResult.Success(null), result)
+    }
+
+    @Test
+    fun `일반 성공 envelope의 null data는 기존처럼 오류로 처리한다`() = runBlocking {
+        val result = apiExecutor.execute<String> {
+            Response.success(ApiEnvelopeDto(success = true, status = 0, message = "ok", data = null))
+        }
+
+        assertTrue(result is NetworkResult.NetworkError)
+    }
 }

@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.moil.R
@@ -22,7 +22,7 @@ internal fun PasswordResetNewPasswordContent(
     uiState: PasswordResetUiState,
     onEvent: (PasswordResetScreenEvent) -> Unit,
 ) {
-    val resources = LocalContext.current.resources
+    val resources = LocalResources.current
     val isPasswordTooShort = uiState.password.isNotEmpty() && !passwordRegex.matches(uiState.password)
     val isPasswordConfirmationInvalid = uiState.passwordConfirmation.isNotEmpty() &&
         uiState.password != uiState.passwordConfirmation

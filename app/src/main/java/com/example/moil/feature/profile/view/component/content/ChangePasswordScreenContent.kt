@@ -11,7 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.moil.R
@@ -32,7 +32,7 @@ internal fun ChangePasswordScreenContent(
     uiState: ChangePasswordUiState,
     onEvent: (ChangePasswordScreenEvent) -> Unit,
 ) {
-    val resources = LocalContext.current.resources
+    val resources = LocalResources.current
 
     Column(
         modifier = Modifier

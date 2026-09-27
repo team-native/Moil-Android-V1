@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -45,6 +47,7 @@ import com.example.moil.feature.calendar.viewmodel.CalendarScheduleSheetMode
 import com.example.moil.feature.calendar.viewmodel.CalendarScheduleMemberUiModel
 import com.example.moil.feature.calendar.viewmodel.CalendarScheduleUiModel
 import com.example.moil.feature.calendar.viewmodel.CalendarScreenEvent
+import com.example.moil.feature.calendar.viewmodel.EventAttendanceUiModel
 import com.example.moil.feature.calendar.viewmodel.CalendarUiState
 import com.example.moil.ui.theme.LocalMoilExtraColors
 import com.example.moil.ui.theme.MoilComponentSize
@@ -68,6 +71,7 @@ internal fun ScheduleSheetContent(
     isMutationLoading: Boolean,
     hasSelectedEventError: Boolean,
     hasMutationError: Boolean,
+    attendance: EventAttendanceUiModel,
     onEvent: (CalendarScreenEvent) -> Unit,
 ) {
     when (uiState.scheduleSheetMode) {
@@ -96,6 +100,7 @@ internal fun ScheduleSheetContent(
             isLoading = isSelectedEventLoading,
             hasError = hasSelectedEventError,
             hasMutationError = hasMutationError,
+            attendance = attendance,
             onEvent = onEvent,
         )
     }
@@ -456,11 +461,14 @@ private fun ScheduleDetailContent(
     isLoading: Boolean,
     hasError: Boolean,
     hasMutationError: Boolean,
+    attendance: EventAttendanceUiModel,
     onEvent: (CalendarScreenEvent) -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            // 참석 섹션이 더해져 시트 높이를 넘을 수 있으므로 상세 내용을 스크롤할 수 있게 한다.
+            .verticalScroll(rememberScrollState())
             .padding(
                 start = MoilScheduleSheet.HorizontalPadding,
                 end = MoilScheduleSheet.HorizontalPadding,
@@ -537,6 +545,25 @@ private fun ScheduleDetailContent(
 
             HorizontalDivider(
                 modifier = Modifier.padding(top = MoilScheduleSheet.DetailSectionTopPadding),
+                color = LocalMoilExtraColors.current.scheduleDivider,
+            )
+
+            EventAttendanceSection(
+                attendance = attendance,
+                onChoiceClick = { choice ->
+                    onEvent(CalendarScreenEvent.AttendanceChoiceClicked(choice))
+                },
+                onCancelClick = { onEvent(CalendarScreenEvent.AttendanceCancelClicked) },
+                onRetryClick = { onEvent(CalendarScreenEvent.AttendanceRetryClicked) },
+                modifier = Modifier.padding(top = MoilScheduleSheet.DetailSectionTopPadding),
+            )
+
+            ScheduleDetailActionRow(
+                label = stringResource(R.string.schedule_availability_entry),
+                onClick = { onEvent(CalendarScreenEvent.AvailabilityClicked) },
+            )
+
+            HorizontalDivider(
                 color = LocalMoilExtraColors.current.scheduleDivider,
             )
 
@@ -681,6 +708,36 @@ private fun ScheduleDetailInfoRow(
                 style = MaterialTheme.typography.labelSmall,
             )
         }
+    }
+}
+
+// 상세 시트 안에서 다른 화면으로 이어지는 행이다.
+@Composable
+private fun ScheduleDetailActionRow(
+    label: String,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = MoilComponentSize.TopBarItem)
+            .clickable(
+                role = Role.Button,
+                onClick = onClick,
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = label,
+            modifier = Modifier.weight(1f),
+            style = MaterialTheme.typography.bodyMedium,
+        )
+
+        Text(
+            text = stringResource(R.string.family_setting_next),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.titleMedium,
+        )
     }
 }
 

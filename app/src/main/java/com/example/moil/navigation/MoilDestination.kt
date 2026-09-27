@@ -84,6 +84,14 @@ sealed interface MoilMainDestination : NavKey {
     @Serializable
     data object ScheduleDeleteConfirmation : MoilMainDestination
 
+    /** 일정 상세에서 여는 가능 시간 화면이다. 대상 일정·날짜는 `MoilMainUiState.eventAvailabilityUiState`가 보관한다. */
+    @Serializable
+    data object EventAvailability : MoilMainDestination
+
+    /** 내 가능 시간 입력을 지우기 전 확인 다이얼로그다. */
+    @Serializable
+    data object EventAvailabilityClearConfirmation : MoilMainDestination
+
     @Serializable
     data object GroupRename : MoilMainDestination
 

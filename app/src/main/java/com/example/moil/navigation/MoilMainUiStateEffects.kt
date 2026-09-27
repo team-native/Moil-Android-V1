@@ -3,7 +3,7 @@ package com.example.moil.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.moil.R
 import com.example.moil.core.component.toUserMessage
@@ -12,6 +12,7 @@ import com.example.moil.feature.calendar.viewmodel.CalendarEffect
 import com.example.moil.feature.calendar.viewmodel.CalendarScheduleSheetMode
 import com.example.moil.feature.calendar.viewmodel.CalendarScreenEvent
 import com.example.moil.feature.calendar.viewmodel.CalendarViewModel
+import com.example.moil.feature.calendar.viewmodel.EventAvailabilityTab
 import com.example.moil.feature.calendar.viewmodel.reduce
 import com.example.moil.feature.calendar.viewmodel.toCalendarEvents
 import com.example.moil.feature.calendar.viewmodel.toCalendarGroups
@@ -57,7 +58,7 @@ internal fun MoilMainUiStateEffects(
     val isJoinGroupTabActive = navigationState.topLevelRoute == MoilMainDestination.JoinGroup
     val isCreateGroupVisible = navigator.isOnCurrentBackStack(MoilMainDestination.CreateGroup)
     val isScheduleSheetOpen = navigator.isOnAnyBackStack(MoilMainDestination.ScheduleSheet)
-    val resources = LocalContext.current.resources
+    val resources = LocalResources.current
 
     // 일정 시트는 스크림 탭·스와이프·시스템 뒤로가기로도 닫히고 이 경로는 CalendarScreenEvent를 거치지 않는다.
     // back stack에서 사라진 뒤에도 달력이 딤 처리된 채로 남지 않도록 시트 관련 상태를 함께 되돌린다.
@@ -264,6 +265,28 @@ internal fun MoilMainUiStateEffects(
 
                     // 일정 시트를 닫으면 그 위에 열려 있던 삭제 확인 다이얼로그도 함께 제거된다.
                     navigator.close(MoilMainDestination.ScheduleSheet)
+                }
+
+                CalendarEffect.AvailabilitySaved -> {
+                    mainUiState.eventAvailabilityUiState = mainUiState.eventAvailabilityUiState.copy(
+                        selectedTab = EventAvailabilityTab.Together,
+                    )
+                    launch {
+                        mainUiState.snackbarHostState.showSnackbar(
+                            resources.getString(R.string.availability_saved),
+                        )
+                    }
+                }
+
+                CalendarEffect.AvailabilityCleared -> {
+                    mainUiState.eventAvailabilityUiState = mainUiState.eventAvailabilityUiState.copy(
+                        selectedSlotStarts = emptySet(),
+                    )
+                    launch {
+                        mainUiState.snackbarHostState.showSnackbar(
+                            resources.getString(R.string.availability_cleared),
+                        )
+                    }
                 }
 
                 is CalendarEffect.ScheduleUpdated -> {
