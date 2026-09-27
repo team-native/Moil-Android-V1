@@ -1,5 +1,6 @@
 package com.example.moil.feature.auth.module.domain.repository
 
+import com.example.moil.feature.auth.module.domain.model.SignInMethod
 import com.example.moil.feature.auth.module.domain.model.UserProfile
 import kotlinx.coroutines.flow.StateFlow
 
@@ -7,7 +8,12 @@ import kotlinx.coroutines.flow.StateFlow
 interface CurrentUserProfileStore {
     val profile: StateFlow<UserProfile?>
 
+    /** 현재 세션의 로그인 방식이다. 이 값을 저장하기 전에 로그인한 세션이면 null이다. */
+    val signInMethod: StateFlow<SignInMethod?>
+
     fun save(profile: UserProfile)
+
+    fun saveSignInMethod(signInMethod: SignInMethod)
 
     fun clear()
 }

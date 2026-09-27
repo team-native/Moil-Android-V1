@@ -22,6 +22,7 @@ fun LoginRoute(
     socialLoginFailure: SocialLoginFailure? = null,
     onSocialLoginFailureConsumed: () -> Unit = {},
     onNavigateToSignUp: () -> Unit,
+    onNavigateToPasswordReset: (String) -> Unit,
     onLoginCompleted: () -> Unit,
 ) {
     val viewModel: AuthViewModel = hiltViewModel()
@@ -37,6 +38,9 @@ fun LoginRoute(
         onEvent = { event ->
             when (event) {
                 LoginScreenEvent.SignUpClicked -> onNavigateToSignUp()
+                LoginScreenEvent.ForgotPasswordClicked -> {
+                    onNavigateToPasswordReset(loginUiState.value.email.trim())
+                }
                 else -> viewModel.onLoginEvent(event)
             }
         },

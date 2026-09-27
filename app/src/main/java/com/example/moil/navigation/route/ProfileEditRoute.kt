@@ -28,14 +28,6 @@ internal fun ProfileEditRoute(
                     )
                 }
 
-                is ProfileEditScreenEvent.ProfileAvatarSelected -> {
-                    mainTabViewModel.clearProfileSaveError()
-                    mainUiState.profileEditUiState = mainUiState.profileEditUiState.copy(
-                        selectedProfileAvatarRes = event.avatarRes,
-                        saveError = null,
-                    )
-                }
-
                 ProfileEditScreenEvent.SaveClicked -> {
                     if (mainUiState.profileEditUiState.canSave) {
                         mainTabViewModel.updateProfileName(

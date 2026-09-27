@@ -27,6 +27,8 @@ import com.example.moil.feature.group.viewmodel.GroupViewModel
 import com.example.moil.feature.group.viewmodel.JoinGroupStep
 import com.example.moil.feature.group.viewmodel.JoinGroupUiState
 import com.example.moil.feature.group.viewmodel.toJoinGroupProfileOptions
+import com.example.moil.feature.auth.module.domain.model.SignInMethod
+import com.example.moil.feature.profile.viewmodel.ChangePasswordUiState
 import com.example.moil.feature.profile.viewmodel.toUpdatedProfileUiState
 import kotlinx.coroutines.launch
 
@@ -48,6 +50,8 @@ internal fun MoilMainUiStateEffects(
 ) {
     val profileUpdateUiState by mainTabViewModel.profileUpdateUiState.collectAsStateWithLifecycle()
     val currentUserProfile by mainTabViewModel.currentUserProfile.collectAsStateWithLifecycle()
+    val signInMethod by mainTabViewModel.signInMethod.collectAsStateWithLifecycle()
+    val accountActionUiState by mainTabViewModel.accountActionUiState.collectAsStateWithLifecycle()
     val groupUiState by groupViewModel.uiState.collectAsStateWithLifecycle()
     val calendarRemoteUiState by calendarViewModel.uiState.collectAsStateWithLifecycle()
     val isJoinGroupTabActive = navigationState.topLevelRoute == MoilMainDestination.JoinGroup
@@ -78,6 +82,40 @@ internal fun MoilMainUiStateEffects(
     LaunchedEffect(currentUserProfile) {
         currentUserProfile?.let { profile ->
             mainUiState.profileUiState = mainUiState.profileUiState.copy(profileName = profile.name)
+        }
+    }
+
+    LaunchedEffect(signInMethod) {
+        mainUiState.profileUiState = mainUiState.profileUiState.copy(
+            canChangePassword = signInMethod != SignInMethod.Social,
+        )
+    }
+
+    LaunchedEffect(accountActionUiState) {
+        mainUiState.changePasswordUiState = mainUiState.changePasswordUiState.copy(
+            isSaving = accountActionUiState.isChangingPassword,
+            error = accountActionUiState.changePasswordError,
+        )
+        mainUiState.deleteAccountUiState = mainUiState.deleteAccountUiState.copy(
+            isDeleting = accountActionUiState.isDeletingAccount,
+            error = accountActionUiState.deleteAccountError,
+        )
+    }
+
+    LaunchedEffect(Unit) {
+        mainTabViewModel.accountEffects.collect { effect ->
+            when (effect) {
+                AccountEffect.PasswordChanged -> {
+                    // 입력했던 비밀번호를 메모리에 남기지 않도록 화면을 닫기 전에 비운다.
+                    mainUiState.changePasswordUiState = ChangePasswordUiState()
+                    navigator.close(MoilMainDestination.ChangePassword)
+                    launch {
+                        mainUiState.snackbarHostState.showSnackbar(
+                            resources.getString(R.string.account_change_password_done),
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -113,6 +151,15 @@ internal fun MoilMainUiStateEffects(
                 GroupEffect.GroupRenamed -> navigator.close(MoilMainDestination.GroupRename)
 
                 GroupEffect.MemberRolesUpdated -> navigator.close(MoilMainDestination.MemberPermissions)
+
+                GroupEffect.MyGroupProfileUpdated -> {
+                    navigator.close(MoilMainDestination.GroupProfileEdit)
+                    launch {
+                        mainUiState.snackbarHostState.showSnackbar(
+                            resources.getString(R.string.group_profile_edit_done),
+                        )
+                    }
+                }
 
                 is GroupEffect.GroupLeft -> {
                     // 나간 그룹을 보여주던 확인 다이얼로그와 그룹 상세를 모두 걷어내 남은 그룹 화면으로 돌아간다.
@@ -233,6 +280,12 @@ internal fun MoilMainUiStateEffects(
     LaunchedEffect(calendarRemoteUiState.currentMonthEventCount) {
         mainUiState.familyUiState = mainUiState.familyUiState.copy(
             currentMonthEventCount = calendarRemoteUiState.currentMonthEventCount,
+        )
+    }
+
+    LaunchedEffect(groupUiState.isSubmitting) {
+        mainUiState.groupProfileEditUiState = mainUiState.groupProfileEditUiState.copy(
+            isSaving = groupUiState.isSubmitting,
         )
     }
 

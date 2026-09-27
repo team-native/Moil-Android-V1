@@ -4,7 +4,7 @@ import androidx.annotation.DrawableRes
 import com.example.moil.R
 
 data class ProfileEditUiState(
-    val profileName: String = "나",
+    val profileName: String = "",
     @param:DrawableRes val selectedProfileAvatarRes: Int = R.drawable.family_avatar_member_green,
     val isSaving: Boolean = false,
     val saveError: ProfileEditSaveError? = null,

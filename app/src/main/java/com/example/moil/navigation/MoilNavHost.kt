@@ -47,6 +47,7 @@ import com.example.moil.feature.auth.module.domain.model.SocialLoginFailure
 import com.example.moil.feature.auth.module.domain.model.SocialLoginProvider
 import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfileStore
 import com.example.moil.feature.auth.view.LoginRoute
+import com.example.moil.feature.auth.view.PasswordResetRoute
 import com.example.moil.feature.auth.view.SignUpRoute
 import com.example.moil.feature.calendar.view.CalendarScreen
 import com.example.moil.feature.calendar.view.ScheduleDatePickerDialog
@@ -58,9 +59,13 @@ import com.example.moil.feature.calendar.viewmodel.CalendarScreenEvent
 import com.example.moil.feature.calendar.viewmodel.CalendarViewModel
 import com.example.moil.feature.group.viewmodel.GroupViewModel
 import com.example.moil.feature.group.viewmodel.JoinGroupUiState
+import com.example.moil.navigation.route.ChangePasswordRoute
 import com.example.moil.navigation.route.CreateGroupRoute
+import com.example.moil.navigation.route.DeleteAccountConfirmationRoute
+import com.example.moil.navigation.route.DeleteAccountRoute
 import com.example.moil.navigation.route.FamilyTabRoute
 import com.example.moil.navigation.route.GroupDetailRoute
+import com.example.moil.navigation.route.GroupProfileEditRoute
 import com.example.moil.navigation.route.GroupRenameRoute
 import com.example.moil.navigation.route.InviteShareRoute
 import com.example.moil.navigation.route.JoinGroupTabRoute
@@ -165,13 +170,13 @@ fun MoilNavHost(
                 onSocialLoginCallbackConsumed = { pendingSocialLoginCallback = null },
                 socialLoginFailure = pendingSocialLoginFailure,
                 onSocialLoginFailureConsumed = { pendingSocialLoginFailure = null },
-                onSignUpCompleted = { email -> registeredEmail = email },
+                onLoginEmailPrepared = { email -> registeredEmail = email },
             )
         }
     }
 }
 
-/** 로그인 전 선형 플로우(로그인 → 회원가입)를 담당한다. */
+/** 로그인 전 선형 플로우(로그인 → 회원가입 / 비밀번호 찾기)를 담당한다. */
 @Composable
 private fun MoilAuthNavDisplay(
     initialEmail: String,
@@ -179,7 +184,7 @@ private fun MoilAuthNavDisplay(
     onSocialLoginCallbackConsumed: () -> Unit,
     socialLoginFailure: SocialLoginFailure?,
     onSocialLoginFailureConsumed: () -> Unit,
-    onSignUpCompleted: (String) -> Unit,
+    onLoginEmailPrepared: (String) -> Unit,
 ) {
     val backStack = rememberNavBackStack(MoilAuthDestination.Login)
 
@@ -204,8 +209,23 @@ private fun MoilAuthNavDisplay(
                     socialLoginFailure = socialLoginFailure,
                     onSocialLoginFailureConsumed = onSocialLoginFailureConsumed,
                     onNavigateToSignUp = { backStack.add(MoilAuthDestination.SignUp) },
+                    onNavigateToPasswordReset = { email ->
+                        backStack.add(MoilAuthDestination.PasswordReset(email))
+                    },
                     // 로그인 성공은 sessionState 변화 + key(sessionState)가 이미 처리하므로 별도 back stack 조작이 필요 없다.
                     onLoginCompleted = {},
+                )
+            }
+
+            entry<MoilAuthDestination.PasswordReset> { key ->
+                PasswordResetRoute(
+                    initialEmail = key.email,
+                    onNavigateBack = { backStack.removeLastOrNull() },
+                    onPasswordResetCompleted = { email ->
+                        // 로그인 화면이 바뀐 비밀번호로 바로 로그인할 수 있게 이메일을 채워 둔다.
+                        onLoginEmailPrepared(email)
+                        backStack.removeLastOrNull()
+                    },
                 )
             }
 
@@ -213,7 +233,7 @@ private fun MoilAuthNavDisplay(
                 SignUpRoute(
                     onNavigateBack = { backStack.removeLastOrNull() },
                     onSignUpCompleted = { email ->
-                        onSignUpCompleted(email)
+                        onLoginEmailPrepared(email)
                         backStack.removeLastOrNull()
                     },
                 )
@@ -401,6 +421,14 @@ private fun MoilMainNavDisplay(
                     )
                 }
 
+                entry<MoilMainDestination.GroupProfileEdit> {
+                    GroupProfileEditRoute(
+                        mainUiState = mainUiState,
+                        groupViewModel = groupViewModel,
+                        navigator = navigator,
+                    )
+                }
+
                 entry<MoilMainDestination.GroupRename>(
                     metadata = MoilDialogSceneStrategy.dialog(),
                 ) {
@@ -471,6 +499,32 @@ private fun MoilMainNavDisplay(
                         mainTabViewModel = mainTabViewModel,
                         navigator = navigator,
                         onDarkThemeChanged = onDarkThemeChanged,
+                    )
+                }
+
+                entry<MoilMainDestination.ChangePassword> {
+                    ChangePasswordRoute(
+                        mainUiState = mainUiState,
+                        mainTabViewModel = mainTabViewModel,
+                        navigator = navigator,
+                    )
+                }
+
+                entry<MoilMainDestination.DeleteAccount> {
+                    DeleteAccountRoute(
+                        mainUiState = mainUiState,
+                        mainTabViewModel = mainTabViewModel,
+                        navigator = navigator,
+                    )
+                }
+
+                entry<MoilMainDestination.DeleteAccountConfirmation>(
+                    metadata = MoilDialogSceneStrategy.dialog(),
+                ) {
+                    DeleteAccountConfirmationRoute(
+                        mainUiState = mainUiState,
+                        mainTabViewModel = mainTabViewModel,
+                        navigator = navigator,
                     )
                 }
 

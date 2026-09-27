@@ -12,8 +12,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.moil.R
 import com.example.moil.feature.family.view.FamilyDetailHeader
-import com.example.moil.feature.group.view.ProfileAvatarSelector
-import com.example.moil.feature.group.view.profileAvatarResources
 import com.example.moil.feature.profile.viewmodel.ProfileEditScreenEvent
 import com.example.moil.feature.profile.viewmodel.ProfileEditUiState
 import com.example.moil.ui.theme.MoilProfileEditDimension
@@ -48,18 +46,6 @@ internal fun ProfileEditScreenContent(
             onProfileNameChange = { profileName ->
                 onEvent(ProfileEditScreenEvent.NameChanged(profileName))
             },
-        )
-
-        Spacer(modifier = Modifier.height(MoilProfileEditDimension.AvatarSelectorTopPadding))
-
-        ProfileAvatarSelector(
-            labelRes = R.string.profile_edit_avatar_label,
-            selectedProfileAvatarRes = uiState.selectedProfileAvatarRes,
-            onProfileAvatarSelected = { avatarRes ->
-                onEvent(ProfileEditScreenEvent.ProfileAvatarSelected(avatarRes))
-            },
-            showCustomProfileImage = false,
-            avatarResources = profileAvatarResources,
         )
 
         uiState.saveError?.let { saveError ->

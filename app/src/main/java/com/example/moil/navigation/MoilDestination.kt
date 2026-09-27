@@ -12,6 +12,10 @@ sealed interface MoilAuthDestination : NavKey {
 
     @Serializable
     data object SignUp : MoilAuthDestination
+
+    /** 로그인 화면의 "비밀번호를 잊으셨나요?"에서 진입하는 비밀번호 찾기 흐름이다. */
+    @Serializable
+    data class PasswordReset(val email: String = "") : MoilAuthDestination
 }
 
 /**
@@ -38,9 +42,25 @@ sealed interface MoilMainDestination : NavKey {
     @Serializable
     data class GroupDetail(val groupId: Long) : MoilMainDestination
 
+    /** Family 탭 back stack에 push되는 그룹 안의 내 프로필 변경 화면이다. */
+    @Serializable
+    data object GroupProfileEdit : MoilMainDestination
+
     /** Profile 탭 back stack에 push되는 프로필 편집 화면이다. */
     @Serializable
     data object ProfileEdit : MoilMainDestination
+
+    /** Profile 탭 back stack에 push되는 비밀번호 변경 화면이다. */
+    @Serializable
+    data object ChangePassword : MoilMainDestination
+
+    /** Profile 탭 back stack에 push되는 회원 탈퇴 화면이다. */
+    @Serializable
+    data object DeleteAccount : MoilMainDestination
+
+    /** 회원 탈퇴 최종 확인 다이얼로그다. */
+    @Serializable
+    data object DeleteAccountConfirmation : MoilMainDestination
 
     /** 진입 시점의 활성 탭 back stack에 push되는 그룹 생성 화면이다. */
     @Serializable

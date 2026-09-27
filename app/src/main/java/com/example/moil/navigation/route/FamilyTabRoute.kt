@@ -10,6 +10,7 @@ import com.example.moil.R
 import com.example.moil.feature.family.view.MemberScreen
 import com.example.moil.feature.family.viewmodel.FamilyScreenEvent
 import com.example.moil.feature.group.viewmodel.GroupViewModel
+import com.example.moil.feature.group.viewmodel.toGroupProfileEditUiState
 import com.example.moil.navigation.MoilMainDestination
 import com.example.moil.navigation.MoilMainNavigator
 import com.example.moil.navigation.MoilMainUiState
@@ -76,6 +77,17 @@ internal fun FamilyTabRoute(
 
                 FamilyScreenEvent.LeaveGroupClicked -> {
                     navigator.openLeaveGroupFlow(mainUiState.familyUiState.leavePolicy)
+                }
+
+                FamilyScreenEvent.MyGroupProfileClicked -> {
+                    val groupUiState = groupViewModel.uiState.value
+
+                    groupUiState.selectedGroup?.let { selectedGroup ->
+                        // 들어올 때마다 서버의 현재 프로필로 입력을 새로 시작한다.
+                        mainUiState.groupProfileEditUiState = selectedGroup
+                            .toGroupProfileEditUiState(groupUiState.members)
+                        navigator.push(MoilMainDestination.GroupProfileEdit)
+                    }
                 }
             }
         },

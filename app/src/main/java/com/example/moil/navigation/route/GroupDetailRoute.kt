@@ -45,6 +45,7 @@ internal fun GroupDetailRoute(
                 FamilyScreenEvent.MemberPermissionsClicked,
                 FamilyScreenEvent.InviteCodeCopyClicked,
                 FamilyScreenEvent.InviteLinkShareClicked,
+                FamilyScreenEvent.MyGroupProfileClicked,
                 -> Unit
             }
         },
