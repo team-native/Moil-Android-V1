@@ -21,11 +21,8 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -121,22 +118,16 @@ fun FamilyGroupNameDialog(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FamilyMemberPermissionsBottomSheet(
     members: List<FamilyMemberUiModel>,
-    sheetState: SheetState,
-    onDismissRequest: () -> Unit,
     onConfirmClick: (Map<Long, Int>) -> Unit,
 ) {
     val memberRoles = remember(members) {
         mutableStateOf(members.associate { member -> member.id to member.roleRes })
     }
 
-    FamilyModalBottomSheet(
-        sheetState = sheetState,
-        onDismissRequest = onDismissRequest,
-    ) {
+    FamilySheetLayout {
         Text(
             text = stringResource(R.string.family_member_permissions_title),
             style = MaterialTheme.typography.titleMedium,
@@ -170,19 +161,13 @@ fun FamilyMemberPermissionsBottomSheet(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FamilyInviteShareBottomSheet(
     inviteLink: String,
-    sheetState: SheetState,
-    onDismissRequest: () -> Unit,
     onShareClick: () -> Unit,
     onCopyLinkClick: () -> Unit,
 ) {
-    FamilyModalBottomSheet(
-        sheetState = sheetState,
-        onDismissRequest = onDismissRequest,
-    ) {
+    FamilySheetLayout {
         Text(
             text = stringResource(R.string.family_invite_share_title),
             style = MaterialTheme.typography.titleMedium,
@@ -297,49 +282,38 @@ fun FamilyAdministratorTransferDialog(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * 그룹 설정 바텀시트들이 공유하는 안쪽 레이아웃이다.
+ *
+ * 바텀시트 컨테이너는 Navigation 3 overlay scene(`MoilBottomSheetSceneStrategy`)이 제공하므로
+ * 여기서는 드래그 핸들과 여백을 포함한 시트 내부만 구성한다.
+ */
 @Composable
-private fun FamilyModalBottomSheet(
-    sheetState: SheetState,
-    onDismissRequest: () -> Unit,
-    content: @Composable () -> Unit,
-) {
-    ModalBottomSheet(
-        onDismissRequest = onDismissRequest,
-        sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surface,
-        scrimColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.45f),
-        shape = RoundedCornerShape(
-            topStart = MoilRadius.OverlaySheet,
-            topEnd = MoilRadius.OverlaySheet,
-        ),
-        dragHandle = null,
+private fun FamilySheetLayout(content: @Composable () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                start = MoilOverlayDimension.SheetHorizontalPadding,
+                top = MoilOverlayDimension.SheetTopPadding,
+                end = MoilOverlayDimension.SheetHorizontalPadding,
+                bottom = MoilOverlayDimension.SheetBottomPadding,
+            ),
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = MoilOverlayDimension.SheetHorizontalPadding,
-                    top = MoilOverlayDimension.SheetTopPadding,
-                    end = MoilOverlayDimension.SheetHorizontalPadding,
-                    bottom = MoilOverlayDimension.SheetBottomPadding,
-                ),
-        ) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .size(
-                        width = MoilOverlayDimension.SheetDragHandleWidth,
-                        height = MoilOverlayDimension.SheetDragHandleHeight,
-                    )
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.outlineVariant),
-            )
+                .align(Alignment.CenterHorizontally)
+                .size(
+                    width = MoilOverlayDimension.SheetDragHandleWidth,
+                    height = MoilOverlayDimension.SheetDragHandleHeight,
+                )
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.outlineVariant),
+        )
 
-            Spacer(modifier = Modifier.height(MoilOverlayDimension.SheetTitleTopPadding))
+        Spacer(modifier = Modifier.height(MoilOverlayDimension.SheetTitleTopPadding))
 
-            content()
-        }
+        content()
     }
 }
 
