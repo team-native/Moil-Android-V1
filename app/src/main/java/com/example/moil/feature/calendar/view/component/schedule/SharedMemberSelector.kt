@@ -34,47 +34,51 @@ internal fun SharedMemberSelector(
     val selectedMemberRingGapColor = androidx.compose.material3.MaterialTheme.colorScheme.surface
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = MoilScheduleSheet.HorizontalPadding),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = MoilScheduleSheet.HorizontalPadding),
         horizontalArrangement = Arrangement.spacedBy(MoilScheduleSheet.SharedMemberSpacing),
     ) {
         members.forEach { calendarMember ->
             val isSelected = calendarMember.id in sharedMemberIds
             val memberName = calendarMember.name
             Column(
-                modifier = Modifier
-                    .width(MoilScheduleSheet.SharedMemberAvatarSize)
-                    .clickable(role = Role.Checkbox) {
-                        onMemberClick(calendarMember.id)
-                    }
-                    .semantics {
-                        contentDescription = memberName
-                    },
+                modifier =
+                    Modifier
+                        .width(MoilScheduleSheet.SharedMemberAvatarSize)
+                        .clickable(role = Role.Checkbox) {
+                            onMemberClick(calendarMember.id)
+                        }.semantics {
+                            contentDescription = memberName
+                        },
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Box(
-                    modifier = Modifier
-                        .size(MoilScheduleSheet.SharedMemberAvatarSize)
-                        .drawBehind {
-                            if (isSelected) {
-                                val avatarRadius = size.minDimension / 2
-                                val primaryRingRadius = avatarRadius +
-                                    MoilScheduleSheet.SelectedMemberWhiteRing.toPx() +
-                                    MoilScheduleSheet.SelectedMemberPrimaryRing.toPx()
-                                val whiteRingRadius = avatarRadius +
-                                    MoilScheduleSheet.SelectedMemberWhiteRing.toPx()
+                    modifier =
+                        Modifier
+                            .size(MoilScheduleSheet.SharedMemberAvatarSize)
+                            .drawBehind {
+                                if (isSelected) {
+                                    val avatarRadius = size.minDimension / 2
+                                    val primaryRingRadius =
+                                        avatarRadius +
+                                            MoilScheduleSheet.SelectedMemberWhiteRing.toPx() +
+                                            MoilScheduleSheet.SelectedMemberPrimaryRing.toPx()
+                                    val whiteRingRadius =
+                                        avatarRadius +
+                                            MoilScheduleSheet.SelectedMemberWhiteRing.toPx()
 
-                                drawCircle(
-                                    color = selectedMemberRingColor,
-                                    radius = primaryRingRadius,
-                                )
-                                drawCircle(
-                                    color = selectedMemberRingGapColor,
-                                    radius = whiteRingRadius,
-                                )
-                            }
-                        },
+                                    drawCircle(
+                                        color = selectedMemberRingColor,
+                                        radius = primaryRingRadius,
+                                    )
+                                    drawCircle(
+                                        color = selectedMemberRingGapColor,
+                                        radius = whiteRingRadius,
+                                    )
+                                }
+                            },
                     contentAlignment = Alignment.Center,
                 ) {
                     MoilRemoteAvatar(
@@ -89,13 +93,15 @@ internal fun SharedMemberSelector(
 
                 androidx.compose.material3.Text(
                     text = memberName,
-                    style = LocalMoilExtraTypography.current.scheduleMemberName.copy(
-                        fontWeight = if (isSelected) {
-                            FontWeight.Bold
-                        } else {
-                            FontWeight.Normal
-                        },
-                    ),
+                    style =
+                        LocalMoilExtraTypography.current.scheduleMemberName.copy(
+                            fontWeight =
+                                if (isSelected) {
+                                    FontWeight.Bold
+                                } else {
+                                    FontWeight.Normal
+                                },
+                        ),
                 )
             }
         }

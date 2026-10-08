@@ -16,10 +16,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.moil.R
@@ -37,45 +37,51 @@ internal fun CalendarDayCell(
     modifier: Modifier,
     onClick: () -> Unit,
 ) {
-    val dateDescription = stringResource(
-        R.string.calendar_date_events_content_description,
-        date.monthValue,
-        date.dayOfMonth,
-        eventCount,
-    )
+    val dateDescription =
+        stringResource(
+            R.string.calendar_date_events_content_description,
+            date.monthValue,
+            date.dayOfMonth,
+            eventCount,
+        )
 
     Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(MoilRadius.Event))
-            .clickable(
-                role = Role.Button,
-                onClick = onClick,
-            )
-            .semantics { contentDescription = dateDescription },
+        modifier =
+            modifier
+                .clip(RoundedCornerShape(MoilRadius.Event))
+                .clickable(
+                    role = Role.Button,
+                    onClick = onClick,
+                ).semantics { contentDescription = dateDescription },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(
-            modifier = Modifier
-                .padding(top = 4.dp)
-                .size(28.dp)
-                .clip(CircleShape)
-                .background(
-                    color = if (isToday) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        Color.Transparent
-                    },
-                ),
+            modifier =
+                Modifier
+                    .padding(top = 4.dp)
+                    .size(28.dp)
+                    .clip(CircleShape)
+                    .background(
+                        color =
+                            if (isToday) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                Color.Transparent
+                            },
+                    ),
             contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = date.dayOfMonth.toString(),
-                color = when {
-                    // Dates outside the displayed month always use the grey/95 token.
-                    !isDisplayedMonth -> LocalMoilExtraColors.current.calendarMutedText
-                    isToday -> MaterialTheme.colorScheme.onPrimary
-                    else -> MaterialTheme.colorScheme.onSurface
-                },
+                color =
+                    when {
+                        // Dates outside the displayed month always use the grey/95 token.
+                        !isDisplayedMonth -> LocalMoilExtraColors.current.calendarMutedText
+
+                        isToday -> MaterialTheme.colorScheme.onPrimary
+
+                        else -> MaterialTheme.colorScheme.onSurface
+                    },
                 style = MaterialTheme.typography.bodyLarge,
             )
         }

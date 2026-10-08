@@ -8,11 +8,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.moil.feature.auth.module.domain.model.SocialLoginCallback
+import com.example.moil.feature.auth.module.domain.model.SocialLoginFailure
 import com.example.moil.feature.auth.viewmodel.AuthEffect
 import com.example.moil.feature.auth.viewmodel.AuthViewModel
 import com.example.moil.feature.auth.viewmodel.LoginScreenEvent
-import com.example.moil.feature.auth.module.domain.model.SocialLoginCallback
-import com.example.moil.feature.auth.module.domain.model.SocialLoginFailure
 
 @Composable
 fun LoginRoute(
@@ -59,18 +59,25 @@ fun LoginRoute(
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
-                AuthEffect.LoginCompleted -> onLoginCompleted()
+                AuthEffect.LoginCompleted -> {
+                    onLoginCompleted()
+                }
+
                 is AuthEffect.OpenSocialLogin -> {
                     val authorizationUri = Uri.parse(effect.authorizationUrl)
                     runCatching {
-                        CustomTabsIntent.Builder()
+                        CustomTabsIntent
+                            .Builder()
                             .build()
                             .launchUrl(context, authorizationUri)
                     }.getOrElse {
                         context.startActivity(Intent(Intent.ACTION_VIEW, authorizationUri))
                     }
                 }
-                is AuthEffect.SignUpCompleted -> Unit
+
+                is AuthEffect.SignUpCompleted -> {
+                    Unit
+                }
             }
         }
     }

@@ -6,11 +6,13 @@ import com.example.moil.feature.event.module.domain.repository.EventRepository
 import java.time.YearMonth
 import javax.inject.Inject
 
-class GetGroupEventsUseCase @Inject constructor(
-    private val repository: EventRepository,
-) {
-    suspend operator fun invoke(
-        groupId: Long,
-        month: YearMonth,
-    ): MoilResult<List<GroupEvent>> = repository.getGroupEvents(groupId, month)
-}
+class GetGroupEventsUseCase
+    @Inject
+    constructor(
+        private val repository: EventRepository,
+    ) {
+        suspend operator fun invoke(
+            groupId: Long,
+            month: YearMonth,
+        ): MoilResult<List<GroupEvent>> = repository.getGroupEvents(groupId, month)
+    }

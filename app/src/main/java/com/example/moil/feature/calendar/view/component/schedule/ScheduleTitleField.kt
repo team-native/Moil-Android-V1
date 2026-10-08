@@ -28,24 +28,27 @@ internal fun ScheduleTitleField(
     val extraTypography = LocalMoilExtraTypography.current
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(MoilScheduleSheet.TitleHeight)
-            .padding(horizontal = MoilScheduleSheet.HorizontalPadding),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(MoilScheduleSheet.TitleHeight)
+                .padding(horizontal = MoilScheduleSheet.HorizontalPadding),
     ) {
         Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
             contentAlignment = Alignment.CenterStart,
         ) {
             BasicTextField(
                 value = value,
                 onValueChange = onValueChange,
                 modifier = Modifier.fillMaxWidth(),
-                textStyle = extraTypography.scheduleTitle.copy(
-                    color = MaterialTheme.colorScheme.onSurface,
-                ),
+                textStyle =
+                    extraTypography.scheduleTitle.copy(
+                        color = MaterialTheme.colorScheme.onSurface,
+                    ),
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 singleLine = true,
                 decorationBox = { innerTextField ->

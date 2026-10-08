@@ -16,9 +16,10 @@ internal fun ScheduleFormValueRow(
     value: String,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 14.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 14.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(

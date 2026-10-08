@@ -62,9 +62,10 @@ internal fun CalendarGroupErrorContent(
         MoilPrimaryButton(
             text = stringResource(R.string.calendar_retry),
             onClick = onRetryClick,
-            modifier = Modifier
-                .height(48.dp)
-                .fillMaxWidth(0.45f),
+            modifier =
+                Modifier
+                    .height(48.dp)
+                    .fillMaxWidth(0.45f),
         )
     }
 }

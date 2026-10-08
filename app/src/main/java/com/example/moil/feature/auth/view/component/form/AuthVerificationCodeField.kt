@@ -45,45 +45,49 @@ internal fun AuthVerificationCodeField(
     BasicTextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = Modifier
-            .fillMaxWidth()
-            .focusRequester(focusRequester),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
         singleLine = true,
         textStyle = MaterialTheme.typography.titleMedium,
         decorationBox = { innerTextField ->
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(
-                        interactionSource = verificationCodeInteractionSource,
-                        indication = null,
-                    ) {
-                        focusRequester.requestFocus()
-                        softwareKeyboardController?.show()
-                    },
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            interactionSource = verificationCodeInteractionSource,
+                            indication = null,
+                        ) {
+                            focusRequester.requestFocus()
+                            softwareKeyboardController?.show()
+                        },
                 horizontalArrangement = Arrangement.spacedBy(MoilAuthDimension.VerificationCodeCellSpacing),
             ) {
                 repeat(verificationCodeLength) { index ->
                     val isErrorCell = isError && index == errorCellIndex
-                    val cellBorderColor = if (isErrorCell) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.surface
-                    }
+                    val cellBorderColor =
+                        if (isErrorCell) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            MaterialTheme.colorScheme.surface
+                        }
 
                     Box(
-                        modifier = Modifier
-                            .width(MoilAuthDimension.VerificationCodeCellWidth)
-                            .height(MoilAuthDimension.VerificationCodeCellHeight)
-                            .clip(verificationCodeCellShape)
-                            .background(MaterialTheme.colorScheme.surface)
-                            .border(
-                                width = MoilAuthDimension.ErrorBorderWidth,
-                                color = cellBorderColor,
-                                shape = verificationCodeCellShape,
-                            ),
+                        modifier =
+                            Modifier
+                                .width(MoilAuthDimension.VerificationCodeCellWidth)
+                                .height(MoilAuthDimension.VerificationCodeCellHeight)
+                                .clip(verificationCodeCellShape)
+                                .background(MaterialTheme.colorScheme.surface)
+                                .border(
+                                    width = MoilAuthDimension.ErrorBorderWidth,
+                                    color = cellBorderColor,
+                                    shape = verificationCodeCellShape,
+                                ),
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
@@ -95,9 +99,10 @@ internal fun AuthVerificationCodeField(
                 }
 
                 Box(
-                    modifier = Modifier
-                        .size(1.dp)
-                        .alpha(0f),
+                    modifier =
+                        Modifier
+                            .size(1.dp)
+                            .alpha(0f),
                 ) {
                     innerTextField()
                 }

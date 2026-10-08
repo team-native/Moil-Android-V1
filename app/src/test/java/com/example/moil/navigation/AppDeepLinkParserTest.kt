@@ -32,7 +32,9 @@ class AppDeepLinkParserTest {
     fun `scheme과 필수 값이 없으면 링크를 무시한다`() {
         assertNull(AppDeepLinkParser.parse("https://example.com/join/123"))
         assertNull(AppDeepLinkParser.parse("moil://join/0"))
-        assertNull(AppDeepLinkParser.parse("moil://oauth/google/callback?accessToken=access-token&refreshToken=refresh-token"))
+        assertNull(
+            AppDeepLinkParser.parse("moil://oauth/google/callback?accessToken=access-token&refreshToken=refresh-token"),
+        )
         assertNull(AppDeepLinkParser.parse("moil://oauth/google/callback?accessToken=access-token&state=state-1"))
         assertEquals(
             AppDeepLink.OAuthFailure(provider = "google", state = "state-1"),

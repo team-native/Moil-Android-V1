@@ -13,4 +13,8 @@ data class GroupEvent(
     val members: List<EventMember>,
 )
 
-data class EventMember(val userId: Long, val nickname: String, val color: GroupColor)
+data class EventMember(
+    val userId: Long,
+    val nickname: String,
+    val color: GroupColor,
+)

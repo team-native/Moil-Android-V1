@@ -1,11 +1,11 @@
 package com.example.moil.feature.calendar.view
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.annotation.StringRes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,18 +25,20 @@ internal fun ScheduleSheetHeader(
     onSave: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(MoilScheduleSheet.HeaderHeight)
-            .padding(horizontal = MoilScheduleSheet.HorizontalPadding),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(MoilScheduleSheet.HeaderHeight)
+                .padding(horizontal = MoilScheduleSheet.HorizontalPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = stringResource(R.string.schedule_cancel),
-            modifier = Modifier.clickable(
-                role = Role.Button,
-                onClick = onDismiss,
-            ),
+            modifier =
+                Modifier.clickable(
+                    role = Role.Button,
+                    onClick = onDismiss,
+                ),
             color = MaterialTheme.colorScheme.outline,
             style = MaterialTheme.typography.bodyLarge,
         )
@@ -48,10 +50,11 @@ internal fun ScheduleSheetHeader(
         )
         Text(
             text = stringResource(R.string.schedule_save),
-            modifier = Modifier.clickable(
-                role = Role.Button,
-                onClick = onSave,
-            ),
+            modifier =
+                Modifier.clickable(
+                    role = Role.Button,
+                    onClick = onSave,
+                ),
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Bold,

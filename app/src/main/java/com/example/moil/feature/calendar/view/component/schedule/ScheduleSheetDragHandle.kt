@@ -19,13 +19,13 @@ internal fun ScheduleSheetDragHandle() {
         contentAlignment = Alignment.Center,
     ) {
         Box(
-            modifier = Modifier
-                .size(
-                    width = MoilScheduleSheet.DragHandleWidth,
-                    height = MoilScheduleSheet.DragHandleHeight,
-                )
-                .clip(RoundedCornerShape(percent = 50))
-                .background(LocalMoilExtraColors.current.scheduleDivider),
+            modifier =
+                Modifier
+                    .size(
+                        width = MoilScheduleSheet.DragHandleWidth,
+                        height = MoilScheduleSheet.DragHandleHeight,
+                    ).clip(RoundedCornerShape(percent = 50))
+                    .background(LocalMoilExtraColors.current.scheduleDivider),
         )
     }
 }

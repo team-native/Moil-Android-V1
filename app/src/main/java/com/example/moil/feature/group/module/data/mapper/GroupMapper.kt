@@ -14,60 +14,69 @@ import com.example.moil.feature.group.module.domain.model.GroupSummary
 import com.example.moil.feature.group.module.domain.model.toGroupColor
 import com.example.moil.feature.group.module.domain.model.toGroupRole
 
-internal fun GroupSummaryResponseDto.toDomain(): GroupSummary = GroupSummary(
-    id = groupId,
-    name = name,
-    inviteCode = inviteCode,
-    myRole = myRole.toGroupRole(),
-    myNickname = myNickname,
-    myColor = (myColor ?: "").toGroupColor(),
-    memberCount = memberCount,
-    myImagePath = myImagePath,
-)
+internal fun GroupSummaryResponseDto.toDomain(): GroupSummary =
+    GroupSummary(
+        id = groupId,
+        name = name,
+        inviteCode = inviteCode,
+        myRole = myRole.toGroupRole(),
+        myNickname = myNickname,
+        myColor = (myColor ?: "").toGroupColor(),
+        memberCount = memberCount,
+        myImagePath = myImagePath,
+    )
 
-internal fun GroupMemberResponseDto.toDomain(): GroupMember = GroupMember(
-    userId = userId,
-    nickname = nickname,
-    email = email,
-    role = role.toGroupRole(),
-    color = colorId?.toGroupColor() ?: GroupColor.Unknown,
-    isMe = isMe,
-    imagePath = imagePath,
-)
+internal fun GroupMemberResponseDto.toDomain(): GroupMember =
+    GroupMember(
+        userId = userId,
+        nickname = nickname,
+        email = email,
+        role = role.toGroupRole(),
+        color = colorId?.toGroupColor() ?: GroupColor.Unknown,
+        isMe = isMe,
+        imagePath = imagePath,
+    )
 
-internal fun GroupMemberProfileResponseDto.toDomain(): GroupMemberProfile = GroupMemberProfile(
-    groupId = groupId,
-    userId = userId,
-    nickname = nickname,
-    color = colorId?.toGroupColor() ?: GroupColor.Unknown,
-    imagePath = imagePath,
-)
+internal fun GroupMemberProfileResponseDto.toDomain(): GroupMemberProfile =
+    GroupMemberProfile(
+        groupId = groupId,
+        userId = userId,
+        nickname = nickname,
+        color = colorId?.toGroupColor() ?: GroupColor.Unknown,
+        imagePath = imagePath,
+    )
 
-internal fun GroupDetailResponseDto.toDomain(): GroupDetail = GroupDetail(
-    id = groupId,
-    name = name,
-    inviteCode = inviteCode,
-    memberCount = memberCount,
-    monthlyEventCount = monthlyEventCount,
-    myRole = myRole.toGroupRole(),
-    members = members.map { member ->
-        GroupMember(
-            userId = member.userId,
-            nickname = member.nickname,
-            email = null,
-            role = member.role.toGroupRole(),
-            color = member.colorId?.toGroupColor()
-                ?: GroupColor.Unknown,
-            isMe = null,
-            imagePath = member.imagePath,
-        )
-    },
-)
+internal fun GroupDetailResponseDto.toDomain(): GroupDetail =
+    GroupDetail(
+        id = groupId,
+        name = name,
+        inviteCode = inviteCode,
+        memberCount = memberCount,
+        monthlyEventCount = monthlyEventCount,
+        myRole = myRole.toGroupRole(),
+        members =
+            members.map { member ->
+                GroupMember(
+                    userId = member.userId,
+                    nickname = member.nickname,
+                    email = null,
+                    role = member.role.toGroupRole(),
+                    color =
+                        member.colorId?.toGroupColor()
+                            ?: GroupColor.Unknown,
+                    isMe = null,
+                    imagePath = member.imagePath,
+                )
+            },
+    )
 
-internal fun GroupRole.toMemberRoleRequestDto(): MemberRoleRequestDto = when (this) {
-    GroupRole.Admin -> MemberRoleRequestDto.Admin
-    GroupRole.Member -> MemberRoleRequestDto.Member
-    GroupRole.Owner,
-    GroupRole.Unknown,
-    -> error("관리자 또는 일반 멤버 역할만 변경 요청에 사용할 수 있습니다.")
-}
+internal fun GroupRole.toMemberRoleRequestDto(): MemberRoleRequestDto =
+    when (this) {
+        GroupRole.Admin -> MemberRoleRequestDto.Admin
+
+        GroupRole.Member -> MemberRoleRequestDto.Member
+
+        GroupRole.Owner,
+        GroupRole.Unknown,
+        -> error("관리자 또는 일반 멤버 역할만 변경 요청에 사용할 수 있습니다.")
+    }

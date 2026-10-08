@@ -19,15 +19,17 @@ internal fun AuthPrimaryButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(MoilAuthDimension.PrimaryButtonHeight),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(MoilAuthDimension.PrimaryButtonHeight),
         enabled = enabled,
         shape = RoundedCornerShape(MoilAuthDimension.FieldCornerRadius),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-        ),
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ),
     ) {
         Text(
             text = text,

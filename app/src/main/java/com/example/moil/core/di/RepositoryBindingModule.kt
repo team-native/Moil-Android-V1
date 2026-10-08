@@ -22,9 +22,7 @@ abstract class RepositoryBindingModule {
     abstract fun bindAuthRepository(implementation: AuthRepositoryImpl): AuthRepository
 
     @Binds
-    abstract fun bindCurrentUserProfileStore(
-        implementation: DefaultCurrentUserProfileStore,
-    ): CurrentUserProfileStore
+    abstract fun bindCurrentUserProfileStore(implementation: DefaultCurrentUserProfileStore): CurrentUserProfileStore
 
     @Binds
     abstract fun bindGroupRepository(implementation: GroupRepositoryImpl): GroupRepository

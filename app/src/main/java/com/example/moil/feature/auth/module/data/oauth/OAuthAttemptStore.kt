@@ -11,28 +11,34 @@ data class OAuthAttempt(
 
 /** 인증 시도에 필요한 일회성 문자열만 보관하며 Activity나 callback을 저장하지 않습니다. */
 @Singleton
-class OAuthAttemptStore @Inject constructor() {
-    private var currentAttempt: OAuthAttempt? = null
+class OAuthAttemptStore
+    @Inject
+    constructor() {
+        private var currentAttempt: OAuthAttempt? = null
 
-    @Synchronized
-    fun replace(attempt: OAuthAttempt) {
-        currentAttempt = attempt
-    }
+        @Synchronized
+        fun replace(attempt: OAuthAttempt) {
+            currentAttempt = attempt
+        }
 
-    @Synchronized
-    fun consume(provider: SocialLoginProvider, state: String): Boolean {
-        val attempt = currentAttempt
-        val isMatchingAttempt = attempt?.let { storedAttempt ->
-            storedAttempt.provider == provider && storedAttempt.state == state
-        } ?: false
-        if (isMatchingAttempt) {
+        @Synchronized
+        fun consume(
+            provider: SocialLoginProvider,
+            state: String,
+        ): Boolean {
+            val attempt = currentAttempt
+            val isMatchingAttempt =
+                attempt?.let { storedAttempt ->
+                    storedAttempt.provider == provider && storedAttempt.state == state
+                } ?: false
+            if (isMatchingAttempt) {
+                currentAttempt = null
+            }
+            return isMatchingAttempt
+        }
+
+        @Synchronized
+        fun clear() {
             currentAttempt = null
         }
-        return isMatchingAttempt
     }
-
-    @Synchronized
-    fun clear() {
-        currentAttempt = null
-    }
-}

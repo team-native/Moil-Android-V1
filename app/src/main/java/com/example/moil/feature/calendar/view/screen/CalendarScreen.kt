@@ -27,10 +27,11 @@ fun CalendarScreen(
 private fun CalendarScreenPreview() {
     MoilTheme(darkTheme = false) {
         CalendarScreen(
-            uiState = CalendarUiState(
-                displayedMonth = YearMonth.of(2026, 7),
-                selectedDate = LocalDate.of(2026, 7, 22),
-            ),
+            uiState =
+                CalendarUiState(
+                    displayedMonth = YearMonth.of(2026, 7),
+                    selectedDate = LocalDate.of(2026, 7, 22),
+                ),
             onEvent = {},
         )
     }
@@ -41,11 +42,12 @@ private fun CalendarScreenPreview() {
 private fun CalendarGroupMenuPreview() {
     MoilTheme(darkTheme = false) {
         CalendarScreen(
-            uiState = CalendarUiState(
-                displayedMonth = YearMonth.of(2026, 7),
-                selectedDate = LocalDate.of(2026, 7, 22),
-                isGroupMenuVisible = true,
-            ),
+            uiState =
+                CalendarUiState(
+                    displayedMonth = YearMonth.of(2026, 7),
+                    selectedDate = LocalDate.of(2026, 7, 22),
+                    isGroupMenuVisible = true,
+                ),
             onEvent = {},
         )
     }
@@ -56,11 +58,12 @@ private fun CalendarGroupMenuPreview() {
 private fun CalendarScheduleSheetVisiblePreview() {
     MoilTheme(darkTheme = false) {
         CalendarScreen(
-            uiState = CalendarUiState(
-                displayedMonth = YearMonth.of(2026, 7),
-                selectedDate = LocalDate.of(2026, 7, 22),
-                isScheduleSheetVisible = true,
-            ),
+            uiState =
+                CalendarUiState(
+                    displayedMonth = YearMonth.of(2026, 7),
+                    selectedDate = LocalDate.of(2026, 7, 22),
+                    isScheduleSheetVisible = true,
+                ),
             onEvent = {},
         )
     }

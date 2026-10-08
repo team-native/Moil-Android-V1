@@ -10,20 +10,22 @@ import org.junit.Test
 class SignUpValidationTest {
     @Test
     fun canLogin_acceptsValidEmailAndPasswordWithAtLeastEightCharacters() {
-        val loginUiState = LoginUiState(
-            email = "user@example.com",
-            password = "12345678",
-        )
+        val loginUiState =
+            LoginUiState(
+                email = "user@example.com",
+                password = "12345678",
+            )
 
         assertTrue(loginUiState.canLogin())
     }
 
     @Test
     fun canLogin_rejectsInvalidEmail() {
-        val loginUiState = LoginUiState(
-            email = "invalid-email",
-            password = "12345678",
-        )
+        val loginUiState =
+            LoginUiState(
+                email = "invalid-email",
+                password = "12345678",
+            )
 
         assertFalse(loginUiState.canLogin())
     }
@@ -46,20 +48,22 @@ class SignUpValidationTest {
 
     @Test
     fun canCreateAccount_acceptsMatchingPasswordWithAtLeastEightCharacters() {
-        val signUpUiState = SignUpUiState(
-            password = "12345678",
-            passwordConfirmation = "12345678",
-        )
+        val signUpUiState =
+            SignUpUiState(
+                password = "12345678",
+                passwordConfirmation = "12345678",
+            )
 
         assertTrue(signUpUiState.canCreateAccount())
     }
 
     @Test
     fun canCreateAccount_rejectsMismatchedPasswordConfirmation() {
-        val signUpUiState = SignUpUiState(
-            password = "12345678",
-            passwordConfirmation = "87654321",
-        )
+        val signUpUiState =
+            SignUpUiState(
+                password = "12345678",
+                passwordConfirmation = "87654321",
+            )
 
         assertFalse(signUpUiState.canCreateAccount())
     }

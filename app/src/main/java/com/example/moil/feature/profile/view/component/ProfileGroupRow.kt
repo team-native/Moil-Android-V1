@@ -34,26 +34,29 @@ internal fun ProfileGroupRow(
     showDivider: Boolean,
     onClick: () -> Unit,
 ) {
-    val groupChevronDrawableRes = if (LocalMoilIsDarkTheme.current) {
-        R.drawable.common_chevron_next_dark
-    } else {
-        R.drawable.common_chevron_next
-    }
+    val groupChevronDrawableRes =
+        if (LocalMoilIsDarkTheme.current) {
+            R.drawable.common_chevron_next_dark
+        } else {
+            R.drawable.common_chevron_next
+        }
 
     Column {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(MoilProfileDimension.GroupRowHeight)
-                .clickable(onClick = onClick)
-                .padding(horizontal = MoilProfileDimension.GroupRowHorizontalPadding),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(MoilProfileDimension.GroupRowHeight)
+                    .clickable(onClick = onClick)
+                    .padding(horizontal = MoilProfileDimension.GroupRowHorizontalPadding),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Spacer(
-                modifier = Modifier
-                    .size(MoilProfileDimension.GroupIndicatorSize)
-                    .clip(CircleShape)
-                    .background(profileGroupIndicatorColor(group.indicator)),
+                modifier =
+                    Modifier
+                        .size(MoilProfileDimension.GroupIndicatorSize)
+                        .clip(CircleShape)
+                        .background(profileGroupIndicatorColor(group.indicator)),
             )
 
             Spacer(modifier = Modifier.width(MoilProfileDimension.GroupRowContentSpacing))
@@ -67,10 +70,11 @@ internal fun ProfileGroupRow(
             Image(
                 painter = painterResource(groupChevronDrawableRes),
                 contentDescription = null,
-                modifier = Modifier.size(
-                    width = MoilProfileDimension.ChevronWidth,
-                    height = MoilProfileDimension.ChevronHeight,
-                ),
+                modifier =
+                    Modifier.size(
+                        width = MoilProfileDimension.ChevronWidth,
+                        height = MoilProfileDimension.ChevronHeight,
+                    ),
                 contentScale = ContentScale.Fit,
             )
         }
@@ -82,7 +86,8 @@ internal fun ProfileGroupRow(
 }
 
 @Composable
-private fun profileGroupIndicatorColor(indicator: ProfileGroupIndicator) = when (indicator) {
-    ProfileGroupIndicator.Primary -> LocalMoilExtraColors.current.profileGroupPrimaryIndicator
-    ProfileGroupIndicator.Secondary -> LocalMoilExtraColors.current.profileGroupSecondaryIndicator
-}
+private fun profileGroupIndicatorColor(indicator: ProfileGroupIndicator) =
+    when (indicator) {
+        ProfileGroupIndicator.Primary -> LocalMoilExtraColors.current.profileGroupPrimaryIndicator
+        ProfileGroupIndicator.Secondary -> LocalMoilExtraColors.current.profileGroupSecondaryIndicator
+    }

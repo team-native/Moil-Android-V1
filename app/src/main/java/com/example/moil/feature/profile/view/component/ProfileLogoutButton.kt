@@ -25,11 +25,12 @@ internal fun ProfileLogoutButton(onClick: () -> Unit) {
         color = LocalMoilExtraColors.current.overlaySurface,
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(MoilProfileDimension.LogoutHeight)
-                .clickable(onClick = onClick)
-                .padding(horizontal = MoilProfileDimension.GroupRowHorizontalPadding),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(MoilProfileDimension.LogoutHeight)
+                    .clickable(onClick = onClick)
+                    .padding(horizontal = MoilProfileDimension.GroupRowHorizontalPadding),
             contentAlignment = Alignment.Center,
         ) {
             Text(

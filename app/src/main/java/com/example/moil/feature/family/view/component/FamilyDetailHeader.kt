@@ -29,9 +29,10 @@ internal fun FamilyDetailHeader(
         // Keep the group name centered independently from the fixed back button.
         Text(
             text = groupName,
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.Center),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center),
             style = MaterialTheme.typography.headlineMedium,
             textAlign = TextAlign.Center,
         )
@@ -39,14 +40,23 @@ internal fun FamilyDetailHeader(
         Image(
             painter = painterResource(R.drawable.common_chevron_back),
             contentDescription = stringResource(R.string.common_back),
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .size(MoilGroupDetailDimension.HeaderIconTouchTarget)
-                .clickable(onClick = onBackClick)
-                .padding(
-                    horizontal = (MoilGroupDetailDimension.HeaderIconTouchTarget - MoilGroupDetailDimension.HeaderIconWidth) / 2,
-                    vertical = (MoilGroupDetailDimension.HeaderIconTouchTarget - MoilGroupDetailDimension.HeaderIconHeight) / 2,
-                ),
+            modifier =
+                Modifier
+                    .align(Alignment.CenterStart)
+                    .size(MoilGroupDetailDimension.HeaderIconTouchTarget)
+                    .clickable(onClick = onBackClick)
+                    .padding(
+                        horizontal =
+                            (
+                                MoilGroupDetailDimension.HeaderIconTouchTarget -
+                                    MoilGroupDetailDimension.HeaderIconWidth
+                            ) / 2,
+                        vertical =
+                            (
+                                MoilGroupDetailDimension.HeaderIconTouchTarget -
+                                    MoilGroupDetailDimension.HeaderIconHeight
+                            ) / 2,
+                    ),
             contentScale = ContentScale.Fit,
         )
     }

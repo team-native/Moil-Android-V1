@@ -11,8 +11,6 @@ import com.example.moil.feature.event.module.domain.usecase.GetEventUseCase
 import com.example.moil.feature.event.module.domain.usecase.GetGroupEventsUseCase
 import com.example.moil.feature.event.module.domain.usecase.UpdateEventUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.YearMonth
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -20,10 +18,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.YearMonth
+import javax.inject.Inject
 
 sealed interface CalendarEffect {
     data object ScheduleCreated : CalendarEffect
-    data class ScheduleUpdated(val eventId: Long) : CalendarEffect
+
+    data class ScheduleUpdated(
+        val eventId: Long,
+    ) : CalendarEffect
+
     data object ScheduleDeleted : CalendarEffect
 }
 
@@ -42,202 +46,227 @@ data class CalendarRemoteUiState(
 )
 
 @HiltViewModel
-class CalendarViewModel @Inject constructor(
-    private val getGroupEventsUseCase: GetGroupEventsUseCase,
-    private val createEventUseCase: CreateEventUseCase,
-    private val getEventUseCase: GetEventUseCase,
-    private val updateEventUseCase: UpdateEventUseCase,
-    private val deleteEventUseCase: DeleteEventUseCase,
-) : ViewModel() {
-    private val mutableUiState = MutableStateFlow(CalendarRemoteUiState())
-    val uiState: StateFlow<CalendarRemoteUiState> = mutableUiState.asStateFlow()
+class CalendarViewModel
+    @Inject
+    constructor(
+        private val getGroupEventsUseCase: GetGroupEventsUseCase,
+        private val createEventUseCase: CreateEventUseCase,
+        private val getEventUseCase: GetEventUseCase,
+        private val updateEventUseCase: UpdateEventUseCase,
+        private val deleteEventUseCase: DeleteEventUseCase,
+    ) : ViewModel() {
+        private val mutableUiState = MutableStateFlow(CalendarRemoteUiState())
+        val uiState: StateFlow<CalendarRemoteUiState> = mutableUiState.asStateFlow()
 
-    private val mutableEffects = MutableSharedFlow<CalendarEffect>()
-    val effects: SharedFlow<CalendarEffect> = mutableEffects.asSharedFlow()
+        private val mutableEffects = MutableSharedFlow<CalendarEffect>()
+        val effects: SharedFlow<CalendarEffect> = mutableEffects.asSharedFlow()
 
-    /** 그룹 선택 이벤트에서 서버의 표시 월 일정과 기기 현재 달 건수를 조회합니다. */
-    fun selectGroup(groupId: Long) {
-        mutableUiState.value = mutableUiState.value.copy(
-            selectedGroupId = groupId,
-            events = emptyList(),
-            currentMonthEventCount = 0,
-            selectedEvent = null,
-            selectedEventError = null,
-            error = null,
-        )
-        loadDisplayedMonthEvents()
-
-        if (mutableUiState.value.displayedMonth != YearMonth.now()) {
-            loadCurrentMonthEventCount()
-        }
-    }
-
-    /** 월 이동 이벤트에서 서버의 표시 월 일정을 새로 조회합니다. */
-    fun selectMonth(month: YearMonth) {
-        mutableUiState.value = mutableUiState.value.copy(
-            displayedMonth = month,
-            events = emptyList(),
-            error = null,
-        )
-        loadDisplayedMonthEvents()
-    }
-
-    /** 표시 월 조회 이벤트에서 서버 일정을 상태에 반영하고, 실패 시 목록을 비웁니다. */
-    private fun loadDisplayedMonthEvents() = viewModelScope.launch {
-        val state = mutableUiState.value
-        val groupId = state.selectedGroupId ?: return@launch
-
-        mutableUiState.value = state.copy(isLoading = true, error = null)
-
-        when (val result = getGroupEventsUseCase(groupId, state.displayedMonth)) {
-            is MoilResult.Success -> {
-                mutableUiState.value = mutableUiState.value.copy(
-                    events = result.value,
-                    currentMonthEventCount = if (state.displayedMonth == YearMonth.now()) {
-                        result.value.size
-                    } else {
-                        mutableUiState.value.currentMonthEventCount
-                    },
-                    isLoading = false,
-                )
-            }
-
-            is MoilResult.Failure -> {
-                mutableUiState.value = mutableUiState.value.copy(
+        /** 그룹 선택 이벤트에서 서버의 표시 월 일정과 기기 현재 달 건수를 조회합니다. */
+        fun selectGroup(groupId: Long) {
+            mutableUiState.value =
+                mutableUiState.value.copy(
+                    selectedGroupId = groupId,
                     events = emptyList(),
                     currentMonthEventCount = 0,
-                    isLoading = false,
-                    error = result.error,
+                    selectedEvent = null,
+                    selectedEventError = null,
+                    error = null,
                 )
+            loadDisplayedMonthEvents()
+
+            if (mutableUiState.value.displayedMonth != YearMonth.now()) {
+                loadCurrentMonthEventCount()
+            }
+        }
+
+        /** 월 이동 이벤트에서 서버의 표시 월 일정을 새로 조회합니다. */
+        fun selectMonth(month: YearMonth) {
+            mutableUiState.value =
+                mutableUiState.value.copy(
+                    displayedMonth = month,
+                    events = emptyList(),
+                    error = null,
+                )
+            loadDisplayedMonthEvents()
+        }
+
+        /** 표시 월 조회 이벤트에서 서버 일정을 상태에 반영하고, 실패 시 목록을 비웁니다. */
+        private fun loadDisplayedMonthEvents() =
+            viewModelScope.launch {
+                val state = mutableUiState.value
+                val groupId = state.selectedGroupId ?: return@launch
+
+                mutableUiState.value = state.copy(isLoading = true, error = null)
+
+                when (val result = getGroupEventsUseCase(groupId, state.displayedMonth)) {
+                    is MoilResult.Success -> {
+                        mutableUiState.value =
+                            mutableUiState.value.copy(
+                                events = result.value,
+                                currentMonthEventCount =
+                                    if (state.displayedMonth == YearMonth.now()) {
+                                        result.value.size
+                                    } else {
+                                        mutableUiState.value.currentMonthEventCount
+                                    },
+                                isLoading = false,
+                            )
+                    }
+
+                    is MoilResult.Failure -> {
+                        mutableUiState.value =
+                            mutableUiState.value.copy(
+                                events = emptyList(),
+                                currentMonthEventCount = 0,
+                                isLoading = false,
+                                error = result.error,
+                            )
+                    }
+                }
+            }
+
+        /** 일정 생성 요청을 실행하고 성공 시 목록을 새로 조회한 뒤 일회성 효과를 보냅니다. */
+        fun createEvent(
+            event: GroupEvent,
+            sharedMemberIds: List<Long>,
+        ) = viewModelScope.launch {
+            val groupId = mutableUiState.value.selectedGroupId ?: return@launch
+            mutableUiState.value =
+                mutableUiState.value.copy(
+                    isMutationLoading = true,
+                    mutationError = null,
+                )
+
+            when (val result = createEventUseCase(event, groupId, sharedMemberIds)) {
+                is MoilResult.Success -> {
+                    mutableUiState.value = mutableUiState.value.copy(isMutationLoading = false)
+                    refreshCalendarDataAfterMutation()
+                    mutableEffects.emit(CalendarEffect.ScheduleCreated)
+                }
+
+                is MoilResult.Failure -> {
+                    mutableUiState.value =
+                        mutableUiState.value.copy(
+                            isMutationLoading = false,
+                            mutationError = result.error,
+                        )
+                }
+            }
+        }
+
+        /** 일정 상세 조회 요청을 실행해 목록보다 최신인 서버 상세 데이터를 표시합니다. */
+        fun loadEvent(eventId: Long) =
+            viewModelScope.launch {
+                mutableUiState.value =
+                    mutableUiState.value.copy(
+                        selectedEvent = null,
+                        isSelectedEventLoading = true,
+                        selectedEventError = null,
+                    )
+
+                when (val result = getEventUseCase(eventId)) {
+                    is MoilResult.Success -> {
+                        mutableUiState.value =
+                            mutableUiState.value.copy(
+                                selectedEvent = result.value,
+                                isSelectedEventLoading = false,
+                            )
+                    }
+
+                    is MoilResult.Failure -> {
+                        mutableUiState.value =
+                            mutableUiState.value.copy(
+                                isSelectedEventLoading = false,
+                                selectedEventError = result.error,
+                            )
+                    }
+                }
+            }
+
+        /** 일정 수정 요청을 실행하고 성공 시 상세 데이터를 다시 조회합니다. */
+        fun updateEvent(
+            eventId: Long,
+            event: GroupEvent,
+            sharedMemberIds: List<Long>,
+        ) = viewModelScope.launch {
+            mutableUiState.value =
+                mutableUiState.value.copy(
+                    isMutationLoading = true,
+                    mutationError = null,
+                )
+
+            when (val result = updateEventUseCase(eventId, event, sharedMemberIds)) {
+                is MoilResult.Success -> {
+                    mutableUiState.value = mutableUiState.value.copy(isMutationLoading = false)
+                    refreshCalendarDataAfterMutation()
+                    mutableEffects.emit(CalendarEffect.ScheduleUpdated(eventId))
+                }
+
+                is MoilResult.Failure -> {
+                    mutableUiState.value =
+                        mutableUiState.value.copy(
+                            isMutationLoading = false,
+                            mutationError = result.error,
+                        )
+                }
+            }
+        }
+
+        /** 일정 삭제 요청을 실행하고 성공 시 목록을 새로 조회한 뒤 시트를 닫습니다. */
+        fun deleteEvent(eventId: Long) =
+            viewModelScope.launch {
+                mutableUiState.value =
+                    mutableUiState.value.copy(
+                        isMutationLoading = true,
+                        mutationError = null,
+                    )
+
+                when (val result = deleteEventUseCase(eventId)) {
+                    is MoilResult.Success -> {
+                        mutableUiState.value = mutableUiState.value.copy(isMutationLoading = false)
+                        refreshCalendarDataAfterMutation()
+                        mutableEffects.emit(CalendarEffect.ScheduleDeleted)
+                    }
+
+                    is MoilResult.Failure -> {
+                        mutableUiState.value =
+                            mutableUiState.value.copy(
+                                isMutationLoading = false,
+                                mutationError = result.error,
+                            )
+                    }
+                }
+            }
+
+        /** 기기 현재 달 일정 수 조회가 실패하면 가족 화면의 건수를 0으로 초기화합니다. */
+        private fun loadCurrentMonthEventCount() =
+            viewModelScope.launch {
+                val groupId = mutableUiState.value.selectedGroupId ?: return@launch
+                val currentMonth = YearMonth.now()
+
+                when (val result = getGroupEventsUseCase(groupId, currentMonth)) {
+                    is MoilResult.Success -> {
+                        mutableUiState.value =
+                            mutableUiState.value.copy(
+                                currentMonthEventCount = result.value.size,
+                            )
+                    }
+
+                    is MoilResult.Failure -> {
+                        mutableUiState.value =
+                            mutableUiState.value.copy(
+                                currentMonthEventCount = 0,
+                                error = result.error,
+                            )
+                    }
+                }
+            }
+
+        private fun refreshCalendarDataAfterMutation() {
+            loadDisplayedMonthEvents()
+
+            if (mutableUiState.value.displayedMonth != YearMonth.now()) {
+                loadCurrentMonthEventCount()
             }
         }
     }
-
-    /** 일정 생성 요청을 실행하고 성공 시 목록을 새로 조회한 뒤 일회성 효과를 보냅니다. */
-    fun createEvent(event: GroupEvent, sharedMemberIds: List<Long>) = viewModelScope.launch {
-        val groupId = mutableUiState.value.selectedGroupId ?: return@launch
-        mutableUiState.value = mutableUiState.value.copy(
-            isMutationLoading = true,
-            mutationError = null,
-        )
-
-        when (val result = createEventUseCase(event, groupId, sharedMemberIds)) {
-            is MoilResult.Success -> {
-                mutableUiState.value = mutableUiState.value.copy(isMutationLoading = false)
-                refreshCalendarDataAfterMutation()
-                mutableEffects.emit(CalendarEffect.ScheduleCreated)
-            }
-
-            is MoilResult.Failure -> {
-                mutableUiState.value = mutableUiState.value.copy(
-                    isMutationLoading = false,
-                    mutationError = result.error,
-                )
-            }
-        }
-    }
-
-    /** 일정 상세 조회 요청을 실행해 목록보다 최신인 서버 상세 데이터를 표시합니다. */
-    fun loadEvent(eventId: Long) = viewModelScope.launch {
-        mutableUiState.value = mutableUiState.value.copy(
-            selectedEvent = null,
-            isSelectedEventLoading = true,
-            selectedEventError = null,
-        )
-
-        when (val result = getEventUseCase(eventId)) {
-            is MoilResult.Success -> {
-                mutableUiState.value = mutableUiState.value.copy(
-                    selectedEvent = result.value,
-                    isSelectedEventLoading = false,
-                )
-            }
-
-            is MoilResult.Failure -> {
-                mutableUiState.value = mutableUiState.value.copy(
-                    isSelectedEventLoading = false,
-                    selectedEventError = result.error,
-                )
-            }
-        }
-    }
-
-    /** 일정 수정 요청을 실행하고 성공 시 상세 데이터를 다시 조회합니다. */
-    fun updateEvent(
-        eventId: Long,
-        event: GroupEvent,
-        sharedMemberIds: List<Long>,
-    ) = viewModelScope.launch {
-        mutableUiState.value = mutableUiState.value.copy(
-            isMutationLoading = true,
-            mutationError = null,
-        )
-
-        when (val result = updateEventUseCase(eventId, event, sharedMemberIds)) {
-            is MoilResult.Success -> {
-                mutableUiState.value = mutableUiState.value.copy(isMutationLoading = false)
-                refreshCalendarDataAfterMutation()
-                mutableEffects.emit(CalendarEffect.ScheduleUpdated(eventId))
-            }
-
-            is MoilResult.Failure -> {
-                mutableUiState.value = mutableUiState.value.copy(
-                    isMutationLoading = false,
-                    mutationError = result.error,
-                )
-            }
-        }
-    }
-
-    /** 일정 삭제 요청을 실행하고 성공 시 목록을 새로 조회한 뒤 시트를 닫습니다. */
-    fun deleteEvent(eventId: Long) = viewModelScope.launch {
-        mutableUiState.value = mutableUiState.value.copy(
-            isMutationLoading = true,
-            mutationError = null,
-        )
-
-        when (val result = deleteEventUseCase(eventId)) {
-            is MoilResult.Success -> {
-                mutableUiState.value = mutableUiState.value.copy(isMutationLoading = false)
-                refreshCalendarDataAfterMutation()
-                mutableEffects.emit(CalendarEffect.ScheduleDeleted)
-            }
-
-            is MoilResult.Failure -> {
-                mutableUiState.value = mutableUiState.value.copy(
-                    isMutationLoading = false,
-                    mutationError = result.error,
-                )
-            }
-        }
-    }
-
-    /** 기기 현재 달 일정 수 조회가 실패하면 가족 화면의 건수를 0으로 초기화합니다. */
-    private fun loadCurrentMonthEventCount() = viewModelScope.launch {
-        val groupId = mutableUiState.value.selectedGroupId ?: return@launch
-        val currentMonth = YearMonth.now()
-
-        when (val result = getGroupEventsUseCase(groupId, currentMonth)) {
-            is MoilResult.Success -> {
-                mutableUiState.value = mutableUiState.value.copy(
-                    currentMonthEventCount = result.value.size,
-                )
-            }
-
-            is MoilResult.Failure -> {
-                mutableUiState.value = mutableUiState.value.copy(
-                    currentMonthEventCount = 0,
-                    error = result.error,
-                )
-            }
-        }
-    }
-
-    private fun refreshCalendarDataAfterMutation() {
-        loadDisplayedMonthEvents()
-
-        if (mutableUiState.value.displayedMonth != YearMonth.now()) {
-            loadCurrentMonthEventCount()
-        }
-    }
-}

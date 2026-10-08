@@ -47,14 +47,14 @@ internal fun FamilyScreenContent(
         containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(
-                    horizontal = MoilGroupDetailDimension.ScreenHorizontalPadding,
-                    vertical = MoilGroupDetailDimension.ContentTopPadding,
-                )
-                .verticalScroll(rememberScrollState()),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(
+                        horizontal = MoilGroupDetailDimension.ScreenHorizontalPadding,
+                        vertical = MoilGroupDetailDimension.ContentTopPadding,
+                    ).verticalScroll(rememberScrollState()),
         ) {
             FamilyDetailHeader(
                 groupName = groupDisplayName(selectedGroup),
@@ -87,10 +87,11 @@ internal fun FamilyScreenContent(
 
             Text(
                 text = stringResource(R.string.family_group_leave),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onEvent(FamilyScreenEvent.BackClicked) }
-                    .padding(vertical = MoilGroupDetailDimension.LeaveActionVerticalPadding),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable { onEvent(FamilyScreenEvent.BackClicked) }
+                        .padding(vertical = MoilGroupDetailDimension.LeaveActionVerticalPadding),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.titleSmall,
                 textAlign = TextAlign.Center,

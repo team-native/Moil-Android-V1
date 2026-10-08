@@ -8,15 +8,16 @@ object RemoteImageUrlResolver {
     private val imageKeyPattern = Regex("^[A-Za-z0-9._~-]+$")
 
     fun resolve(imagePath: String?): String? {
-        val imageKey = imagePath
-            ?.let(::runCatchingUri)
-            ?.path
-            ?.split('/')
-            ?.filter(String::isNotBlank)
-            ?.takeIf { segments -> segments.size == 2 && segments.first() == "image" }
-            ?.last()
-            ?.takeIf(imageKeyPattern::matches)
-            ?: return null
+        val imageKey =
+            imagePath
+                ?.let(::runCatchingUri)
+                ?.path
+                ?.split('/')
+                ?.filter(String::isNotBlank)
+                ?.takeIf { segments -> segments.size == 2 && segments.first() == "image" }
+                ?.last()
+                ?.takeIf(imageKeyPattern::matches)
+                ?: return null
 
         val baseUri = URI(BuildConfig.BASE_URL)
         return URI(

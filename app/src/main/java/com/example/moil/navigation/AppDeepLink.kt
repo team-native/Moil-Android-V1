@@ -5,7 +5,9 @@ import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 
 sealed interface AppDeepLink {
-    data class JoinGroup(val groupId: Long) : AppDeepLink
+    data class JoinGroup(
+        val groupId: Long,
+    ) : AppDeepLink
 
     data class OAuthCallback(
         val provider: String,
@@ -35,28 +37,31 @@ object AppDeepLinkParser {
     }
 
     private fun parseJoinGroup(uri: URI): AppDeepLink.JoinGroup? {
-        val groupId = uri.path
-            .split('/')
-            .filter(String::isNotBlank)
-            .takeIf { segments -> segments.size == 1 }
-            ?.firstOrNull()
-            ?.toLongOrNull()
-            ?.takeIf { candidateId -> candidateId > 0L }
-            ?: return null
+        val groupId =
+            uri.path
+                .split('/')
+                .filter(String::isNotBlank)
+                .takeIf { segments -> segments.size == 1 }
+                ?.firstOrNull()
+                ?.toLongOrNull()
+                ?.takeIf { candidateId -> candidateId > 0L }
+                ?: return null
 
         return AppDeepLink.JoinGroup(groupId)
     }
 
     private fun parseOAuthCallback(uri: URI): AppDeepLink? {
-        val pathSegments = uri.path
-            .split('/')
-            .filter(String::isNotBlank)
-        val provider = pathSegments
-            .takeIf { segments -> segments.size == 2 && segments.last() == "callback" }
-            ?.firstOrNull()
-            ?.lowercase()
-            ?.takeIf { candidateProvider -> candidateProvider in SUPPORTED_PROVIDERS }
-            ?: return null
+        val pathSegments =
+            uri.path
+                .split('/')
+                .filter(String::isNotBlank)
+        val provider =
+            pathSegments
+                .takeIf { segments -> segments.size == 2 && segments.last() == "callback" }
+                ?.firstOrNull()
+                ?.lowercase()
+                ?.takeIf { candidateProvider -> candidateProvider in SUPPORTED_PROVIDERS }
+                ?: return null
         val state = uri.queryParameter("state")?.takeIf(String::isNotBlank)
         if (uri.queryParameter("error") != null) {
             return AppDeepLink.OAuthFailure(provider = provider, state = state)
@@ -74,11 +79,12 @@ object AppDeepLinkParser {
         )
     }
 
-    private fun URI.queryParameter(name: String): String? = rawQuery
-        ?.split('&')
-        ?.firstOrNull { parameter -> parameter.substringBefore('=') == name }
-        ?.substringAfter('=', missingDelimiterValue = "")
-        ?.let { encodedValue -> URLDecoder.decode(encodedValue, StandardCharsets.UTF_8) }
+    private fun URI.queryParameter(name: String): String? =
+        rawQuery
+            ?.split('&')
+            ?.firstOrNull { parameter -> parameter.substringBefore('=') == name }
+            ?.substringAfter('=', missingDelimiterValue = "")
+            ?.let { encodedValue -> URLDecoder.decode(encodedValue, StandardCharsets.UTF_8) }
 
     private fun runCatchingUri(value: String): URI? = runCatching { URI(value) }.getOrNull()
 

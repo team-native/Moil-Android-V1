@@ -26,10 +26,11 @@ internal fun ScheduleAllDayRow(
 ) {
     Column {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(MoilScheduleSheet.AllDayRowHeight - 1.dp)
-                .padding(horizontal = MoilScheduleSheet.HorizontalPadding),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(MoilScheduleSheet.AllDayRowHeight - 1.dp)
+                    .padding(horizontal = MoilScheduleSheet.HorizontalPadding),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(

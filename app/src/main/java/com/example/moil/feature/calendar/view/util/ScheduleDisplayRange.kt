@@ -12,19 +12,29 @@ internal fun LocalTime.toScheduleDisplayTime(): String = toKoreanTimeDisplay()
 internal fun formatScheduleTimeRange(
     startTime: LocalTime?,
     endTime: LocalTime?,
-): String = when {
-    startTime == null && endTime == null -> stringResource(R.string.schedule_all_day)
-    startTime != null && endTime != null -> stringResource(
-        R.string.schedule_time_range,
-        startTime.toKoreanTimeDisplay(),
-        endTime.toKoreanTimeDisplay(),
-    )
-    else -> stringResource(R.string.schedule_time_unknown)
-}
+): String =
+    when {
+        startTime == null && endTime == null -> {
+            stringResource(R.string.schedule_all_day)
+        }
+
+        startTime != null && endTime != null -> {
+            stringResource(
+                R.string.schedule_time_range,
+                startTime.toKoreanTimeDisplay(),
+                endTime.toKoreanTimeDisplay(),
+            )
+        }
+
+        else -> {
+            stringResource(R.string.schedule_time_unknown)
+        }
+    }
 
 @Composable
-internal fun LocalTime.toShortScheduleTime(): String = stringResource(
-    R.string.schedule_time_short,
-    hour,
-    minute,
-)
+internal fun LocalTime.toShortScheduleTime(): String =
+    stringResource(
+        R.string.schedule_time_short,
+        hour,
+        minute,
+    )

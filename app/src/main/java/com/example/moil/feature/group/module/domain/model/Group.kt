@@ -33,7 +33,12 @@ data class GroupMemberProfile(
     val imagePath: String? = null,
 )
 
-data class InviteVerification(val groupId: Long, val groupName: String, val memberCount: Int, val inviteCode: String)
+data class InviteVerification(
+    val groupId: Long,
+    val groupName: String,
+    val memberCount: Int,
+    val inviteCode: String,
+)
 
 data class GroupDetail(
     val id: Long,
@@ -45,38 +50,42 @@ data class GroupDetail(
     val members: List<GroupMember>,
 )
 
-fun String.toGroupRole(): GroupRole = when (uppercase()) {
-    "OWNER" -> GroupRole.Owner
-    "ADMIN" -> GroupRole.Admin
-    "MEMBER" -> GroupRole.Member
-    else -> GroupRole.Unknown
-}
+fun String.toGroupRole(): GroupRole =
+    when (uppercase()) {
+        "OWNER" -> GroupRole.Owner
+        "ADMIN" -> GroupRole.Admin
+        "MEMBER" -> GroupRole.Member
+        else -> GroupRole.Unknown
+    }
 
-fun GroupRole.toWireValue(): String = when (this) {
-    GroupRole.Owner -> "OWNER"
-    GroupRole.Admin -> "ADMIN"
-    GroupRole.Member -> "MEMBER"
-    GroupRole.Unknown -> error("알 수 없는 역할은 권한 요청에 사용할 수 없습니다.")
-}
+fun GroupRole.toWireValue(): String =
+    when (this) {
+        GroupRole.Owner -> "OWNER"
+        GroupRole.Admin -> "ADMIN"
+        GroupRole.Member -> "MEMBER"
+        GroupRole.Unknown -> error("알 수 없는 역할은 권한 요청에 사용할 수 없습니다.")
+    }
 
-fun String.toGroupColor(): GroupColor = when (uppercase()) {
-    "SKY" -> GroupColor.Sky
-    "RED" -> GroupColor.Red
-    "GREEN" -> GroupColor.Green
-    "YELLOW" -> GroupColor.Yellow
-    "TEAL" -> GroupColor.Teal
-    "VIOLET" -> GroupColor.Violet
-    "MAGENTA" -> GroupColor.Magenta
-    else -> GroupColor.Unknown
-}
+fun String.toGroupColor(): GroupColor =
+    when (uppercase()) {
+        "SKY" -> GroupColor.Sky
+        "RED" -> GroupColor.Red
+        "GREEN" -> GroupColor.Green
+        "YELLOW" -> GroupColor.Yellow
+        "TEAL" -> GroupColor.Teal
+        "VIOLET" -> GroupColor.Violet
+        "MAGENTA" -> GroupColor.Magenta
+        else -> GroupColor.Unknown
+    }
 
-fun GroupColor.toWireValue(): String = when (this) {
-    GroupColor.Sky -> "SKY"
-    GroupColor.Red -> "RED"
-    GroupColor.Green -> "GREEN"
-    GroupColor.Yellow -> "YELLOW"
-    GroupColor.Teal -> "TEAL"
-    GroupColor.Violet -> "VIOLET"
-    GroupColor.Magenta -> "MAGENTA"
-    GroupColor.Unknown -> error("알 수 없는 색상은 서버에 전송할 수 없습니다.")
-}
+fun GroupColor.toWireValue(): String =
+    when (this) {
+        GroupColor.Sky -> "SKY"
+        GroupColor.Red -> "RED"
+        GroupColor.Green -> "GREEN"
+        GroupColor.Yellow -> "YELLOW"
+        GroupColor.Teal -> "TEAL"
+        GroupColor.Violet -> "VIOLET"
+        GroupColor.Magenta -> "MAGENTA"
+        GroupColor.Unknown -> error("알 수 없는 색상은 서버에 전송할 수 없습니다.")
+    }

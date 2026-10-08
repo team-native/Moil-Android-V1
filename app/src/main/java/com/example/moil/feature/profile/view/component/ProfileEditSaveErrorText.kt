@@ -10,9 +10,10 @@ import com.example.moil.feature.profile.viewmodel.ProfileEditSaveError
 /** 프로필 저장 실패 상태를 사용자가 재시도할 수 있도록 고정 문구로 안내합니다. */
 @Composable
 internal fun ProfileEditSaveErrorText(error: ProfileEditSaveError) {
-    val messageResId = when (error) {
-        ProfileEditSaveError.SaveFailed -> R.string.profile_edit_save_error
-    }
+    val messageResId =
+        when (error) {
+            ProfileEditSaveError.SaveFailed -> R.string.profile_edit_save_error
+        }
 
     Text(
         text = stringResource(messageResId),

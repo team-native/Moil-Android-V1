@@ -41,9 +41,10 @@ internal fun CalendarTopBarSection(
                 selectedGroupId = selectedGroupId,
                 onGroupClick = onGroupSelected,
                 onDismissRequest = onGroupClick,
-                modifier = Modifier.padding(
-                    top = MoilSpacing.HeaderTop + MoilComponentSize.TopBarItem,
-                ),
+                modifier =
+                    Modifier.padding(
+                        top = MoilSpacing.HeaderTop + MoilComponentSize.TopBarItem,
+                    ),
             )
         }
     }

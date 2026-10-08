@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 enum class MemberRoleRequestDto {
     @SerialName("admin")
     Admin,
+
     @SerialName("member")
     Member,
 }

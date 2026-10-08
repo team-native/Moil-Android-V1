@@ -17,9 +17,10 @@ fun ApplyDialogWindowBackgroundBlur(
     dimAmount: Float? = null,
 ) {
     val dialogWindow = (LocalView.current.parent as? DialogWindowProvider)?.window
-    val blurRadiusPx = with(LocalDensity.current) {
-        blurRadius.toPx().roundToInt()
-    }
+    val blurRadiusPx =
+        with(LocalDensity.current) {
+            blurRadius.toPx().roundToInt()
+        }
 
     DisposableEffect(dialogWindow, blurRadiusPx, dimAmount) {
         dialogWindow?.apply {
@@ -43,10 +44,11 @@ fun ApplyDialogWindowBackgroundBlur(
 fun Modifier.applyDialogBackdropBlur(
     shouldBlur: Boolean,
     blurRadius: Dp,
-): Modifier = if (shouldBlur) {
-    blur(blurRadius)
-} else {
-    this
-}
+): Modifier =
+    if (shouldBlur) {
+        blur(blurRadius)
+    } else {
+        this
+    }
 
 private const val NO_BACKGROUND_BLUR_RADIUS = 0

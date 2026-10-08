@@ -26,11 +26,12 @@ internal fun SocialLoginButton(
         enabled = enabled,
         modifier = Modifier.size(52.dp),
         shape = CircleShape,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
-            contentColor = Color.Unspecified,
-            disabledContainerColor = Color.Transparent,
-        ),
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = Color.Unspecified,
+                disabledContainerColor = Color.Transparent,
+            ),
         contentPadding = PaddingValues(0.dp),
     ) {
         Image(
@@ -42,15 +43,17 @@ internal fun SocialLoginButton(
 }
 
 private val SocialLoginProvider.labelRes: Int
-    get() = when (this) {
-        SocialLoginProvider.Google -> R.string.auth_login_google
-        SocialLoginProvider.Kakao -> R.string.auth_login_kakao
-        SocialLoginProvider.Apple -> R.string.auth_login_apple
-    }
+    get() =
+        when (this) {
+            SocialLoginProvider.Google -> R.string.auth_login_google
+            SocialLoginProvider.Kakao -> R.string.auth_login_kakao
+            SocialLoginProvider.Apple -> R.string.auth_login_apple
+        }
 
 private val SocialLoginProvider.iconRes: Int
-    get() = when (this) {
-        SocialLoginProvider.Google -> R.drawable.google
-        SocialLoginProvider.Kakao -> R.drawable.kakao
-        SocialLoginProvider.Apple -> R.drawable.apple
-    }
+    get() =
+        when (this) {
+            SocialLoginProvider.Google -> R.drawable.google
+            SocialLoginProvider.Kakao -> R.drawable.kakao
+            SocialLoginProvider.Apple -> R.drawable.apple
+        }

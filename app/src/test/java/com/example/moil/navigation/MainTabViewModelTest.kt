@@ -16,11 +16,11 @@ import com.example.moil.feature.auth.module.domain.usecase.LogoutUseCase
 import com.example.moil.feature.auth.module.domain.usecase.UpdateProfileNameUseCase
 import com.example.moil.feature.profile.viewmodel.ProfileEditSaveError
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.async
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -46,48 +46,55 @@ class MainTabViewModelTest {
     }
 
     @Test
-    fun `프로필 저장 성공은 전체 프로필을 담은 저장 효과를 발행한다`() = runTest {
-        val profileRepository = FakeAuthRepository(
-            updateProfileResult = MoilResult.Success(UserProfile(1L, "네이티브", "native@example.com")),
-        )
-        val viewModel = MainTabViewModel(
-            logoutUseCase = LogoutUseCase(profileRepository),
-            updateProfileNameUseCase = UpdateProfileNameUseCase(profileRepository),
-            currentUserProfileStore = FakeCurrentUserProfileStore(),
-        )
-        val savedEffect = async(start = CoroutineStart.UNDISPATCHED) {
-            viewModel.profileUpdateEffects.first()
+    fun `프로필 저장 성공은 전체 프로필을 담은 저장 효과를 발행한다`() =
+        runTest {
+            val profileRepository =
+                FakeAuthRepository(
+                    updateProfileResult = MoilResult.Success(UserProfile(1L, "네이티브", "native@example.com")),
+                )
+            val viewModel =
+                MainTabViewModel(
+                    logoutUseCase = LogoutUseCase(profileRepository),
+                    updateProfileNameUseCase = UpdateProfileNameUseCase(profileRepository),
+                    currentUserProfileStore = FakeCurrentUserProfileStore(),
+                )
+            val savedEffect =
+                async(start = CoroutineStart.UNDISPATCHED) {
+                    viewModel.profileUpdateEffects.first()
+                }
+
+            viewModel.updateProfileName("네이티브")
+            advanceUntilIdle()
+
+            assertEquals(ProfileUpdateUiState(), viewModel.profileUpdateUiState.value)
+            assertEquals(
+                ProfileUpdateEffect.Saved(UserProfile(1L, "네이티브", "native@example.com")),
+                savedEffect.await(),
+            )
         }
 
-        viewModel.updateProfileName("네이티브")
-        advanceUntilIdle()
-
-        assertEquals(ProfileUpdateUiState(), viewModel.profileUpdateUiState.value)
-        assertEquals(
-            ProfileUpdateEffect.Saved(UserProfile(1L, "네이티브", "native@example.com")),
-            savedEffect.await(),
-        )
-    }
-
     @Test
-    fun `프로필 저장 실패는 입력을 유지할 수 있는 오류 상태를 남긴다`() = runTest {
-        val profileRepository = FakeAuthRepository(
-            updateProfileResult = MoilResult.Failure(MoilError.Network),
-        )
-        val viewModel = MainTabViewModel(
-            logoutUseCase = LogoutUseCase(profileRepository),
-            updateProfileNameUseCase = UpdateProfileNameUseCase(profileRepository),
-            currentUserProfileStore = FakeCurrentUserProfileStore(),
-        )
+    fun `프로필 저장 실패는 입력을 유지할 수 있는 오류 상태를 남긴다`() =
+        runTest {
+            val profileRepository =
+                FakeAuthRepository(
+                    updateProfileResult = MoilResult.Failure(MoilError.Network),
+                )
+            val viewModel =
+                MainTabViewModel(
+                    logoutUseCase = LogoutUseCase(profileRepository),
+                    updateProfileNameUseCase = UpdateProfileNameUseCase(profileRepository),
+                    currentUserProfileStore = FakeCurrentUserProfileStore(),
+                )
 
-        viewModel.updateProfileName("네이티브")
-        advanceUntilIdle()
+            viewModel.updateProfileName("네이티브")
+            advanceUntilIdle()
 
-        assertEquals(
-            ProfileUpdateUiState(saveError = ProfileEditSaveError.SaveFailed),
-            viewModel.profileUpdateUiState.value,
-        )
-    }
+            assertEquals(
+                ProfileUpdateUiState(saveError = ProfileEditSaveError.SaveFailed),
+                viewModel.profileUpdateUiState.value,
+            )
+        }
 }
 
 private class FakeCurrentUserProfileStore : CurrentUserProfileStore {
@@ -108,17 +115,59 @@ private class FakeAuthRepository(
     private val updateProfileResult: MoilResult<UserProfile>,
 ) : AuthRepository {
     override suspend fun updateProfileName(name: String): MoilResult<UserProfile> = updateProfileResult
-    override suspend fun sendCode(name: String?, email: String, step: VerificationStep): MoilResult<Verification> = unused()
-    override suspend fun verifyCode(verifyId: String, code: String): MoilResult<VerifiedSession> = unused()
-    override suspend fun confirmSignUp(sessionId: String, password: String, passwordConfirmation: String, userName: String): MoilResult<AuthSession> = unused()
-    override suspend fun login(email: String, password: String): MoilResult<AuthSession> = unused()
-    override suspend fun startSocialLogin(provider: SocialLoginProvider): MoilResult<OAuthAuthorizationRequest> = unused()
+
+    override suspend fun sendCode(
+        name: String?,
+        email: String,
+        step: VerificationStep,
+    ): MoilResult<Verification> = unused()
+
+    override suspend fun verifyCode(
+        verifyId: String,
+        code: String,
+    ): MoilResult<VerifiedSession> = unused()
+
+    override suspend fun confirmSignUp(
+        sessionId: String,
+        password: String,
+        passwordConfirmation: String,
+        userName: String,
+    ): MoilResult<AuthSession> = unused()
+
+    override suspend fun login(
+        email: String,
+        password: String,
+    ): MoilResult<AuthSession> = unused()
+
+    override suspend fun startSocialLogin(provider: SocialLoginProvider): MoilResult<OAuthAuthorizationRequest> =
+        unused()
+
     override suspend fun completeSocialLogin(callback: SocialLoginCallback): MoilResult<AuthSession> = unused()
-    override fun cancelSocialLoginAttempt(provider: SocialLoginProvider, state: String?) = Unit
-    override suspend fun resetPassword(sessionId: String, password: String, passwordConfirmation: String): MoilResult<Unit> = unused()
-    override suspend fun changePassword(origin: String, newPassword: String, passwordConfirmation: String): MoilResult<Unit> = unused()
+
+    override fun cancelSocialLoginAttempt(
+        provider: SocialLoginProvider,
+        state: String?,
+    ) = Unit
+
+    override suspend fun resetPassword(
+        sessionId: String,
+        password: String,
+        passwordConfirmation: String,
+    ): MoilResult<Unit> = unused()
+
+    override suspend fun changePassword(
+        origin: String,
+        newPassword: String,
+        passwordConfirmation: String,
+    ): MoilResult<Unit> = unused()
+
     override suspend fun logout(): MoilResult<Unit> = unused()
-    override suspend fun deleteAccount(email: String, password: String, leaveData: Boolean): MoilResult<Unit> = unused()
+
+    override suspend fun deleteAccount(
+        email: String,
+        password: String,
+        leaveData: Boolean,
+    ): MoilResult<Unit> = unused()
 
     private fun <T> unused(): MoilResult<T> = MoilResult.Failure(MoilError.Network)
 }

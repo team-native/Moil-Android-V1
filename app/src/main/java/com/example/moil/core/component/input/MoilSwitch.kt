@@ -32,39 +32,37 @@ fun MoilSwitch(
     val thumbAlignment = if (checked) Alignment.CenterEnd else Alignment.CenterStart
 
     Box(
-        modifier = modifier
-            .size(
-                width = MoilComponentSize.SwitchWidth,
-                height = MoilComponentSize.SwitchHeight,
-            )
-            .clip(RoundedCornerShape(percent = 50))
-            .background(
-                if (checked) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    LocalMoilExtraColors.current.switchTrack
-                },
-            )
-            .semantics {
-                contentDescription = switchDescription
-            }
-            .toggleable(
-                value = checked,
-                role = Role.Switch,
-                onValueChange = onCheckedChange,
-            ),
+        modifier =
+            modifier
+                .size(
+                    width = MoilComponentSize.SwitchWidth,
+                    height = MoilComponentSize.SwitchHeight,
+                ).clip(RoundedCornerShape(percent = 50))
+                .background(
+                    if (checked) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        LocalMoilExtraColors.current.switchTrack
+                    },
+                ).semantics {
+                    contentDescription = switchDescription
+                }.toggleable(
+                    value = checked,
+                    role = Role.Switch,
+                    onValueChange = onCheckedChange,
+                ),
         contentAlignment = thumbAlignment,
     ) {
         Box(
-            modifier = Modifier
-                .shadow(
-                    elevation = 1.dp,
-                    shape = CircleShape,
-                )
-                .padding(horizontal = MoilComponentSize.SwitchThumbPadding)
-                .size(MoilComponentSize.SwitchThumbSize)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surface),
+            modifier =
+                Modifier
+                    .shadow(
+                        elevation = 1.dp,
+                        shape = CircleShape,
+                    ).padding(horizontal = MoilComponentSize.SwitchThumbPadding)
+                    .size(MoilComponentSize.SwitchThumbSize)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surface),
         )
     }
 }

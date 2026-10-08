@@ -25,7 +25,9 @@ import com.example.moil.feature.auth.view.SignUpRoute
 
 private sealed interface MoilAppDestination {
     data object Login : MoilAppDestination
+
     data object SignUp : MoilAppDestination
+
     data object Main : MoilAppDestination
 }
 
@@ -46,30 +48,42 @@ fun MoilAppRoute(
     var pendingJoinGroupId by remember { mutableStateOf<Long?>(null) }
     var pendingOAuthCallback by remember { mutableStateOf<SocialLoginCallback?>(null) }
     var pendingOAuthFailure by remember { mutableStateOf<SocialLoginFailure?>(null) }
-    val appDeepLink = remember(deepLinkUri) {
-        AppDeepLinkParser.parse(deepLinkUri)
-    }
+    val appDeepLink =
+        remember(deepLinkUri) {
+            AppDeepLinkParser.parse(deepLinkUri)
+        }
 
     LaunchedEffect(appDeepLink) {
         when (val parsedDeepLink = appDeepLink) {
-            is AppDeepLink.JoinGroup -> pendingJoinGroupId = parsedDeepLink.groupId
+            is AppDeepLink.JoinGroup -> {
+                pendingJoinGroupId = parsedDeepLink.groupId
+            }
+
             is AppDeepLink.OAuthCallback -> {
-                pendingOAuthCallback = SocialLoginCallback(
-                    provider = SocialLoginProvider.fromWireValue(parsedDeepLink.provider)
-                        ?: return@LaunchedEffect,
-                    state = parsedDeepLink.state,
-                    accessToken = parsedDeepLink.accessToken,
-                    refreshToken = parsedDeepLink.refreshToken,
-                )
+                pendingOAuthCallback =
+                    SocialLoginCallback(
+                        provider =
+                            SocialLoginProvider.fromWireValue(parsedDeepLink.provider)
+                                ?: return@LaunchedEffect,
+                        state = parsedDeepLink.state,
+                        accessToken = parsedDeepLink.accessToken,
+                        refreshToken = parsedDeepLink.refreshToken,
+                    )
             }
+
             is AppDeepLink.OAuthFailure -> {
-                pendingOAuthFailure = SocialLoginFailure(
-                    provider = SocialLoginProvider.fromWireValue(parsedDeepLink.provider)
-                        ?: return@LaunchedEffect,
-                    state = parsedDeepLink.state,
-                )
+                pendingOAuthFailure =
+                    SocialLoginFailure(
+                        provider =
+                            SocialLoginProvider.fromWireValue(parsedDeepLink.provider)
+                                ?: return@LaunchedEffect,
+                        state = parsedDeepLink.state,
+                    )
             }
-            null -> Unit
+
+            null -> {
+                Unit
+            }
         }
 
         if (deepLinkUri != null) {
@@ -124,18 +138,20 @@ private fun MoilAppNavigation(
     socialLoginFailure: SocialLoginFailure?,
     onOAuthFailureConsumed: () -> Unit,
 ) {
-    val destinationBackStack = remember {
-        mutableStateListOf(if (isAuthenticated) MoilAppDestination.Main else MoilAppDestination.Login)
-    }
+    val destinationBackStack =
+        remember {
+            mutableStateListOf(if (isAuthenticated) MoilAppDestination.Main else MoilAppDestination.Login)
+        }
     var registeredEmail by remember { mutableStateOf("") }
     val currentDestination = destinationBackStack.last()
 
     LaunchedEffect(isAuthenticated, sessionExpirationCount) {
-        val expectedDestination = if (isAuthenticated) {
-            MoilAppDestination.Main
-        } else {
-            MoilAppDestination.Login
-        }
+        val expectedDestination =
+            if (isAuthenticated) {
+                MoilAppDestination.Main
+            } else {
+                MoilAppDestination.Login
+            }
         if (destinationBackStack.last() != expectedDestination) {
             destinationBackStack.clear()
             destinationBackStack += expectedDestination
@@ -176,13 +192,15 @@ private fun MoilAppNavigation(
             )
         }
 
-        MoilAppDestination.Main -> MainTabRoute(
-            isDarkTheme = isDarkTheme,
-            onDarkThemeChanged = onDarkThemeChanged,
-            currentUserRole = currentUserRole,
-            onCurrentUserRoleChanged = onCurrentUserRoleChanged,
-            pendingJoinGroupId = pendingJoinGroupId,
-            onJoinGroupDeepLinkHandled = onJoinGroupDeepLinkHandled,
-        )
+        MoilAppDestination.Main -> {
+            MainTabRoute(
+                isDarkTheme = isDarkTheme,
+                onDarkThemeChanged = onDarkThemeChanged,
+                currentUserRole = currentUserRole,
+                onCurrentUserRoleChanged = onCurrentUserRoleChanged,
+                pendingJoinGroupId = pendingJoinGroupId,
+                onJoinGroupDeepLinkHandled = onJoinGroupDeepLinkHandled,
+            )
+        }
     }
 }

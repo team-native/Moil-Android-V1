@@ -7,10 +7,13 @@ import com.example.moil.feature.image.module.domain.model.UploadedProfileImage
 import com.example.moil.feature.image.module.domain.repository.ImageRepository
 import javax.inject.Inject
 
-class ImageRepositoryImpl @Inject constructor(
-    private val imageRemoteDataSource: ImageRemoteDataSource,
-) : ImageRepository {
-    override suspend fun uploadProfileImage(contentUri: String): MoilResult<UploadedProfileImage> = imageRemoteDataSource
-        .uploadProfileImage(contentUri)
-        .mapToDomain { response -> UploadedProfileImage(imagePath = response.imagePath) }
-}
+class ImageRepositoryImpl
+    @Inject
+    constructor(
+        private val imageRemoteDataSource: ImageRemoteDataSource,
+    ) : ImageRepository {
+        override suspend fun uploadProfileImage(contentUri: String): MoilResult<UploadedProfileImage> =
+            imageRemoteDataSource
+                .uploadProfileImage(contentUri)
+                .mapToDomain { response -> UploadedProfileImage(imagePath = response.imagePath) }
+    }

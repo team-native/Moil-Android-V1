@@ -17,14 +17,14 @@ import com.example.moil.feature.auth.module.data.dto.UserProfileResponseDto
 import com.example.moil.feature.auth.module.data.dto.VerificationResponseDto
 import com.example.moil.feature.auth.module.data.dto.VerifiedSessionResponseDto
 import com.example.moil.feature.auth.module.data.dto.VerifyCodeRequestDto
-import com.example.moil.feature.auth.module.data.remote.AuthRemoteDataSource
-import com.example.moil.feature.auth.module.data.oauth.OAuthAttemptStore
 import com.example.moil.feature.auth.module.data.oauth.OAuthAttempt
+import com.example.moil.feature.auth.module.data.oauth.OAuthAttemptStore
 import com.example.moil.feature.auth.module.data.oauth.OAuthAuthorizationRequestFactory
+import com.example.moil.feature.auth.module.data.remote.AuthRemoteDataSource
+import com.example.moil.feature.auth.module.domain.model.AuthSession
 import com.example.moil.feature.auth.module.domain.model.OAuthAuthorizationRequest
 import com.example.moil.feature.auth.module.domain.model.SocialLoginCallback
 import com.example.moil.feature.auth.module.domain.model.SocialLoginProvider
-import com.example.moil.feature.auth.module.domain.model.AuthSession
 import com.example.moil.feature.auth.module.domain.model.UserProfile
 import com.example.moil.feature.auth.module.domain.repository.CurrentUserProfileStore
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -38,71 +38,81 @@ import org.junit.Test
 
 class AuthRepositoryImplTest {
     @Test
-    fun `프로필 변경 성공은 전체 서버 프로필을 로컬 프로필 저장소에 반영한다`() = runBlocking {
-        val profileStore = FakeCurrentUserProfileStore()
-        val repository = AuthRepositoryImpl(
-            authRemoteDataSource = FakeAuthRemoteDataSource(
-                updateProfileResult = NetworkResult.Success(
-                    UserProfileResponseDto(1L, "네이티브", "native@example.com"),
-                ),
-            ),
-            sessionManager = FakeSessionManager(),
-            currentUserProfileStore = profileStore,
-            oauthAuthorizationRequestFactory = OAuthAuthorizationRequestFactory(OAuthAttemptStore()),
-        )
+    fun `프로필 변경 성공은 전체 서버 프로필을 로컬 프로필 저장소에 반영한다`() =
+        runBlocking {
+            val profileStore = FakeCurrentUserProfileStore()
+            val repository =
+                AuthRepositoryImpl(
+                    authRemoteDataSource =
+                        FakeAuthRemoteDataSource(
+                            updateProfileResult =
+                                NetworkResult.Success(
+                                    UserProfileResponseDto(1L, "네이티브", "native@example.com"),
+                                ),
+                        ),
+                    sessionManager = FakeSessionManager(),
+                    currentUserProfileStore = profileStore,
+                    oauthAuthorizationRequestFactory = OAuthAuthorizationRequestFactory(OAuthAttemptStore()),
+                )
 
-        val result = repository.updateProfileName("네이티브")
+            val result = repository.updateProfileName("네이티브")
 
-        assertEquals(
-            MoilResult.Success(UserProfile(1L, "네이티브", "native@example.com")),
-            result,
-        )
-        assertEquals(UserProfile(1L, "네이티브", "native@example.com"), profileStore.profile.value)
-    }
-
-    @Test
-    fun `로그아웃 성공은 프로필 저장소를 비우고 인증 세션을 종료한다`() = runBlocking {
-        val profileStore = FakeCurrentUserProfileStore(UserProfile(1L, "네이티브", "native@example.com"))
-        val sessionManager = FakeSessionManager()
-        val repository = AuthRepositoryImpl(
-            authRemoteDataSource = FakeAuthRemoteDataSource(logoutResult = NetworkResult.Success(Unit)),
-            sessionManager = sessionManager,
-            currentUserProfileStore = profileStore,
-            oauthAuthorizationRequestFactory = OAuthAuthorizationRequestFactory(OAuthAttemptStore()),
-        )
-
-        val result = repository.logout()
-
-        assertEquals(MoilResult.Success(Unit), result)
-        assertEquals(null, profileStore.profile.value)
-        assertTrue(sessionManager.isExpired)
-    }
-
-    @Test
-    fun `일치하는 state의 소셜 로그인 콜백만 토큰 세션으로 저장한다`() = runBlocking {
-        val attemptStore = OAuthAttemptStore().apply {
-            replace(OAuthAttempt(SocialLoginProvider.Google, "oauth-state"))
+            assertEquals(
+                MoilResult.Success(UserProfile(1L, "네이티브", "native@example.com")),
+                result,
+            )
+            assertEquals(UserProfile(1L, "네이티브", "native@example.com"), profileStore.profile.value)
         }
-        val sessionManager = FakeSessionManager()
-        val repository = AuthRepositoryImpl(
-            authRemoteDataSource = FakeAuthRemoteDataSource(),
-            sessionManager = sessionManager,
-            currentUserProfileStore = FakeCurrentUserProfileStore(),
-            oauthAuthorizationRequestFactory = OAuthAuthorizationRequestFactory(attemptStore),
-        )
 
-        val result = repository.completeSocialLogin(
-            SocialLoginCallback(
-                provider = SocialLoginProvider.Google,
-                state = "oauth-state",
-                accessToken = "access-token",
-                refreshToken = "refresh-token",
-            ),
-        )
+    @Test
+    fun `로그아웃 성공은 프로필 저장소를 비우고 인증 세션을 종료한다`() =
+        runBlocking {
+            val profileStore = FakeCurrentUserProfileStore(UserProfile(1L, "네이티브", "native@example.com"))
+            val sessionManager = FakeSessionManager()
+            val repository =
+                AuthRepositoryImpl(
+                    authRemoteDataSource = FakeAuthRemoteDataSource(logoutResult = NetworkResult.Success(Unit)),
+                    sessionManager = sessionManager,
+                    currentUserProfileStore = profileStore,
+                    oauthAuthorizationRequestFactory = OAuthAuthorizationRequestFactory(OAuthAttemptStore()),
+                )
 
-        assertEquals(MoilResult.Success(AuthSession("access-token", "refresh-token")), result)
-        assertEquals(SessionTokens("access-token", "refresh-token"), sessionManager.savedTokens)
-    }
+            val result = repository.logout()
+
+            assertEquals(MoilResult.Success(Unit), result)
+            assertEquals(null, profileStore.profile.value)
+            assertTrue(sessionManager.isExpired)
+        }
+
+    @Test
+    fun `일치하는 state의 소셜 로그인 콜백만 토큰 세션으로 저장한다`() =
+        runBlocking {
+            val attemptStore =
+                OAuthAttemptStore().apply {
+                    replace(OAuthAttempt(SocialLoginProvider.Google, "oauth-state"))
+                }
+            val sessionManager = FakeSessionManager()
+            val repository =
+                AuthRepositoryImpl(
+                    authRemoteDataSource = FakeAuthRemoteDataSource(),
+                    sessionManager = sessionManager,
+                    currentUserProfileStore = FakeCurrentUserProfileStore(),
+                    oauthAuthorizationRequestFactory = OAuthAuthorizationRequestFactory(attemptStore),
+                )
+
+            val result =
+                repository.completeSocialLogin(
+                    SocialLoginCallback(
+                        provider = SocialLoginProvider.Google,
+                        state = "oauth-state",
+                        accessToken = "access-token",
+                        refreshToken = "refresh-token",
+                    ),
+                )
+
+            assertEquals(MoilResult.Success(AuthSession("access-token", "refresh-token")), result)
+            assertEquals(SessionTokens("access-token", "refresh-token"), sessionManager.savedTokens)
+        }
 }
 
 private class FakeAuthRemoteDataSource(
@@ -110,19 +120,31 @@ private class FakeAuthRemoteDataSource(
         NetworkResult.NetworkError(IllegalStateException("not used")),
     private val logoutResult: NetworkResult<Unit> = NetworkResult.NetworkError(IllegalStateException("not used")),
 ) : AuthRemoteDataSource {
-    override suspend fun updateProfile(request: UpdateProfileRequestDto): NetworkResult<UserProfileResponseDto> = updateProfileResult
+    override suspend fun updateProfile(request: UpdateProfileRequestDto): NetworkResult<UserProfileResponseDto> =
+        updateProfileResult
+
     override suspend fun sendCode(request: SendCodeRequestDto): NetworkResult<VerificationResponseDto> = unused()
+
     override suspend fun verifyCode(request: VerifyCodeRequestDto): NetworkResult<VerifiedSessionResponseDto> = unused()
+
     override suspend fun confirmSignUp(request: PasswordSessionRequestDto): NetworkResult<TokenResponseDto> = unused()
+
     override suspend fun login(request: LoginRequestDto): NetworkResult<TokenResponseDto> = unused()
+
     override suspend fun resetPassword(request: PasswordSessionRequestDto): NetworkResult<Unit> = unused()
+
     override suspend fun changePassword(request: ChangePasswordRequestDto): NetworkResult<Unit> = unused()
+
     override suspend fun logout(): NetworkResult<Unit> = logoutResult
+
     override suspend fun deleteAccount(request: DeleteAccountRequestDto): NetworkResult<Unit> = unused()
+
     private fun <T> unused(): NetworkResult<T> = NetworkResult.NetworkError(IllegalStateException("not used"))
 }
 
-private class FakeCurrentUserProfileStore(initialProfile: UserProfile? = null) : CurrentUserProfileStore {
+private class FakeCurrentUserProfileStore(
+    initialProfile: UserProfile? = null,
+) : CurrentUserProfileStore {
     private val mutableProfile = MutableStateFlow(initialProfile)
 
     override val profile: StateFlow<UserProfile?> = mutableProfile
@@ -149,6 +171,7 @@ private class FakeSessionManager : SessionManager {
     override val sessionEvents: SharedFlow<SessionEvent> = mutableSessionEvents
 
     override fun currentTokens(): SessionTokens? = null
+
     override fun save(tokens: SessionTokens) {
         savedTokens = tokens
     }

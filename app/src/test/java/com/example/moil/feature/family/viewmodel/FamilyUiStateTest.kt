@@ -14,10 +14,11 @@ class FamilyUiStateTest {
 
     @Test
     fun `selected server group retains the current user role`() {
-        val familyUiState = FamilyUiState(
-            selectedGroupId = "24",
-            currentUserRole = GroupMemberRole.Administrator,
-        )
+        val familyUiState =
+            FamilyUiState(
+                selectedGroupId = "24",
+                currentUserRole = GroupMemberRole.Administrator,
+            )
 
         assertEquals(GroupMemberRole.Administrator, familyUiState.selectedGroupCurrentUserRole)
     }

@@ -15,9 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -39,8 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.moil.R
 import com.example.moil.core.component.MoilOverlayDialog
@@ -69,16 +69,18 @@ fun FamilyGroupNameDialog(
             BasicTextField(
                 value = editedGroupName,
                 onValueChange = { editedGroupName = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(MoilOverlayDimension.DialogFieldHeight)
-                    .clip(RoundedCornerShape(MoilRadius.DialogField))
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(horizontal = MoilOverlayDimension.DialogContentPadding),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(MoilOverlayDimension.DialogFieldHeight)
+                        .clip(RoundedCornerShape(MoilRadius.DialogField))
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(horizontal = MoilOverlayDimension.DialogContentPadding),
                 singleLine = true,
-                textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.onSurface,
-                ),
+                textStyle =
+                    MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurface,
+                    ),
                 decorationBox = { innerTextField ->
                     Box(contentAlignment = Alignment.CenterStart) {
                         innerTextField()
@@ -91,28 +93,32 @@ fun FamilyGroupNameDialog(
             Row(horizontalArrangement = Arrangement.spacedBy(MoilOverlayDimension.DialogActionSpacing)) {
                 OutlinedButton(
                     onClick = onDismissRequest,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(MoilOverlayDimension.DialogActionHeight),
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .height(MoilOverlayDimension.DialogActionHeight),
                     shape = RoundedCornerShape(MoilRadius.DialogButton),
-                    border = BorderStroke(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant,
-                    ),
+                    border =
+                        BorderStroke(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant,
+                        ),
                 ) {
                     Text(text = stringResource(R.string.family_dialog_cancel))
                 }
 
                 Button(
                     onClick = { onSaveClick(editedGroupName) },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(MoilOverlayDimension.DialogActionHeight),
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .height(MoilOverlayDimension.DialogActionHeight),
                     shape = RoundedCornerShape(MoilRadius.DialogButton),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                    ),
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
                 ) {
                     Text(text = stringResource(R.string.family_dialog_save))
                 }
@@ -129,9 +135,10 @@ fun FamilyMemberPermissionsBottomSheet(
     onDismissRequest: () -> Unit,
     onConfirmClick: (Map<Long, Int>) -> Unit,
 ) {
-    val memberRoles = remember(members) {
-        mutableStateOf(members.associate { member -> member.id to member.roleRes })
-    }
+    val memberRoles =
+        remember(members) {
+            mutableStateOf(members.associate { member -> member.id to member.roleRes })
+        }
 
     FamilyModalBottomSheet(
         sheetState = sheetState,
@@ -151,7 +158,7 @@ fun FamilyMemberPermissionsBottomSheet(
                 member = member,
                 selectedRoleRes = selectedRoleRes,
                 onRoleClick = { roleRes ->
-                memberRoles.value = memberRoles.value + (member.id to roleRes)
+                    memberRoles.value = memberRoles.value + (member.id to roleRes)
                 },
             )
         }
@@ -160,9 +167,10 @@ fun FamilyMemberPermissionsBottomSheet(
 
         Button(
             onClick = { onConfirmClick(memberRoles.value) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(MoilOverlayDimension.DialogActionHeight),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(MoilOverlayDimension.DialogActionHeight),
             shape = RoundedCornerShape(MoilRadius.DialogButton),
         ) {
             Text(text = stringResource(R.string.family_member_permissions_confirm))
@@ -224,9 +232,10 @@ fun FamilyAdministratorTransferDialog(
 ) {
     var selectedMemberId by rememberSaveable { mutableStateOf<Long?>(null) }
     val transferCandidates = members.filterNot(FamilyMemberUiModel::isCurrentUser)
-    val selectedMember = transferCandidates.firstOrNull { member ->
-        member.id == selectedMemberId
-    }
+    val selectedMember =
+        transferCandidates.firstOrNull { member ->
+            member.id == selectedMemberId
+        }
 
     MoilOverlayDialog(onDismissRequest = onDismissRequest) {
         Column(
@@ -263,14 +272,16 @@ fun FamilyAdministratorTransferDialog(
             Button(
                 onClick = { selectedMember?.let(onConfirmClick) },
                 enabled = selectedMember != null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(MoilOverlayDimension.DialogActionHeight),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(MoilOverlayDimension.DialogActionHeight),
                 shape = RoundedCornerShape(MoilRadius.DialogButton),
-                colors = ButtonDefaults.buttonColors(
-                    disabledContainerColor = LocalMoilExtraColors.current.scheduleDivider,
-                    disabledContentColor = LocalMoilExtraColors.current.scheduleMutedText,
-                ),
+                colors =
+                    ButtonDefaults.buttonColors(
+                        disabledContainerColor = LocalMoilExtraColors.current.scheduleDivider,
+                        disabledContentColor = LocalMoilExtraColors.current.scheduleMutedText,
+                    ),
             ) {
                 Text(text = stringResource(R.string.family_admin_transfer_confirm))
             }
@@ -279,17 +290,20 @@ fun FamilyAdministratorTransferDialog(
 
             OutlinedButton(
                 onClick = onDismissRequest,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(MoilOverlayDimension.DialogActionHeight),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(MoilOverlayDimension.DialogActionHeight),
                 shape = RoundedCornerShape(MoilRadius.DialogButton),
-                border = BorderStroke(
-                    width = 1.dp,
-                    color = LocalMoilExtraColors.current.scheduleDivider,
-                ),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                ),
+                border =
+                    BorderStroke(
+                        width = 1.dp,
+                        color = LocalMoilExtraColors.current.scheduleDivider,
+                    ),
+                colors =
+                    ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
             ) {
                 Text(text = stringResource(R.string.family_dialog_cancel))
             }
@@ -309,31 +323,33 @@ private fun FamilyModalBottomSheet(
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surface,
         scrimColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.45f),
-        shape = RoundedCornerShape(
-            topStart = MoilRadius.OverlaySheet,
-            topEnd = MoilRadius.OverlaySheet,
-        ),
+        shape =
+            RoundedCornerShape(
+                topStart = MoilRadius.OverlaySheet,
+                topEnd = MoilRadius.OverlaySheet,
+            ),
         dragHandle = null,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = MoilOverlayDimension.SheetHorizontalPadding,
-                    top = MoilOverlayDimension.SheetTopPadding,
-                    end = MoilOverlayDimension.SheetHorizontalPadding,
-                    bottom = MoilOverlayDimension.SheetBottomPadding,
-                ),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = MoilOverlayDimension.SheetHorizontalPadding,
+                        top = MoilOverlayDimension.SheetTopPadding,
+                        end = MoilOverlayDimension.SheetHorizontalPadding,
+                        bottom = MoilOverlayDimension.SheetBottomPadding,
+                    ),
         ) {
             Box(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .size(
-                        width = MoilOverlayDimension.SheetDragHandleWidth,
-                        height = MoilOverlayDimension.SheetDragHandleHeight,
-                    )
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.outlineVariant),
+                modifier =
+                    Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .size(
+                            width = MoilOverlayDimension.SheetDragHandleWidth,
+                            height = MoilOverlayDimension.SheetDragHandleHeight,
+                        ).clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.outlineVariant),
             )
 
             Spacer(modifier = Modifier.height(MoilOverlayDimension.SheetTitleTopPadding))
@@ -350,16 +366,18 @@ private fun FamilyMemberRoleRow(
     onRoleClick: (Int) -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(MoilOverlayDimension.RoleRowHeight),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(MoilOverlayDimension.RoleRowHeight),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
-            modifier = Modifier
-                .size(12.dp)
-                .clip(CircleShape)
-                .background(LocalMoilExtraColors.current.memberCyan),
+            modifier =
+                Modifier
+                    .size(12.dp)
+                    .clip(CircleShape)
+                    .background(LocalMoilExtraColors.current.memberCyan),
         )
 
         Spacer(modifier = Modifier.width(10.dp))
@@ -393,25 +411,28 @@ private fun FamilyRoleButton(
     onClick: () -> Unit,
 ) {
     Surface(
-        modifier = Modifier
-            .width(MoilOverlayDimension.RoleButtonWidth)
-            .height(MoilOverlayDimension.RoleButtonHeight)
-            .clickable(onClick = onClick),
+        modifier =
+            Modifier
+                .width(MoilOverlayDimension.RoleButtonWidth)
+                .height(MoilOverlayDimension.RoleButtonHeight)
+                .clickable(onClick = onClick),
         shape = RoundedCornerShape(MoilRadius.DialogField),
-        color = if (isSelected) {
-            MaterialTheme.colorScheme.primary
-        } else {
-            MaterialTheme.colorScheme.surfaceVariant
-        },
+        color =
+            if (isSelected) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant
+            },
     ) {
         Box(contentAlignment = Alignment.Center) {
             Text(
                 text = stringResource(labelRes),
-                color = if (isSelected) {
-                    MaterialTheme.colorScheme.onPrimary
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
+                color =
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
                 style = MaterialTheme.typography.labelSmall,
             )
         }
@@ -426,15 +447,17 @@ private fun FamilyShareOption(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .width(MoilOverlayDimension.ShareOptionSize)
-            .clickable(onClick = onClick),
+        modifier =
+            Modifier
+                .width(MoilOverlayDimension.ShareOptionSize)
+                .clickable(onClick = onClick),
     ) {
         Box(
-            modifier = Modifier
-                .size(MoilOverlayDimension.ShareOptionSize)
-                .clip(CircleShape)
-                .background(color),
+            modifier =
+                Modifier
+                    .size(MoilOverlayDimension.ShareOptionSize)
+                    .clip(CircleShape)
+                    .background(color),
         )
 
         Spacer(modifier = Modifier.height(6.dp))
@@ -456,28 +479,28 @@ private fun FamilyTransferCandidateRow(
     onClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(MoilOverlayDimension.TransferCandidateHeight)
-            .clip(RoundedCornerShape(MoilRadius.DialogField))
-            .border(
-                width = 1.dp,
-                color = LocalMoilExtraColors.current.scheduleDivider,
-                shape = RoundedCornerShape(MoilRadius.DialogField),
-            )
-            .selectable(
-                selected = isSelected,
-                role = Role.RadioButton,
-                onClick = onClick,
-            )
-            .padding(horizontal = 13.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(MoilOverlayDimension.TransferCandidateHeight)
+                .clip(RoundedCornerShape(MoilRadius.DialogField))
+                .border(
+                    width = 1.dp,
+                    color = LocalMoilExtraColors.current.scheduleDivider,
+                    shape = RoundedCornerShape(MoilRadius.DialogField),
+                ).selectable(
+                    selected = isSelected,
+                    role = Role.RadioButton,
+                    onClick = onClick,
+                ).padding(horizontal = 13.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
-            modifier = Modifier
-                .size(MoilOverlayDimension.TransferCandidateAvatarSize)
-                .clip(CircleShape)
-                .background(transferCandidateColor(member.id)),
+            modifier =
+                Modifier
+                    .size(MoilOverlayDimension.TransferCandidateAvatarSize)
+                    .clip(CircleShape)
+                    .background(transferCandidateColor(member.id)),
         )
 
         Spacer(modifier = Modifier.width(10.dp))
@@ -485,9 +508,10 @@ private fun FamilyTransferCandidateRow(
         Text(
             text = member.name,
             modifier = Modifier.weight(1f),
-            style = MaterialTheme.typography.bodyMedium.copy(
-                fontWeight = FontWeight.SemiBold,
-            ),
+            style =
+                MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.SemiBold,
+                ),
         )
 
         Spacer(modifier = Modifier.width(10.dp))
@@ -501,33 +525,37 @@ private fun FamilyTransferCandidateRow(
 @Composable
 private fun FamilyTransferRadioButton(isSelected: Boolean) {
     Box(
-        modifier = Modifier
-            .size(MoilOverlayDimension.TransferCandidateRadioSize)
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.outline),
+        modifier =
+            Modifier
+                .size(MoilOverlayDimension.TransferCandidateRadioSize)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.outline),
         contentAlignment = Alignment.Center,
     ) {
         Box(
-            modifier = Modifier
-                .size(MoilOverlayDimension.TransferCandidateRadioSize - 2.dp)
-                .clip(CircleShape)
-                .background(LocalMoilExtraColors.current.overlaySurface),
+            modifier =
+                Modifier
+                    .size(MoilOverlayDimension.TransferCandidateRadioSize - 2.dp)
+                    .clip(CircleShape)
+                    .background(LocalMoilExtraColors.current.overlaySurface),
         )
 
         if (isSelected) {
             Box(
-                modifier = Modifier
-                    .size(10.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary),
+                modifier =
+                    Modifier
+                        .size(10.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary),
             )
         }
     }
 }
 
 @Composable
-private fun transferCandidateColor(memberId: Long) = if (memberId % 2 == 0L) {
-    LocalMoilExtraColors.current.memberViolet
-} else {
-    LocalMoilExtraColors.current.memberCyan
-}
+private fun transferCandidateColor(memberId: Long) =
+    if (memberId % 2 == 0L) {
+        LocalMoilExtraColors.current.memberViolet
+    } else {
+        LocalMoilExtraColors.current.memberCyan
+    }

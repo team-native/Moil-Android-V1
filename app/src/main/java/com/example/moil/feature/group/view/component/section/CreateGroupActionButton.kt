@@ -19,11 +19,11 @@ internal fun CreateGroupActionButton(
         text = stringResource(R.string.group_create_action),
         enabled = enabled,
         onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                bottom = MoilGroupCreateDimension.BottomButtonPadding,
-            )
-            .height(MoilGroupCreateDimension.BottomButtonHeight),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(
+                    bottom = MoilGroupCreateDimension.BottomButtonPadding,
+                ).height(MoilGroupCreateDimension.BottomButtonHeight),
     )
 }

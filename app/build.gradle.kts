@@ -35,7 +35,7 @@ android {
             buildConfigField("int", "CONNECT_TIMEOUT_SECONDS", "15")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -47,7 +47,6 @@ android {
         compose = true
         buildConfig = true
     }
-
 }
 
 dependencies {

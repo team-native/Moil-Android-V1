@@ -21,37 +21,54 @@ import retrofit2.http.POST
 
 interface PublicAuthApiService {
     @POST("auth/send-code")
-    suspend fun sendCode(@Body request: SendCodeRequestDto): Response<ApiEnvelopeDto<VerificationResponseDto>>
+    suspend fun sendCode(
+        @Body request: SendCodeRequestDto,
+    ): Response<ApiEnvelopeDto<VerificationResponseDto>>
 
     @POST("auth/verify-code")
-    suspend fun verifyCode(@Body request: VerifyCodeRequestDto): Response<ApiEnvelopeDto<VerifiedSessionResponseDto>>
+    suspend fun verifyCode(
+        @Body request: VerifyCodeRequestDto,
+    ): Response<ApiEnvelopeDto<VerifiedSessionResponseDto>>
 
     @POST("auth/confirm")
-    suspend fun confirmSignUp(@Body request: PasswordSessionRequestDto): Response<ApiEnvelopeDto<TokenResponseDto>>
+    suspend fun confirmSignUp(
+        @Body request: PasswordSessionRequestDto,
+    ): Response<ApiEnvelopeDto<TokenResponseDto>>
 
     @POST("auth/login")
-    suspend fun login(@Body request: LoginRequestDto): Response<ApiEnvelopeDto<TokenResponseDto>>
+    suspend fun login(
+        @Body request: LoginRequestDto,
+    ): Response<ApiEnvelopeDto<TokenResponseDto>>
 
     @POST("auth/reset-password")
-    suspend fun resetPassword(@Body request: PasswordSessionRequestDto): Response<ApiEnvelopeDto<Unit>>
-
+    suspend fun resetPassword(
+        @Body request: PasswordSessionRequestDto,
+    ): Response<ApiEnvelopeDto<Unit>>
 }
 
 interface AuthenticatedAuthApiService {
     @PATCH("auth/profile")
-    suspend fun updateProfile(@Body request: UpdateProfileRequestDto): Response<ApiEnvelopeDto<UserProfileResponseDto>>
+    suspend fun updateProfile(
+        @Body request: UpdateProfileRequestDto,
+    ): Response<ApiEnvelopeDto<UserProfileResponseDto>>
 
     @POST("auth/change-password")
-    suspend fun changePassword(@Body request: ChangePasswordRequestDto): Response<ApiEnvelopeDto<Unit>>
+    suspend fun changePassword(
+        @Body request: ChangePasswordRequestDto,
+    ): Response<ApiEnvelopeDto<Unit>>
 
     @POST("auth/logout")
     suspend fun logout(): Response<ApiEnvelopeDto<Unit>>
 
     @POST("auth/delete-account")
-    suspend fun deleteAccount(@Body request: DeleteAccountRequestDto): Response<ApiEnvelopeDto<Unit>>
+    suspend fun deleteAccount(
+        @Body request: DeleteAccountRequestDto,
+    ): Response<ApiEnvelopeDto<Unit>>
 }
 
 interface RefreshAuthApiService {
     @POST("auth/refresh")
-    fun refresh(@Body request: RefreshTokenRequestDto): Call<ApiEnvelopeDto<TokenResponseDto>>
+    fun refresh(
+        @Body request: RefreshTokenRequestDto,
+    ): Call<ApiEnvelopeDto<TokenResponseDto>>
 }

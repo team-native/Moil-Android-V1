@@ -5,8 +5,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -17,9 +17,9 @@ import com.example.moil.core.component.MoilPrimaryButton
 import com.example.moil.core.component.MoilTabScaffold
 import com.example.moil.feature.group.viewmodel.JoinGroupScreenEvent
 import com.example.moil.feature.group.viewmodel.JoinGroupUiState
+import com.example.moil.ui.theme.LocalMoilExtraTypography
 import com.example.moil.ui.theme.MoilGroupCreateDimension
 import com.example.moil.ui.theme.MoilGroupJoinDimension
-import com.example.moil.ui.theme.LocalMoilExtraTypography
 import com.example.moil.ui.theme.MoilSpacing
 import com.example.moil.ui.theme.MoilTheme
 
@@ -61,9 +61,10 @@ internal fun JoinGroupScreenContent(
             MoilPrimaryButton(
                 text = stringResource(R.string.group_join_action),
                 onClick = { onEvent(JoinGroupScreenEvent.InviteCodeConfirmed) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(MoilGroupCreateDimension.BottomButtonHeight),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(MoilGroupCreateDimension.BottomButtonHeight),
             )
 
             Spacer(modifier = Modifier.height(MoilGroupJoinDimension.BottomButtonSpacing))

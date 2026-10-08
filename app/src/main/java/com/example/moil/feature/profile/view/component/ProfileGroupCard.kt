@@ -45,11 +45,12 @@ internal fun ProfileGroupCard(
             }
 
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(MoilProfileDimension.GroupRowHeight)
-                    .clickable(onClick = onCreateGroupClick)
-                    .padding(horizontal = MoilProfileDimension.GroupRowHorizontalPadding),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(MoilProfileDimension.GroupRowHeight)
+                        .clickable(onClick = onCreateGroupClick)
+                        .padding(horizontal = MoilProfileDimension.GroupRowHorizontalPadding),
                 contentAlignment = Alignment.CenterStart,
             ) {
                 Text(

@@ -15,19 +15,21 @@ import com.example.moil.R
 
 @Composable
 internal fun CalendarEventOverflowBadge(hiddenEventCount: Int) {
-    val eventCountDescription = stringResource(
-        R.string.calendar_more_events_content_description,
-        hiddenEventCount,
-    )
+    val eventCountDescription =
+        stringResource(
+            R.string.calendar_more_events_content_description,
+            hiddenEventCount,
+        )
 
     Text(
         text = stringResource(R.string.calendar_more_events, hiddenEventCount),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 2.dp)
-            .semantics {
-                contentDescription = eventCountDescription
-            },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 2.dp)
+                .semantics {
+                    contentDescription = eventCountDescription
+                },
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         style = MaterialTheme.typography.labelSmall,
         textAlign = TextAlign.Center,

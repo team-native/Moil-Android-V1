@@ -28,19 +28,29 @@ interface GroupApiService {
     suspend fun getMyGroups(): Response<ApiEnvelopeDto<List<GroupSummaryResponseDto>>>
 
     @POST("groups")
-    suspend fun createGroup(@Body request: CreateGroupRequestDto): Response<ApiEnvelopeDto<GroupSummaryResponseDto>>
+    suspend fun createGroup(
+        @Body request: CreateGroupRequestDto,
+    ): Response<ApiEnvelopeDto<GroupSummaryResponseDto>>
 
     @POST("groups/join/verify")
-    suspend fun verifyInvite(@Body request: VerifyInviteRequestDto): Response<ApiEnvelopeDto<InviteVerificationResponseDto>>
+    suspend fun verifyInvite(
+        @Body request: VerifyInviteRequestDto,
+    ): Response<ApiEnvelopeDto<InviteVerificationResponseDto>>
 
     @POST("groups/join")
-    suspend fun joinGroup(@Body request: JoinGroupRequestDto): Response<ApiEnvelopeDto<GroupSummaryResponseDto>>
+    suspend fun joinGroup(
+        @Body request: JoinGroupRequestDto,
+    ): Response<ApiEnvelopeDto<GroupSummaryResponseDto>>
 
     @GET("groups/{groupId}")
-    suspend fun getGroup(@Path("groupId") groupId: Long): Response<ApiEnvelopeDto<GroupDetailResponseDto>>
+    suspend fun getGroup(
+        @Path("groupId") groupId: Long,
+    ): Response<ApiEnvelopeDto<GroupDetailResponseDto>>
 
     @DELETE("groups/{groupId}/members/me")
-    suspend fun leaveGroup(@Path("groupId") groupId: Long): Response<ApiEnvelopeDto<Unit>>
+    suspend fun leaveGroup(
+        @Path("groupId") groupId: Long,
+    ): Response<ApiEnvelopeDto<Unit>>
 
     @PATCH("groups/{groupId}/members/me")
     suspend fun updateMyGroupProfile(
@@ -49,7 +59,9 @@ interface GroupApiService {
     ): Response<ApiEnvelopeDto<GroupMemberProfileResponseDto>>
 
     @GET("groups/{groupId}/members")
-    suspend fun getMembers(@Path("groupId") groupId: Long): Response<ApiEnvelopeDto<List<GroupMemberResponseDto>>>
+    suspend fun getMembers(
+        @Path("groupId") groupId: Long,
+    ): Response<ApiEnvelopeDto<List<GroupMemberResponseDto>>>
 
     @PATCH("groups/{groupId}/notification")
     suspend fun updateNotification(
@@ -58,11 +70,20 @@ interface GroupApiService {
     ): Response<ApiEnvelopeDto<NotificationResponseDto>>
 
     @PATCH("groups/{groupId}")
-    suspend fun renameGroup(@Path("groupId") groupId: Long, @Body request: RenameGroupRequestDto): Response<ApiEnvelopeDto<Unit>>
+    suspend fun renameGroup(
+        @Path("groupId") groupId: Long,
+        @Body request: RenameGroupRequestDto,
+    ): Response<ApiEnvelopeDto<Unit>>
 
     @PATCH("groups/{groupId}/members")
-    suspend fun updateMemberRoles(@Path("groupId") groupId: Long, @Body request: UpdateMemberRolesRequestDto): Response<ApiEnvelopeDto<Unit>>
+    suspend fun updateMemberRoles(
+        @Path("groupId") groupId: Long,
+        @Body request: UpdateMemberRolesRequestDto,
+    ): Response<ApiEnvelopeDto<Unit>>
 
     @POST("groups/{groupId}/transfer-admin")
-    suspend fun transferAdmin(@Path("groupId") groupId: Long, @Body request: TransferAdminRequestDto): Response<ApiEnvelopeDto<Unit>>
+    suspend fun transferAdmin(
+        @Path("groupId") groupId: Long,
+        @Body request: TransferAdminRequestDto,
+    ): Response<ApiEnvelopeDto<Unit>>
 }

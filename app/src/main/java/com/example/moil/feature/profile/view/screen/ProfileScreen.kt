@@ -29,23 +29,24 @@ private fun ProfileScreenPreview() {
     MoilTheme(darkTheme = false) {
         ProfileScreen(
             uiState = ProfileUiState(),
-            groups = listOf(
-                ProfileGroupUiModel(
-                    id = "family",
-                    name = stringResource(R.string.family_subtitle),
-                    indicator = ProfileGroupIndicator.Primary,
+            groups =
+                listOf(
+                    ProfileGroupUiModel(
+                        id = "family",
+                        name = stringResource(R.string.family_subtitle),
+                        indicator = ProfileGroupIndicator.Primary,
+                    ),
+                    ProfileGroupUiModel(
+                        id = "college",
+                        name = stringResource(R.string.family_group_college),
+                        indicator = ProfileGroupIndicator.Secondary,
+                    ),
+                    ProfileGroupUiModel(
+                        id = "work",
+                        name = stringResource(R.string.family_group_work),
+                        indicator = ProfileGroupIndicator.Secondary,
+                    ),
                 ),
-                ProfileGroupUiModel(
-                    id = "college",
-                    name = stringResource(R.string.family_group_college),
-                    indicator = ProfileGroupIndicator.Secondary,
-                ),
-                ProfileGroupUiModel(
-                    id = "work",
-                    name = stringResource(R.string.family_group_work),
-                    indicator = ProfileGroupIndicator.Secondary,
-                ),
-            ),
             onEvent = {},
         )
     }

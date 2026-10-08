@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,8 +18,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -55,11 +55,12 @@ internal fun MemberScreenContent(
         onDestinationClick = { destination ->
             onEvent(FamilyScreenEvent.DestinationClicked(destination))
         },
-        contentHorizontalPadding = if (isEmptyGroupContentVisible) {
-            MoilSpacing.ScreenHorizontal
-        } else {
-            MoilMemberDimension.ScreenHorizontalPadding
-        },
+        contentHorizontalPadding =
+            if (isEmptyGroupContentVisible) {
+                MoilSpacing.ScreenHorizontal
+            } else {
+                MoilMemberDimension.ScreenHorizontalPadding
+            },
         contentVerticalPadding = if (isEmptyGroupContentVisible) 0.dp else MoilSpacing.HeaderTop,
     ) { contentModifier ->
         val selectedGroup = uiState.selectedGroup
@@ -68,9 +69,11 @@ internal fun MemberScreenContent(
             uiState.isGroupsLoading -> {
                 FamilyGroupLoadingContent(modifier = contentModifier)
             }
+
             uiState.hasGroupLoadError -> {
                 FamilyGroupErrorContent(modifier = contentModifier)
             }
+
             selectedGroup == null -> {
                 MoilEmptyJoinedGroupContent(
                     onJoinGroupClick = { onEvent(FamilyScreenEvent.EmptyGroupJoinClicked) },
@@ -78,6 +81,7 @@ internal fun MemberScreenContent(
                     modifier = contentModifier,
                 )
             }
+
             else -> {
                 MemberGroupContent(
                     selectedGroup = selectedGroup,
@@ -135,11 +139,12 @@ private fun MemberGroupContent(
         Spacer(modifier = Modifier.height(MoilMemberDimension.SectionSpacing))
 
         FamilySectionLabel(
-            text = if (uiState.selectedGroupCurrentUserRole == GroupMemberRole.Administrator) {
-                stringResource(R.string.family_group_settings_administrator)
-            } else {
-                stringResource(R.string.family_group_settings)
-            },
+            text =
+                if (uiState.selectedGroupCurrentUserRole == GroupMemberRole.Administrator) {
+                    stringResource(R.string.family_group_settings_administrator)
+                } else {
+                    stringResource(R.string.family_group_settings)
+                },
         )
 
         Spacer(modifier = Modifier.height(MoilMemberDimension.SectionLabelBottomSpacing))
@@ -188,12 +193,13 @@ private fun FamilyInviteCodeCard(
         color = LocalMoilExtraColors.current.overlaySurface,
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = MoilMemberDimension.ListItemHorizontalPadding,
-                    vertical = MoilMemberDimension.InviteCodeVerticalPadding,
-                ),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = MoilMemberDimension.ListItemHorizontalPadding,
+                        vertical = MoilMemberDimension.InviteCodeVerticalPadding,
+                    ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
@@ -211,12 +217,12 @@ private fun FamilyInviteCodeCard(
             }
 
             Surface(
-                modifier = Modifier
-                    .size(
-                        width = MoilMemberDimension.InviteCodeActionWidth,
-                        height = MoilMemberDimension.InviteCodeActionHeight,
-                    )
-                    .clickable(onClick = onCopyClick),
+                modifier =
+                    Modifier
+                        .size(
+                            width = MoilMemberDimension.InviteCodeActionWidth,
+                            height = MoilMemberDimension.InviteCodeActionHeight,
+                        ).clickable(onClick = onCopyClick),
                 shape = RoundedCornerShape(percent = 50),
                 color = MaterialTheme.colorScheme.primary,
             ) {
@@ -315,10 +321,11 @@ private fun FamilyNotificationSettingRow(
     onNotificationsChanged: (Boolean) -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(MoilMemberDimension.SettingsRowHeight)
-            .padding(horizontal = MoilMemberDimension.ListItemHorizontalPadding),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(MoilMemberDimension.SettingsRowHeight)
+                .padding(horizontal = MoilMemberDimension.ListItemHorizontalPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -340,11 +347,12 @@ private fun FamilyActionSettingRow(
     onClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(MoilMemberDimension.SettingsRowHeight)
-            .clickable(onClick = onClick)
-            .padding(horizontal = MoilMemberDimension.ListItemHorizontalPadding),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(MoilMemberDimension.SettingsRowHeight)
+                .clickable(onClick = onClick)
+                .padding(horizontal = MoilMemberDimension.ListItemHorizontalPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -364,11 +372,12 @@ private fun FamilyActionSettingRow(
 @Composable
 private fun FamilyLeaveSettingRow(onClick: () -> Unit) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(MoilMemberDimension.SettingsRowHeight)
-            .clickable(onClick = onClick)
-            .padding(horizontal = MoilMemberDimension.ListItemHorizontalPadding),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(MoilMemberDimension.SettingsRowHeight)
+                .clickable(onClick = onClick)
+                .padding(horizontal = MoilMemberDimension.ListItemHorizontalPadding),
         contentAlignment = Alignment.CenterStart,
     ) {
         Text(

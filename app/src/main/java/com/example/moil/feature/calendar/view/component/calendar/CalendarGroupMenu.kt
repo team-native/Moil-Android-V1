@@ -1,6 +1,7 @@
 package com.example.moil.feature.calendar.view
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,7 +24,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.compose.foundation.clickable
 import com.example.moil.core.component.ApplyDialogWindowBackgroundBlur
 import com.example.moil.feature.calendar.viewmodel.CalendarGroupUiModel
 import com.example.moil.ui.theme.LocalMoilExtraColors
@@ -50,31 +50,34 @@ internal fun CalendarGroupMenu(
 
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
-                modifier = modifier
-                    .width(116.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.surface),
+                modifier =
+                    modifier
+                        .width(116.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.surface),
             ) {
                 groups.forEachIndexed { groupIndex, calendarGroup ->
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(30.dp)
-                            .clickable { onGroupClick(calendarGroup.id) }
-                            .padding(horizontal = 10.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(30.dp)
+                                .clickable { onGroupClick(calendarGroup.id) }
+                                .padding(horizontal = 10.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Box(
-                            modifier = Modifier
-                                .size(5.dp)
-                                .clip(CircleShape)
-                                .background(
-                                    if (calendarGroup.id == selectedGroupId) {
-                                        LocalMoilExtraColors.current.calendarEventBlue
-                                    } else {
-                                        LocalMoilExtraColors.current.calendarEventGreen
-                                    },
-                                ),
+                            modifier =
+                                Modifier
+                                    .size(5.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        if (calendarGroup.id == selectedGroupId) {
+                                            LocalMoilExtraColors.current.calendarEventBlue
+                                        } else {
+                                            LocalMoilExtraColors.current.calendarEventGreen
+                                        },
+                                    ),
                         )
 
                         Spacer(modifier = Modifier.width(8.dp))
