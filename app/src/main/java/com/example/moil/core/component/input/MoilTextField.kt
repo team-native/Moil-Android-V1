@@ -29,32 +29,36 @@ fun MoilTextField(
     keyboardType: KeyboardType = KeyboardType.Text,
     isPassword: Boolean = false,
 ) {
-    val visualTransformation = if (isPassword) {
-        PasswordVisualTransformation()
-    } else {
-        VisualTransformation.None
-    }
+    val visualTransformation =
+        if (isPassword) {
+            PasswordVisualTransformation()
+        } else {
+            VisualTransformation.None
+        }
 
     Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(MoilTextFieldDimension.Height)
-            .clip(RoundedCornerShape(MoilTextFieldDimension.CornerRadius))
-            .background(MaterialTheme.colorScheme.surfaceContainerLowest),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(MoilTextFieldDimension.Height)
+                .clip(RoundedCornerShape(MoilTextFieldDimension.CornerRadius))
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest),
         contentAlignment = Alignment.CenterStart,
     ) {
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = MoilTextFieldDimension.HorizontalPadding),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = MoilTextFieldDimension.HorizontalPadding),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             singleLine = true,
-            textStyle = MaterialTheme.typography.bodyMedium.copy(
-                color = MaterialTheme.colorScheme.onSurface,
-            ),
+            textStyle =
+                MaterialTheme.typography.bodyMedium.copy(
+                    color = MaterialTheme.colorScheme.onSurface,
+                ),
             visualTransformation = visualTransformation,
             decorationBox = { innerTextField ->
                 if (value.isEmpty()) {

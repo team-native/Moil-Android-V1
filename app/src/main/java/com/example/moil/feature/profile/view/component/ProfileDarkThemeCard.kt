@@ -29,10 +29,11 @@ internal fun ProfileDarkThemeCard(
         color = LocalMoilExtraColors.current.overlaySurface,
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(MoilProfileDimension.SettingRowHeight)
-                .padding(horizontal = MoilProfileDimension.GroupRowHorizontalPadding),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(MoilProfileDimension.SettingRowHeight)
+                    .padding(horizontal = MoilProfileDimension.GroupRowHorizontalPadding),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {

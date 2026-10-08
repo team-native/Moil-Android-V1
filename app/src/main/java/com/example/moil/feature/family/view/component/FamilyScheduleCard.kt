@@ -27,9 +27,10 @@ internal fun FamilyScheduleCard(
     ) {
         Text(
             text = stringResource(R.string.family_month_schedule_count, month.monthValue, eventCount),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = MoilGroupDetailDimension.ScheduleCardVerticalPadding),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = MoilGroupDetailDimension.ScheduleCardVerticalPadding),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,

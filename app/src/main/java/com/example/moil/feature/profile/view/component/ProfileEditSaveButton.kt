@@ -21,10 +21,11 @@ internal fun ProfileEditSaveButton(
         text = stringResource(R.string.profile_edit_save),
         enabled = enabled,
         onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .navigationBarsPadding()
-            .padding(bottom = MoilProfileEditDimension.SaveButtonBottomPadding)
-            .height(MoilProfileEditDimension.SaveButtonHeight),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(bottom = MoilProfileEditDimension.SaveButtonBottomPadding)
+                .height(MoilProfileEditDimension.SaveButtonHeight),
     )
 }

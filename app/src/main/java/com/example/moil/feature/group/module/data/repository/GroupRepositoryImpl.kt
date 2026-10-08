@@ -28,85 +28,122 @@ import com.example.moil.feature.group.module.domain.model.toWireValue
 import com.example.moil.feature.group.module.domain.repository.GroupRepository
 import javax.inject.Inject
 
-class GroupRepositoryImpl @Inject constructor(
-    private val groupRemoteDataSource: GroupRemoteDataSource,
-) : GroupRepository {
-    override suspend fun getMyGroups(): MoilResult<List<GroupSummary>> = groupRemoteDataSource
-        .getMyGroups()
-        .mapToDomain { groups -> groups.map(GroupSummaryResponseDto::toDomain) }
+class GroupRepositoryImpl
+    @Inject
+    constructor(
+        private val groupRemoteDataSource: GroupRemoteDataSource,
+    ) : GroupRepository {
+        override suspend fun getMyGroups(): MoilResult<List<GroupSummary>> =
+            groupRemoteDataSource
+                .getMyGroups()
+                .mapToDomain { groups -> groups.map(GroupSummaryResponseDto::toDomain) }
 
-    override suspend fun createGroup(name: String, nickname: String, color: GroupColor?, imagePath: String?): MoilResult<GroupSummary> = groupRemoteDataSource
-        .createGroup(
-            CreateGroupRequestDto(
-                name = name,
-                nickname = nickname,
-                colorId = color?.toWireValue(),
-                imagePath = imagePath,
-            ),
-        )
-        .mapToDomain(GroupSummaryResponseDto::toDomain)
+        override suspend fun createGroup(
+            name: String,
+            nickname: String,
+            color: GroupColor?,
+            imagePath: String?,
+        ): MoilResult<GroupSummary> =
+            groupRemoteDataSource
+                .createGroup(
+                    CreateGroupRequestDto(
+                        name = name,
+                        nickname = nickname,
+                        colorId = color?.toWireValue(),
+                        imagePath = imagePath,
+                    ),
+                ).mapToDomain(GroupSummaryResponseDto::toDomain)
 
-    override suspend fun verifyInvite(inviteCode: String): MoilResult<InviteVerification> = groupRemoteDataSource
-        .verifyInvite(VerifyInviteRequestDto(inviteCode))
-        .mapToDomain { response -> InviteVerification(response.groupId, response.name, response.memberCount, response.inviteCode) }
+        override suspend fun verifyInvite(inviteCode: String): MoilResult<InviteVerification> =
+            groupRemoteDataSource
+                .verifyInvite(VerifyInviteRequestDto(inviteCode))
+                .mapToDomain { response ->
+                    InviteVerification(response.groupId, response.name, response.memberCount, response.inviteCode)
+                }
 
-    override suspend fun joinGroup(inviteCode: String, nickname: String, color: GroupColor?, imagePath: String?): MoilResult<GroupSummary> = groupRemoteDataSource
-        .joinGroup(
-            JoinGroupRequestDto(
-                inviteCode = inviteCode,
-                nickname = nickname,
-                colorId = color?.toWireValue(),
-                imagePath = imagePath,
-            ),
-        )
-        .mapToDomain(GroupSummaryResponseDto::toDomain)
+        override suspend fun joinGroup(
+            inviteCode: String,
+            nickname: String,
+            color: GroupColor?,
+            imagePath: String?,
+        ): MoilResult<GroupSummary> =
+            groupRemoteDataSource
+                .joinGroup(
+                    JoinGroupRequestDto(
+                        inviteCode = inviteCode,
+                        nickname = nickname,
+                        colorId = color?.toWireValue(),
+                        imagePath = imagePath,
+                    ),
+                ).mapToDomain(GroupSummaryResponseDto::toDomain)
 
-    override suspend fun getGroup(groupId: Long): MoilResult<GroupDetail> = groupRemoteDataSource
-        .getGroup(groupId)
-        .mapToDomain(GroupDetailResponseDto::toDomain)
+        override suspend fun getGroup(groupId: Long): MoilResult<GroupDetail> =
+            groupRemoteDataSource
+                .getGroup(groupId)
+                .mapToDomain(GroupDetailResponseDto::toDomain)
 
-    override suspend fun getMembers(groupId: Long): MoilResult<List<GroupMember>> = groupRemoteDataSource
-        .getMembers(groupId)
-        .mapToDomain { members -> members.map(GroupMemberResponseDto::toDomain) }
+        override suspend fun getMembers(groupId: Long): MoilResult<List<GroupMember>> =
+            groupRemoteDataSource
+                .getMembers(groupId)
+                .mapToDomain { members -> members.map(GroupMemberResponseDto::toDomain) }
 
-    override suspend fun leaveGroup(groupId: Long): MoilResult<Unit> = groupRemoteDataSource
-        .leaveGroup(groupId)
-        .mapToDomain { Unit }
+        override suspend fun leaveGroup(groupId: Long): MoilResult<Unit> =
+            groupRemoteDataSource
+                .leaveGroup(groupId)
+                .mapToDomain { Unit }
 
-    // 그룹 내 프로필 편집 화면의 저장 요청에 사용할 내 멤버 프로필을 갱신합니다.
-    override suspend fun updateMyGroupProfile(
-        groupId: Long,
-        nickname: String,
-        color: GroupColor?,
-        imagePath: String?,
-    ): MoilResult<GroupMemberProfile> = groupRemoteDataSource
-        .updateMyGroupProfile(
-            groupId = groupId,
-            request = UpdateMyGroupProfileRequestDto(
-                nickname = nickname,
-                colorId = color?.toWireValue(),
-                imagePath = imagePath,
-            ),
-        )
-        .mapToDomain { response -> response.toDomain() }
+        // 그룹 내 프로필 편집 화면의 저장 요청에 사용할 내 멤버 프로필을 갱신합니다.
+        override suspend fun updateMyGroupProfile(
+            groupId: Long,
+            nickname: String,
+            color: GroupColor?,
+            imagePath: String?,
+        ): MoilResult<GroupMemberProfile> =
+            groupRemoteDataSource
+                .updateMyGroupProfile(
+                    groupId = groupId,
+                    request =
+                        UpdateMyGroupProfileRequestDto(
+                            nickname = nickname,
+                            colorId = color?.toWireValue(),
+                            imagePath = imagePath,
+                        ),
+                ).mapToDomain { response -> response.toDomain() }
 
-    override suspend fun updateNotification(groupId: Long, enabled: Boolean): MoilResult<Unit> = groupRemoteDataSource
-        .updateNotification(groupId, NotificationRequestDto(enabled))
-        .mapToDomain { Unit }
+        override suspend fun updateNotification(
+            groupId: Long,
+            enabled: Boolean,
+        ): MoilResult<Unit> =
+            groupRemoteDataSource
+                .updateNotification(groupId, NotificationRequestDto(enabled))
+                .mapToDomain { Unit }
 
-    override suspend fun renameGroup(groupId: Long, name: String): MoilResult<Unit> = groupRemoteDataSource
-        .renameGroup(groupId, RenameGroupRequestDto(name))
-        .mapToDomain { Unit }
-    override suspend fun updateMemberRoles(groupId: Long, roles: Map<Long, GroupRole>): MoilResult<Unit> {
-        val changes = roles.map { (userId, role) ->
-            MemberRoleChangeDto(userId, role.toMemberRoleRequestDto())
+        override suspend fun renameGroup(
+            groupId: Long,
+            name: String,
+        ): MoilResult<Unit> =
+            groupRemoteDataSource
+                .renameGroup(groupId, RenameGroupRequestDto(name))
+                .mapToDomain { Unit }
+
+        override suspend fun updateMemberRoles(
+            groupId: Long,
+            roles: Map<Long, GroupRole>,
+        ): MoilResult<Unit> {
+            val changes =
+                roles.map { (userId, role) ->
+                    MemberRoleChangeDto(userId, role.toMemberRoleRequestDto())
+                }
+            return groupRemoteDataSource
+                .updateMemberRoles(groupId, UpdateMemberRolesRequestDto(changes))
+                .mapToDomain { Unit }
         }
-        return groupRemoteDataSource
-            .updateMemberRoles(groupId, UpdateMemberRolesRequestDto(changes))
-            .mapToDomain { Unit }
-    }
 
-    override suspend fun transferAdmin(groupId: Long, targetUserId: Long): MoilResult<Unit> = groupRemoteDataSource
-        .transferAdmin(groupId, TransferAdminRequestDto(targetUserId))
-        .mapToDomain { Unit }
-}
+        override suspend fun transferAdmin(
+            groupId: Long,
+            targetUserId: Long,
+        ): MoilResult<Unit> =
+            groupRemoteDataSource
+                .transferAdmin(groupId, TransferAdminRequestDto(targetUserId))
+                .mapToDomain { Unit }
+    }

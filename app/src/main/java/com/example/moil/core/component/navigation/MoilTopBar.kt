@@ -51,12 +51,13 @@ private fun MoilTopBarPreview() {
         MoilTopBar(
             groupName = stringResource(R.string.calendar_family_name),
             groupMenuContentDescription = stringResource(R.string.calendar_group_menu),
-            groupMemberAvatarResources = listOf(
-                R.drawable.family_avatar_mine,
-                R.drawable.family_avatar_mom,
-                R.drawable.family_avatar_dad,
-                R.drawable.family_avatar_sibling,
-            ),
+            groupMemberAvatarResources =
+                listOf(
+                    R.drawable.family_avatar_mine,
+                    R.drawable.family_avatar_mom,
+                    R.drawable.family_avatar_dad,
+                    R.drawable.family_avatar_sibling,
+                ),
             isGroupIndicatorExpanded = false,
             searchContentDescription = stringResource(R.string.calendar_search),
             onGroupClick = {},

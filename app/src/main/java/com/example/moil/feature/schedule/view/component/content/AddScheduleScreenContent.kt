@@ -43,9 +43,10 @@ internal fun AddScheduleScreenContent(
             Image(
                 painter = painterResource(R.drawable.common_mascot),
                 contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(82.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(82.dp),
                 contentScale = ContentScale.Fit,
             )
 
@@ -77,9 +78,10 @@ internal fun AddScheduleScreenContent(
             Button(
                 onClick = { onEvent(AddScheduleScreenEvent.CompleteClicked) },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                ),
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                    ),
             ) {
                 Text(text = stringResource(R.string.add_schedule_complete))
             }

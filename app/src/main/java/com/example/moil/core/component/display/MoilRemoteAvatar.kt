@@ -21,17 +21,19 @@ fun MoilRemoteAvatar(
     modifier: Modifier = Modifier,
     size: Dp,
 ) {
-    val imageUrl = remember(imagePath) {
-        RemoteImageUrlResolver.resolve(imagePath)
-    }
+    val imageUrl =
+        remember(imagePath) {
+            RemoteImageUrlResolver.resolve(imagePath)
+        }
     val fallbackPainter = painterResource(fallbackAvatarRes)
 
     AsyncImage(
         model = imageUrl,
         contentDescription = contentDescription,
-        modifier = modifier
-            .size(size)
-            .clip(CircleShape),
+        modifier =
+            modifier
+                .size(size)
+                .clip(CircleShape),
         contentScale = ContentScale.Crop,
         placeholder = fallbackPainter,
         error = fallbackPainter,

@@ -37,16 +37,16 @@ fun MoilGroupSelector(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .height(MoilComponentSize.TopBarItem)
-            .clip(RoundedCornerShape(MoilRadius.Event))
-            .clickable(
-                role = Role.Button,
-                onClick = onClick,
-            )
-            .semantics {
-                contentDescription = groupMenuContentDescription
-            },
+        modifier =
+            modifier
+                .height(MoilComponentSize.TopBarItem)
+                .clip(RoundedCornerShape(MoilRadius.Event))
+                .clickable(
+                    role = Role.Button,
+                    onClick = onClick,
+                ).semantics {
+                    contentDescription = groupMenuContentDescription
+                },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         MoilGroupAvatarStack(groupMemberAvatarResources)
@@ -62,18 +62,20 @@ fun MoilGroupSelector(
         Spacer(modifier = Modifier.width(4.dp))
 
         Image(
-            painter = painterResource(
-                if (isGroupIndicatorExpanded) {
-                    R.drawable.group_collapse_indicator
-                } else {
-                    R.drawable.group_expand_indicator
-                },
-            ),
+            painter =
+                painterResource(
+                    if (isGroupIndicatorExpanded) {
+                        R.drawable.group_collapse_indicator
+                    } else {
+                        R.drawable.group_expand_indicator
+                    },
+                ),
             contentDescription = null,
-            modifier = Modifier.size(
-                width = 9.dp,
-                height = 6.dp,
-            ),
+            modifier =
+                Modifier.size(
+                    width = 9.dp,
+                    height = 6.dp,
+                ),
             contentScale = ContentScale.Fit,
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
         )

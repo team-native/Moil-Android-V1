@@ -18,8 +18,9 @@ internal fun SignUpPasswordContent(
     onEvent: (SignUpScreenEvent) -> Unit,
 ) {
     val isPasswordTooShort = uiState.password.isNotEmpty() && !passwordRegex.matches(uiState.password)
-    val isPasswordConfirmationInvalid = uiState.passwordConfirmation.isNotEmpty() &&
-        uiState.password != uiState.passwordConfirmation
+    val isPasswordConfirmationInvalid =
+        uiState.passwordConfirmation.isNotEmpty() &&
+            uiState.password != uiState.passwordConfirmation
 
     AuthScaffold(
         title = stringResource(R.string.auth_password_setup),

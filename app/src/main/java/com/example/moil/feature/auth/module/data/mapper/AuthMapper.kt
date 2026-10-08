@@ -6,11 +6,12 @@ import com.example.moil.feature.auth.module.data.dto.VerificationStepDto
 import com.example.moil.feature.auth.module.domain.model.UserProfile
 import com.example.moil.feature.auth.module.domain.model.VerificationStep
 
-internal fun UserProfileResponseDto.toDomain(): UserProfile = UserProfile(
-    userId = userId,
-    name = name,
-    email = email,
-)
+internal fun UserProfileResponseDto.toDomain(): UserProfile =
+    UserProfile(
+        userId = userId,
+        name = name,
+        email = email,
+    )
 
 internal fun TokenResponseDto.toUserProfileOrNull(fallbackName: String? = null): UserProfile? {
     val responseUserId = userId ?: return null
@@ -24,7 +25,8 @@ internal fun TokenResponseDto.toUserProfileOrNull(fallbackName: String? = null):
     )
 }
 
-internal fun VerificationStep.toDto(): VerificationStepDto = when (this) {
-    VerificationStep.SignUp -> VerificationStepDto.SignUp
-    VerificationStep.Reset -> VerificationStepDto.Reset
-}
+internal fun VerificationStep.toDto(): VerificationStepDto =
+    when (this) {
+        VerificationStep.SignUp -> VerificationStepDto.SignUp
+        VerificationStep.Reset -> VerificationStepDto.Reset
+    }

@@ -5,8 +5,10 @@ import com.example.moil.feature.group.module.domain.model.GroupSummary
 import com.example.moil.feature.group.module.domain.repository.GroupRepository
 import javax.inject.Inject
 
-class GetMyGroupsUseCase @Inject constructor(
-    private val repository: GroupRepository,
-) {
-    suspend operator fun invoke(): MoilResult<List<GroupSummary>> = repository.getMyGroups()
-}
+class GetMyGroupsUseCase
+    @Inject
+    constructor(
+        private val repository: GroupRepository,
+    ) {
+        suspend operator fun invoke(): MoilResult<List<GroupSummary>> = repository.getMyGroups()
+    }

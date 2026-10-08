@@ -23,10 +23,11 @@ fun SignUpScreen(
 private fun SignUpPasswordScreenPreview() {
     MoilTheme(darkTheme = false) {
         SignUpScreen(
-            uiState = SignUpUiState(
-                currentStep = SignUpStep.Password,
-                password = "1234",
-            ),
+            uiState =
+                SignUpUiState(
+                    currentStep = SignUpStep.Password,
+                    password = "1234",
+                ),
             onEvent = {},
         )
     }

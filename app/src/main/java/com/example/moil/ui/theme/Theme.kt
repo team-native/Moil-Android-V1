@@ -35,9 +35,10 @@ data class MoilExtraColors(
     val profileLogout: Color,
 )
 
-val LocalMoilExtraColors = staticCompositionLocalOf<MoilExtraColors> {
-    error("MoilExtraColors is not provided.")
-}
+val LocalMoilExtraColors =
+    staticCompositionLocalOf<MoilExtraColors> {
+        error("MoilExtraColors is not provided.")
+    }
 
 val LocalMoilIsDarkTheme = staticCompositionLocalOf { false }
 
@@ -108,133 +109,139 @@ private val profileLogoutColor = Color(0xFFCF4040)
 private val darkScheduleDividerColor = Color(0xFF615D57)
 private val darkScheduleMutedTextColor = Color(0xFF9B9891)
 
-private val LightColorScheme = lightColorScheme(
-    primary = lightPrimaryColor,
-    onPrimary = lightOnPrimaryColor,
-    primaryContainer = lightPrimaryContainerColor,
-    onPrimaryContainer = lightOnPrimaryContainerColor,
-    secondary = lightSecondaryColor,
-    onSecondary = lightOnSecondaryColor,
-    secondaryContainer = lightSecondaryContainerColor,
-    onSecondaryContainer = lightOnSecondaryContainerColor,
-    tertiary = lightTertiaryColor,
-    onTertiary = lightOnTertiaryColor,
-    tertiaryContainer = lightTertiaryContainerColor,
-    onTertiaryContainer = lightOnTertiaryContainerColor,
-    background = lightBackgroundColor,
-    onBackground = lightOnBackgroundColor,
-    surface = lightSurfaceColor,
-    onSurface = lightOnSurfaceColor,
-    surfaceContainerLowest = lightSurfaceContainerColor,
-    surfaceContainerLow = lightSurfaceContainerColor,
-    surfaceContainer = lightSurfaceContainerColor,
-    surfaceContainerHigh = lightSurfaceContainerColor,
-    surfaceContainerHighest = lightSurfaceContainerColor,
-    surfaceVariant = lightSurfaceVariantColor,
-    onSurfaceVariant = lightOnSurfaceVariantColor,
-    outline = lightOutlineColor,
-    outlineVariant = lightOutlineVariantColor,
-    error = lightErrorColor,
-    onError = lightOnErrorColor,
-    errorContainer = lightErrorContainerColor,
-    onErrorContainer = lightOnErrorContainerColor,
-)
+private val LightColorScheme =
+    lightColorScheme(
+        primary = lightPrimaryColor,
+        onPrimary = lightOnPrimaryColor,
+        primaryContainer = lightPrimaryContainerColor,
+        onPrimaryContainer = lightOnPrimaryContainerColor,
+        secondary = lightSecondaryColor,
+        onSecondary = lightOnSecondaryColor,
+        secondaryContainer = lightSecondaryContainerColor,
+        onSecondaryContainer = lightOnSecondaryContainerColor,
+        tertiary = lightTertiaryColor,
+        onTertiary = lightOnTertiaryColor,
+        tertiaryContainer = lightTertiaryContainerColor,
+        onTertiaryContainer = lightOnTertiaryContainerColor,
+        background = lightBackgroundColor,
+        onBackground = lightOnBackgroundColor,
+        surface = lightSurfaceColor,
+        onSurface = lightOnSurfaceColor,
+        surfaceContainerLowest = lightSurfaceContainerColor,
+        surfaceContainerLow = lightSurfaceContainerColor,
+        surfaceContainer = lightSurfaceContainerColor,
+        surfaceContainerHigh = lightSurfaceContainerColor,
+        surfaceContainerHighest = lightSurfaceContainerColor,
+        surfaceVariant = lightSurfaceVariantColor,
+        onSurfaceVariant = lightOnSurfaceVariantColor,
+        outline = lightOutlineColor,
+        outlineVariant = lightOutlineVariantColor,
+        error = lightErrorColor,
+        onError = lightOnErrorColor,
+        errorContainer = lightErrorContainerColor,
+        onErrorContainer = lightOnErrorContainerColor,
+    )
 
-private val DarkColorScheme = darkColorScheme(
-    primary = darkPrimaryColor,
-    onPrimary = darkOnPrimaryColor,
-    primaryContainer = darkPrimaryContainerColor,
-    onPrimaryContainer = darkOnPrimaryContainerColor,
-    secondary = darkSecondaryColor,
-    onSecondary = darkOnSecondaryColor,
-    secondaryContainer = darkSecondaryContainerColor,
-    onSecondaryContainer = darkOnSecondaryContainerColor,
-    tertiary = darkTertiaryColor,
-    onTertiary = darkOnTertiaryColor,
-    tertiaryContainer = darkTertiaryContainerColor,
-    onTertiaryContainer = darkOnTertiaryContainerColor,
-    background = darkBackgroundColor,
-    onBackground = darkOnBackgroundColor,
-    surface = darkSurfaceColor,
-    onSurface = darkOnSurfaceColor,
-    surfaceContainerLowest = darkSurfaceContainerColor,
-    surfaceContainerLow = darkSurfaceContainerColor,
-    surfaceContainer = darkSurfaceContainerColor,
-    surfaceContainerHigh = darkSurfaceContainerColor,
-    surfaceContainerHighest = darkSurfaceContainerColor,
-    surfaceVariant = darkSurfaceVariantColor,
-    onSurfaceVariant = darkOnSurfaceVariantColor,
-    outline = darkOutlineColor,
-    outlineVariant = darkOutlineVariantColor,
-    error = darkErrorColor,
-    onError = darkOnErrorColor,
-    errorContainer = darkErrorContainerColor,
-    onErrorContainer = darkOnErrorContainerColor,
-)
+private val DarkColorScheme =
+    darkColorScheme(
+        primary = darkPrimaryColor,
+        onPrimary = darkOnPrimaryColor,
+        primaryContainer = darkPrimaryContainerColor,
+        onPrimaryContainer = darkOnPrimaryContainerColor,
+        secondary = darkSecondaryColor,
+        onSecondary = darkOnSecondaryColor,
+        secondaryContainer = darkSecondaryContainerColor,
+        onSecondaryContainer = darkOnSecondaryContainerColor,
+        tertiary = darkTertiaryColor,
+        onTertiary = darkOnTertiaryColor,
+        tertiaryContainer = darkTertiaryContainerColor,
+        onTertiaryContainer = darkOnTertiaryContainerColor,
+        background = darkBackgroundColor,
+        onBackground = darkOnBackgroundColor,
+        surface = darkSurfaceColor,
+        onSurface = darkOnSurfaceColor,
+        surfaceContainerLowest = darkSurfaceContainerColor,
+        surfaceContainerLow = darkSurfaceContainerColor,
+        surfaceContainer = darkSurfaceContainerColor,
+        surfaceContainerHigh = darkSurfaceContainerColor,
+        surfaceContainerHighest = darkSurfaceContainerColor,
+        surfaceVariant = darkSurfaceVariantColor,
+        onSurfaceVariant = darkOnSurfaceVariantColor,
+        outline = darkOutlineColor,
+        outlineVariant = darkOutlineVariantColor,
+        error = darkErrorColor,
+        onError = darkOnErrorColor,
+        errorContainer = darkErrorContainerColor,
+        onErrorContainer = darkOnErrorContainerColor,
+    )
 
-private val moilExtraColors = MoilExtraColors(
-    memberCyan = memberCyanColor,
-    memberViolet = memberVioletColor,
-    memberRose = memberRoseColor,
-    calendarEventBlue = calendarEventBlueColor,
-    calendarEventGreen = calendarEventGreenColor,
-    calendarEventYellow = calendarEventYellowColor,
-    profileSky = calendarEventBlueColor,
-    profileRed = lightPrimaryColor,
-    profileGreen = calendarEventGreenColor,
-    profileYellow = calendarEventYellowColor,
-    profileTeal = memberCyanColor,
-    profileViolet = memberVioletColor,
-    profileMagenta = memberRoseColor,
-    calendarMutedText = calendarMutedTextColor,
-    scheduleDivider = lightScheduleDividerColor,
-    scheduleMutedText = lightScheduleMutedTextColor,
-    switchTrack = lightScheduleDividerColor,
-    overlaySurface = Color.White,
-    profileGroupPrimaryIndicator = profileGroupPrimaryIndicatorColor,
-    profileGroupSecondaryIndicator = profileGroupSecondaryIndicatorColor,
-    profileLogout = profileLogoutColor,
-)
+private val moilExtraColors =
+    MoilExtraColors(
+        memberCyan = memberCyanColor,
+        memberViolet = memberVioletColor,
+        memberRose = memberRoseColor,
+        calendarEventBlue = calendarEventBlueColor,
+        calendarEventGreen = calendarEventGreenColor,
+        calendarEventYellow = calendarEventYellowColor,
+        profileSky = calendarEventBlueColor,
+        profileRed = lightPrimaryColor,
+        profileGreen = calendarEventGreenColor,
+        profileYellow = calendarEventYellowColor,
+        profileTeal = memberCyanColor,
+        profileViolet = memberVioletColor,
+        profileMagenta = memberRoseColor,
+        calendarMutedText = calendarMutedTextColor,
+        scheduleDivider = lightScheduleDividerColor,
+        scheduleMutedText = lightScheduleMutedTextColor,
+        switchTrack = lightScheduleDividerColor,
+        overlaySurface = Color.White,
+        profileGroupPrimaryIndicator = profileGroupPrimaryIndicatorColor,
+        profileGroupSecondaryIndicator = profileGroupSecondaryIndicatorColor,
+        profileLogout = profileLogoutColor,
+    )
 
-private val darkMoilExtraColors = MoilExtraColors(
-    memberCyan = memberCyanColor,
-    memberViolet = memberVioletColor,
-    memberRose = memberRoseColor,
-    calendarEventBlue = calendarEventBlueColor,
-    calendarEventGreen = calendarEventGreenColor,
-    calendarEventYellow = calendarEventYellowColor,
-    profileSky = calendarEventBlueColor,
-    profileRed = darkPrimaryColor,
-    profileGreen = calendarEventGreenColor,
-    profileYellow = calendarEventYellowColor,
-    profileTeal = memberCyanColor,
-    profileViolet = memberVioletColor,
-    profileMagenta = memberRoseColor,
-    calendarMutedText = calendarMutedTextColor,
-    scheduleDivider = darkScheduleDividerColor,
-    scheduleMutedText = darkScheduleMutedTextColor,
-    switchTrack = darkScheduleDividerColor,
-    overlaySurface = darkSurfaceColor,
-    profileGroupPrimaryIndicator = profileGroupPrimaryIndicatorColor,
-    profileGroupSecondaryIndicator = profileGroupSecondaryIndicatorColor,
-    profileLogout = profileLogoutColor,
-)
+private val darkMoilExtraColors =
+    MoilExtraColors(
+        memberCyan = memberCyanColor,
+        memberViolet = memberVioletColor,
+        memberRose = memberRoseColor,
+        calendarEventBlue = calendarEventBlueColor,
+        calendarEventGreen = calendarEventGreenColor,
+        calendarEventYellow = calendarEventYellowColor,
+        profileSky = calendarEventBlueColor,
+        profileRed = darkPrimaryColor,
+        profileGreen = calendarEventGreenColor,
+        profileYellow = calendarEventYellowColor,
+        profileTeal = memberCyanColor,
+        profileViolet = memberVioletColor,
+        profileMagenta = memberRoseColor,
+        calendarMutedText = calendarMutedTextColor,
+        scheduleDivider = darkScheduleDividerColor,
+        scheduleMutedText = darkScheduleMutedTextColor,
+        switchTrack = darkScheduleDividerColor,
+        overlaySurface = darkSurfaceColor,
+        profileGroupPrimaryIndicator = profileGroupPrimaryIndicatorColor,
+        profileGroupSecondaryIndicator = profileGroupSecondaryIndicatorColor,
+        profileLogout = profileLogoutColor,
+    )
 
 @Composable
 fun MoilTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
-    val colorScheme = if (darkTheme) {
-        DarkColorScheme
-    } else {
-        LightColorScheme
-    }
-    val extraColors = if (darkTheme) {
-        darkMoilExtraColors
-    } else {
-        moilExtraColors
-    }
+    val colorScheme =
+        if (darkTheme) {
+            DarkColorScheme
+        } else {
+            LightColorScheme
+        }
+    val extraColors =
+        if (darkTheme) {
+            darkMoilExtraColors
+        } else {
+            moilExtraColors
+        }
 
     CompositionLocalProvider(
         LocalMoilExtraColors provides extraColors,

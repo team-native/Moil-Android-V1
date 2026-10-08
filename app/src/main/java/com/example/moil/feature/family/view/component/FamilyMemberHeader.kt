@@ -14,9 +14,7 @@ import com.example.moil.ui.theme.LocalMoilExtraTypography
 import com.example.moil.ui.theme.MoilTheme
 
 @Composable
-internal fun FamilyMemberHeader(
-    modifier: Modifier = Modifier,
-) {
+internal fun FamilyMemberHeader(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,

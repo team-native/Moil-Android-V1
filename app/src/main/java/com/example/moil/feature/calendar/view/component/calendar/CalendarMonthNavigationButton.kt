@@ -26,21 +26,23 @@ internal fun CalendarMonthNavigationButton(
     onClick: () -> Unit,
 ) {
     val isDarkTheme = LocalMoilIsDarkTheme.current
-    val navigationImageModifier = if (isDarkTheme) {
-        Modifier.fillMaxSize()
-    } else {
-        Modifier.size(12.dp)
-    }
+    val navigationImageModifier =
+        if (isDarkTheme) {
+            Modifier.fillMaxSize()
+        } else {
+            Modifier.size(12.dp)
+        }
 
     Box(
-        modifier = Modifier
-            .size(30.dp)
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.surface)
-            .clickable(
-                role = Role.Button,
-                onClick = onClick,
-            ),
+        modifier =
+            Modifier
+                .size(30.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surface)
+                .clickable(
+                    role = Role.Button,
+                    onClick = onClick,
+                ),
         contentAlignment = Alignment.Center,
     ) {
         Image(

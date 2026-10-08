@@ -24,9 +24,10 @@ internal fun MoilGroupAvatarStack(
             Image(
                 painter = painterResource(avatarResource),
                 contentDescription = null,
-                modifier = Modifier
-                    .size(18.dp)
-                    .clip(CircleShape),
+                modifier =
+                    Modifier
+                        .size(18.dp)
+                        .clip(CircleShape),
                 contentScale = ContentScale.Crop,
             )
 

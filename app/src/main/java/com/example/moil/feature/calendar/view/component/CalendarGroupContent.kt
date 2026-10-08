@@ -17,10 +17,11 @@ internal fun CalendarGroupContent(
 ) {
     Column(modifier = modifier) {
         CalendarTopBarSection(
-            selectedGroupName = uiState.groups
-                .firstOrNull { group -> group.id == uiState.selectedGroupId }
-                ?.name
-                .orEmpty(),
+            selectedGroupName =
+                uiState.groups
+                    .firstOrNull { group -> group.id == uiState.selectedGroupId }
+                    ?.name
+                    .orEmpty(),
             memberAvatarResources = uiState.members.map { member -> member.avatarRes },
             groups = uiState.groups,
             selectedGroupId = uiState.selectedGroupId,

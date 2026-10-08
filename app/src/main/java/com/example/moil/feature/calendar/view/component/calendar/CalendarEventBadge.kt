@@ -15,12 +15,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import com.example.moil.feature.calendar.viewmodel.CalendarEventUiModel
 import com.example.moil.feature.group.module.domain.model.GroupColor
 import com.example.moil.ui.theme.LocalMoilExtraColors
 import com.example.moil.ui.theme.MoilCalendarDimension
 import com.example.moil.ui.theme.MoilRadius
-import androidx.compose.ui.unit.dp
 
 @Composable
 internal fun CalendarEventBadge(
@@ -30,24 +30,25 @@ internal fun CalendarEventBadge(
     isRangeEnd: Boolean = true,
 ) {
     val extraColors = LocalMoilExtraColors.current
-    val eventShape = RoundedCornerShape(
-        topStart = if (isRangeStart) MoilRadius.Event else 0.dp,
-        bottomStart = if (isRangeStart) MoilRadius.Event else 0.dp,
-        topEnd = if (isRangeEnd) MoilRadius.Event else 0.dp,
-        bottomEnd = if (isRangeEnd) MoilRadius.Event else 0.dp,
-    )
+    val eventShape =
+        RoundedCornerShape(
+            topStart = if (isRangeStart) MoilRadius.Event else 0.dp,
+            bottomStart = if (isRangeStart) MoilRadius.Event else 0.dp,
+            topEnd = if (isRangeEnd) MoilRadius.Event else 0.dp,
+            bottomEnd = if (isRangeEnd) MoilRadius.Event else 0.dp,
+        )
 
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = MoilCalendarDimension.EventBadgeOuterHorizontalPadding)
-            .clip(eventShape)
-            .background(extraColors.colorForProfile(calendarEvent.displayColor))
-            .padding(
-                horizontal = MoilCalendarDimension.EventBadgeHorizontalPadding,
-                vertical = MoilCalendarDimension.EventBadgeVerticalPadding,
-            )
-            .semantics { contentDescription = calendarEvent.title },
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = MoilCalendarDimension.EventBadgeOuterHorizontalPadding)
+                .clip(eventShape)
+                .background(extraColors.colorForProfile(calendarEvent.displayColor))
+                .padding(
+                    horizontal = MoilCalendarDimension.EventBadgeHorizontalPadding,
+                    vertical = MoilCalendarDimension.EventBadgeVerticalPadding,
+                ).semantics { contentDescription = calendarEvent.title },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -60,15 +61,14 @@ internal fun CalendarEventBadge(
     }
 }
 
-internal fun com.example.moil.ui.theme.MoilExtraColors.colorForProfile(
-    profileColor: GroupColor,
-): Color = when (profileColor) {
-    GroupColor.Sky -> profileSky
-    GroupColor.Red -> profileRed
-    GroupColor.Green -> profileGreen
-    GroupColor.Yellow -> profileYellow
-    GroupColor.Teal -> profileTeal
-    GroupColor.Violet -> profileViolet
-    GroupColor.Magenta -> profileMagenta
-    GroupColor.Unknown -> calendarMutedText
-}
+internal fun com.example.moil.ui.theme.MoilExtraColors.colorForProfile(profileColor: GroupColor): Color =
+    when (profileColor) {
+        GroupColor.Sky -> profileSky
+        GroupColor.Red -> profileRed
+        GroupColor.Green -> profileGreen
+        GroupColor.Yellow -> profileYellow
+        GroupColor.Teal -> profileTeal
+        GroupColor.Violet -> profileViolet
+        GroupColor.Magenta -> profileMagenta
+        GroupColor.Unknown -> calendarMutedText
+    }

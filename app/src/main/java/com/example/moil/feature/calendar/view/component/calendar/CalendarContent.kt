@@ -12,20 +12,31 @@ internal fun CalendarContent(
     modifier: Modifier = Modifier,
 ) {
     when {
-        uiState.isGroupsLoading -> CalendarGroupLoadingContent(modifier = modifier)
-        uiState.groupLoadError != null -> CalendarGroupErrorContent(
-            onRetryClick = { onEvent(CalendarScreenEvent.RetryGroupsClicked) },
-            modifier = modifier,
-        )
-        uiState.groups.isEmpty() -> CalendarEmptyGroupContent(
-            onJoinGroupClick = { onEvent(CalendarScreenEvent.EmptyGroupJoinClicked) },
-            onCreateGroupClick = { onEvent(CalendarScreenEvent.EmptyGroupCreateClicked) },
-            modifier = modifier,
-        )
-        else -> CalendarGroupContent(
-            uiState = uiState,
-            onEvent = onEvent,
-            modifier = modifier,
-        )
+        uiState.isGroupsLoading -> {
+            CalendarGroupLoadingContent(modifier = modifier)
+        }
+
+        uiState.groupLoadError != null -> {
+            CalendarGroupErrorContent(
+                onRetryClick = { onEvent(CalendarScreenEvent.RetryGroupsClicked) },
+                modifier = modifier,
+            )
+        }
+
+        uiState.groups.isEmpty() -> {
+            CalendarEmptyGroupContent(
+                onJoinGroupClick = { onEvent(CalendarScreenEvent.EmptyGroupJoinClicked) },
+                onCreateGroupClick = { onEvent(CalendarScreenEvent.EmptyGroupCreateClicked) },
+                modifier = modifier,
+            )
+        }
+
+        else -> {
+            CalendarGroupContent(
+                uiState = uiState,
+                onEvent = onEvent,
+                modifier = modifier,
+            )
+        }
     }
 }

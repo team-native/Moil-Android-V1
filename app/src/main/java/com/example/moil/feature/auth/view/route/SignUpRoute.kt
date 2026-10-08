@@ -44,8 +44,7 @@ internal const val verificationCodeLength = 6
 
 internal fun SignUpUiState.emailRegexMatches(): Boolean = emailRegex.matches(email)
 
-internal fun LoginUiState.canLogin(): Boolean =
-    emailRegex.matches(email) && passwordRegex.matches(password)
+internal fun LoginUiState.canLogin(): Boolean = emailRegex.matches(email) && passwordRegex.matches(password)
 
 internal fun SignUpUiState.canCreateAccount(): Boolean =
     passwordRegex.matches(password) && password == passwordConfirmation

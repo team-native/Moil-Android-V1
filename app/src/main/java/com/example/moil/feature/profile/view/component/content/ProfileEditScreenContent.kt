@@ -25,10 +25,11 @@ internal fun ProfileEditScreenContent(
     onEvent: (ProfileEditScreenEvent) -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .padding(horizontal = MoilProfileEditDimension.ScreenHorizontalPadding),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .padding(horizontal = MoilProfileEditDimension.ScreenHorizontalPadding),
     ) {
         FamilyDetailHeader(
             groupName = stringResource(R.string.profile_edit_title),

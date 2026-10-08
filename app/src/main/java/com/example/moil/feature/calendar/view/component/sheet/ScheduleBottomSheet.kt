@@ -40,14 +40,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.example.moil.R
 import com.example.moil.core.component.display.MoilRemoteAvatar
-import com.example.moil.feature.calendar.viewmodel.CalendarScheduleSheetMode
 import com.example.moil.feature.calendar.viewmodel.CalendarScheduleMemberUiModel
+import com.example.moil.feature.calendar.viewmodel.CalendarScheduleSheetMode
 import com.example.moil.feature.calendar.viewmodel.CalendarScheduleUiModel
 import com.example.moil.feature.calendar.viewmodel.CalendarScreenEvent
 import com.example.moil.feature.calendar.viewmodel.CalendarUiState
@@ -76,41 +76,49 @@ internal fun ScheduleBottomSheet(
         onDismissRequest = { onEvent(CalendarScreenEvent.ScheduleSheetDismissed) },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surface,
-        shape = RoundedCornerShape(
-            topStart = MoilRadius.ScheduleSheet,
-            topEnd = MoilRadius.ScheduleSheet,
-        ),
+        shape =
+            RoundedCornerShape(
+                topStart = MoilRadius.ScheduleSheet,
+                topEnd = MoilRadius.ScheduleSheet,
+            ),
         dragHandle = null,
         contentWindowInsets = { WindowInsets.statusBars },
     ) {
         when (uiState.scheduleSheetMode) {
-            CalendarScheduleSheetMode.List -> ScheduleListContent(
-                selectedDate = uiState.selectedDate,
-                schedules = uiState.schedules,
-                onCreateClick = {
-                    onEvent(CalendarScreenEvent.ScheduleCreateClicked)
-                },
-                onScheduleClick = { eventId ->
-                    onEvent(CalendarScreenEvent.ScheduleItemClicked(eventId))
-                },
-            )
+            CalendarScheduleSheetMode.List -> {
+                ScheduleListContent(
+                    selectedDate = uiState.selectedDate,
+                    schedules = uiState.schedules,
+                    onCreateClick = {
+                        onEvent(CalendarScreenEvent.ScheduleCreateClicked)
+                    },
+                    onScheduleClick = { eventId ->
+                        onEvent(CalendarScreenEvent.ScheduleItemClicked(eventId))
+                    },
+                )
+            }
 
             CalendarScheduleSheetMode.Create,
-            CalendarScheduleSheetMode.Edit -> ScheduleFormContent(
-                uiState = uiState,
-                isEditMode = uiState.scheduleSheetMode == CalendarScheduleSheetMode.Edit,
-                isMutationLoading = isMutationLoading,
-                hasMutationError = hasMutationError,
-                onEvent = onEvent,
-            )
+            CalendarScheduleSheetMode.Edit,
+            -> {
+                ScheduleFormContent(
+                    uiState = uiState,
+                    isEditMode = uiState.scheduleSheetMode == CalendarScheduleSheetMode.Edit,
+                    isMutationLoading = isMutationLoading,
+                    hasMutationError = hasMutationError,
+                    onEvent = onEvent,
+                )
+            }
 
-            CalendarScheduleSheetMode.Detail -> ScheduleDetailContent(
-                schedule = selectedSchedule,
-                isLoading = isSelectedEventLoading,
-                hasError = hasSelectedEventError,
-                hasMutationError = hasMutationError,
-                onEvent = onEvent,
-            )
+            CalendarScheduleSheetMode.Detail -> {
+                ScheduleDetailContent(
+                    schedule = selectedSchedule,
+                    isLoading = isSelectedEventLoading,
+                    hasError = hasSelectedEventError,
+                    hasMutationError = hasMutationError,
+                    onEvent = onEvent,
+                )
+            }
         }
     }
 }
@@ -122,9 +130,10 @@ private fun ScheduleListContent(
     onCreateClick: () -> Unit,
     onScheduleClick: (Long) -> Unit,
 ) {
-    val selectedDateSchedules = schedules
-        .filter { schedule -> schedule.date == selectedDate }
-        .sortedWith(compareBy<CalendarScheduleUiModel> { it.startTime ?: LocalTime.MAX }.thenBy { it.id })
+    val selectedDateSchedules =
+        schedules
+            .filter { schedule -> schedule.date == selectedDate }
+            .sortedWith(compareBy<CalendarScheduleUiModel> { it.startTime ?: LocalTime.MAX }.thenBy { it.id })
 
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
@@ -139,9 +148,10 @@ private fun ScheduleListContent(
         if (selectedDateSchedules.isEmpty()) {
             item {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(MoilScheduleSheet.ListItemHeight),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(MoilScheduleSheet.ListItemHeight),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
@@ -177,21 +187,23 @@ private fun ScheduleListHeader(
     val createContentDescription = stringResource(R.string.schedule_create_content_description)
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(MoilScheduleSheet.ListHeaderHeight)
-            .padding(horizontal = MoilScheduleSheet.HorizontalPadding),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(MoilScheduleSheet.ListHeaderHeight)
+                .padding(horizontal = MoilScheduleSheet.HorizontalPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = stringResource(
-                        R.string.schedule_date_header,
-                        selectedDate.monthValue,
-                        selectedDate.dayOfMonth,
-                        stringResource(weekdayNameRes(selectedDate)),
-                    ),
+                    text =
+                        stringResource(
+                            R.string.schedule_date_header,
+                            selectedDate.monthValue,
+                            selectedDate.dayOfMonth,
+                            stringResource(weekdayNameRes(selectedDate)),
+                        ),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                 )
@@ -209,17 +221,17 @@ private fun ScheduleListHeader(
         }
 
         Box(
-            modifier = Modifier
-                .size(MoilScheduleSheet.ListCreateButtonSize)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .clickable(
-                    role = Role.Button,
-                    onClick = onCreateClick,
-                )
-                .semantics {
-                    contentDescription = createContentDescription
-                },
+            modifier =
+                Modifier
+                    .size(MoilScheduleSheet.ListCreateButtonSize)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .clickable(
+                        role = Role.Button,
+                        onClick = onCreateClick,
+                    ).semantics {
+                        contentDescription = createContentDescription
+                    },
             contentAlignment = Alignment.Center,
         ) {
             // 버튼(60dp)만 커진 만큼 "+" 심볼도 같은 비율(25%)로 이 버튼 안에서만 확대한다.
@@ -227,10 +239,11 @@ private fun ScheduleListHeader(
             Text(
                 text = stringResource(R.string.schedule_add_symbol),
                 color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontSize = 25.sp,
-                    lineHeight = 32.5.sp,
-                ),
+                style =
+                    MaterialTheme.typography.headlineMedium.copy(
+                        fontSize = 25.sp,
+                        lineHeight = 32.5.sp,
+                    ),
                 fontWeight = FontWeight.Light,
             )
         }
@@ -246,21 +259,22 @@ private fun ScheduleListRow(
 
     Column {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(MoilScheduleSheet.ListItemHeight)
-                .clickable(
-                    role = Role.Button,
-                    onClick = onClick,
-                )
-                .padding(horizontal = MoilScheduleSheet.HorizontalPadding),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(MoilScheduleSheet.ListItemHeight)
+                    .clickable(
+                        role = Role.Button,
+                        onClick = onClick,
+                    ).padding(horizontal = MoilScheduleSheet.HorizontalPadding),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
-                modifier = Modifier
-                    .size(MoilScheduleSheet.ListEventDotSize)
-                    .clip(CircleShape)
-                    .background(extraColors.colorForProfile(schedule.displayColor)),
+                modifier =
+                    Modifier
+                        .size(MoilScheduleSheet.ListEventDotSize)
+                        .clip(CircleShape)
+                        .background(extraColors.colorForProfile(schedule.displayColor)),
             )
 
             Spacer(modifier = Modifier.width(MoilScheduleSheet.ListContentSpacing))
@@ -296,10 +310,11 @@ private fun ScheduleListRow(
 
                 ScheduleParticipantAvatars(
                     members = schedule.members,
-                    contentDescription = stringResource(
-                        R.string.schedule_participants_content_description,
-                        schedule.members.size,
-                    ),
+                    contentDescription =
+                        stringResource(
+                            R.string.schedule_participants_content_description,
+                            schedule.members.size,
+                        ),
                 )
             }
 
@@ -382,47 +397,53 @@ private fun ScheduleFormContent(
 
         ScheduleInfoRow(
             labelRes = R.string.schedule_date,
-            value = stringResource(
-                R.string.schedule_date_value,
-                uiState.scheduleDate.monthValue,
-                uiState.scheduleDate.dayOfMonth,
-                stringResource(weekdayNameRes(uiState.scheduleDate)),
-            ),
+            value =
+                stringResource(
+                    R.string.schedule_date_value,
+                    uiState.scheduleDate.monthValue,
+                    uiState.scheduleDate.dayOfMonth,
+                    stringResource(weekdayNameRes(uiState.scheduleDate)),
+                ),
             onClick = { onEvent(CalendarScreenEvent.ScheduleDateClicked) },
         )
 
         ScheduleInfoRow(
             labelRes = R.string.schedule_time,
-            value = formatScheduleTimeRange(
-                startTime = uiState.scheduleStartTime,
-                endTime = uiState.scheduleEndTime,
-            ),
+            value =
+                formatScheduleTimeRange(
+                    startTime = uiState.scheduleStartTime,
+                    endTime = uiState.scheduleEndTime,
+                ),
             onClick = { onEvent(CalendarScreenEvent.ScheduleTimeClicked) },
         )
 
         ScheduleInfoRow(
             labelRes = R.string.schedule_location,
-            value = uiState.scheduleLocation.ifEmpty {
-                stringResource(R.string.schedule_add)
-            },
-            valueColor = if (uiState.scheduleLocation.isEmpty()) {
-                LocalMoilExtraColors.current.scheduleMutedText
-            } else {
-                MaterialTheme.colorScheme.outline
-            },
+            value =
+                uiState.scheduleLocation.ifEmpty {
+                    stringResource(R.string.schedule_add)
+                },
+            valueColor =
+                if (uiState.scheduleLocation.isEmpty()) {
+                    LocalMoilExtraColors.current.scheduleMutedText
+                } else {
+                    MaterialTheme.colorScheme.outline
+                },
             onClick = { onEvent(CalendarScreenEvent.ScheduleLocationClicked) },
         )
 
         ScheduleInfoRow(
             labelRes = R.string.schedule_memo,
-            value = uiState.scheduleMemo.ifEmpty {
-                stringResource(R.string.schedule_add)
-            },
-            valueColor = if (uiState.scheduleMemo.isEmpty()) {
-                LocalMoilExtraColors.current.scheduleMutedText
-            } else {
-                MaterialTheme.colorScheme.outline
-            },
+            value =
+                uiState.scheduleMemo.ifEmpty {
+                    stringResource(R.string.schedule_add)
+                },
+            valueColor =
+                if (uiState.scheduleMemo.isEmpty()) {
+                    LocalMoilExtraColors.current.scheduleMutedText
+                } else {
+                    MaterialTheme.colorScheme.outline
+                },
             onClick = { onEvent(CalendarScreenEvent.ScheduleMemoClicked) },
         )
 
@@ -456,9 +477,10 @@ private fun ScheduleFormContent(
 
         if (isMutationLoading) {
             CircularProgressIndicator(
-                modifier = Modifier
-                    .padding(top = MoilScheduleSheet.ListContentSpacing)
-                    .align(Alignment.CenterHorizontally),
+                modifier =
+                    Modifier
+                        .padding(top = MoilScheduleSheet.ListContentSpacing)
+                        .align(Alignment.CenterHorizontally),
             )
         }
     }
@@ -473,13 +495,14 @@ private fun ScheduleDetailContent(
     onEvent: (CalendarScreenEvent) -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                start = MoilScheduleSheet.HorizontalPadding,
-                end = MoilScheduleSheet.HorizontalPadding,
-                bottom = MoilScheduleSheet.BottomPadding,
-            ),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(
+                    start = MoilScheduleSheet.HorizontalPadding,
+                    end = MoilScheduleSheet.HorizontalPadding,
+                    bottom = MoilScheduleSheet.BottomPadding,
+                ),
     ) {
         Spacer(modifier = Modifier.height(MoilScheduleSheet.DragHandleTopPadding))
         ScheduleSheetDragHandle()
@@ -507,13 +530,14 @@ private fun ScheduleDetailContent(
             )
             ScheduleDetailInfoRow(
                 label = stringResource(R.string.schedule_date),
-                value = stringResource(
-                    R.string.schedule_detail_date_value,
-                    schedule.date.year,
-                    schedule.date.monthValue,
-                    schedule.date.dayOfMonth,
-                    stringResource(weekdayNameRes(schedule.date)),
-                ),
+                value =
+                    stringResource(
+                        R.string.schedule_detail_date_value,
+                        schedule.date.year,
+                        schedule.date.monthValue,
+                        schedule.date.dayOfMonth,
+                        stringResource(weekdayNameRes(schedule.date)),
+                    ),
             )
             ScheduleDetailInfoRow(
                 label = stringResource(R.string.schedule_time),
@@ -521,8 +545,9 @@ private fun ScheduleDetailContent(
             )
             ScheduleDetailInfoRow(
                 label = stringResource(R.string.schedule_location),
-                value = schedule.location?.takeIf(String::isNotBlank)
-                    ?: stringResource(R.string.schedule_no_location),
+                value =
+                    schedule.location?.takeIf(String::isNotBlank)
+                        ?: stringResource(R.string.schedule_no_location),
                 showMapAction = !schedule.location.isNullOrBlank(),
             )
 
@@ -539,10 +564,11 @@ private fun ScheduleDetailContent(
             ScheduleParticipantAvatars(
                 members = schedule.members,
                 modifier = Modifier.padding(top = MoilScheduleSheet.ListContentSpacing),
-                contentDescription = stringResource(
-                    R.string.schedule_participants_content_description,
-                    schedule.members.size,
-                ),
+                contentDescription =
+                    stringResource(
+                        R.string.schedule_participants_content_description,
+                        schedule.members.size,
+                    ),
             )
 
             HorizontalDivider(
@@ -555,32 +581,37 @@ private fun ScheduleDetailContent(
             )
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = MoilScheduleSheet.DetailSectionTopPadding),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = MoilScheduleSheet.DetailSectionTopPadding),
                 horizontalArrangement = Arrangement.spacedBy(MoilScheduleSheet.DetailButtonSpacing),
             ) {
                 Button(
                     onClick = { onEvent(CalendarScreenEvent.ScheduleDetailEditClicked) },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(MoilScheduleSheet.DetailButtonHeight),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = MaterialTheme.colorScheme.onSurface,
-                    ),
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .height(MoilScheduleSheet.DetailButtonHeight),
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                        ),
                 ) {
                     Text(text = stringResource(R.string.schedule_edit))
                 }
                 Button(
                     onClick = { onEvent(CalendarScreenEvent.ScheduleDetailDeleteClicked) },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(MoilScheduleSheet.DetailButtonHeight),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.error,
-                    ),
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .height(MoilScheduleSheet.DetailButtonHeight),
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.error,
+                        ),
                 ) {
                     Text(text = stringResource(R.string.schedule_delete))
                 }
@@ -633,16 +664,16 @@ private fun ScheduleDetailCloseButton(onClick: () -> Unit) {
 
     Text(
         text = stringResource(R.string.schedule_close_symbol),
-        modifier = Modifier
-            .size(MoilScheduleSheet.ListAddButtonSize)
-            .wrapContentSize(Alignment.Center)
-            .clickable(
-                role = Role.Button,
-                onClick = onClick,
-            )
-            .semantics {
-                contentDescription = closeContentDescription
-            },
+        modifier =
+            Modifier
+                .size(MoilScheduleSheet.ListAddButtonSize)
+                .wrapContentSize(Alignment.Center)
+                .clickable(
+                    role = Role.Button,
+                    onClick = onClick,
+                ).semantics {
+                    contentDescription = closeContentDescription
+                },
         color = MaterialTheme.colorScheme.outline,
         style = MaterialTheme.typography.headlineSmall,
     )
@@ -655,9 +686,10 @@ private fun ScheduleDetailInfoRow(
     showMapAction: Boolean = false,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = MoilScheduleSheet.ListContentSpacing),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(top = MoilScheduleSheet.ListContentSpacing),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -690,8 +722,9 @@ private fun ScheduleDetailMemo(memo: String?) {
             style = MaterialTheme.typography.bodySmall,
         )
         Text(
-            text = memo?.takeIf(String::isNotBlank)
-                ?: stringResource(R.string.schedule_no_memo),
+            text =
+                memo?.takeIf(String::isNotBlank)
+                    ?: stringResource(R.string.schedule_no_memo),
             modifier = Modifier.padding(top = MoilScheduleSheet.ListContentSpacing),
             color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.bodySmall,
@@ -706,9 +739,10 @@ private fun ScheduleParticipantAvatars(
     contentDescription: String,
 ) {
     Row(
-        modifier = modifier.semantics {
-            this.contentDescription = contentDescription
-        },
+        modifier =
+            modifier.semantics {
+                this.contentDescription = contentDescription
+            },
         horizontalArrangement = Arrangement.spacedBy(MoilScheduleSheet.ListAvatarSpacing),
     ) {
         members.take(MoilScheduleSheet.ListVisibleAvatarCount).forEach { member ->
@@ -723,9 +757,10 @@ private fun ScheduleParticipantAvatars(
         val remainingMemberCount = members.size - MoilScheduleSheet.ListVisibleAvatarCount
         if (remainingMemberCount > 0) {
             Box(
-                modifier = Modifier
-                    .size(MoilScheduleSheet.ListAvatarSize)
-                    .clip(CircleShape),
+                modifier =
+                    Modifier
+                        .size(MoilScheduleSheet.ListAvatarSize)
+                        .clip(CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
@@ -744,19 +779,20 @@ private fun ScheduleBottomSheetPreview() {
     MoilTheme(darkTheme = false) {
         ScheduleListContent(
             selectedDate = LocalDate.of(2026, 7, 15),
-            schedules = listOf(
-                CalendarScheduleUiModel(
-                    id = 1L,
-                    title = "디자인 회의",
-                    date = LocalDate.of(2026, 7, 15),
-                    startTime = LocalTime.of(10, 0),
-                    endTime = LocalTime.of(11, 30),
-                    location = "회의실 A",
-                    memo = "신규 서비스 리뷰",
-                    members = emptyList(),
-                    displayColor = com.example.moil.feature.group.module.domain.model.GroupColor.Sky,
+            schedules =
+                listOf(
+                    CalendarScheduleUiModel(
+                        id = 1L,
+                        title = "디자인 회의",
+                        date = LocalDate.of(2026, 7, 15),
+                        startTime = LocalTime.of(10, 0),
+                        endTime = LocalTime.of(11, 30),
+                        location = "회의실 A",
+                        memo = "신규 서비스 리뷰",
+                        members = emptyList(),
+                        displayColor = com.example.moil.feature.group.module.domain.model.GroupColor.Sky,
+                    ),
                 ),
-            ),
             onCreateClick = {},
             onScheduleClick = {},
         )

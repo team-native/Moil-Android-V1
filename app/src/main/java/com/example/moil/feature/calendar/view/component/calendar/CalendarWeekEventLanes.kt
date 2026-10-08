@@ -18,13 +18,15 @@ internal fun CalendarWeekEventLanes(
     weekStartDate: LocalDate,
 ) {
     val weekEndDate = weekStartDate.plusDays((DAYS_PER_WEEK - 1).toLong())
-    val weekEvents = events.filter { event ->
-        !event.endDate.isBefore(weekStartDate) && !event.startDate.isAfter(weekEndDate)
-    }
+    val weekEvents =
+        events.filter { event ->
+            !event.endDate.isBefore(weekStartDate) && !event.startDate.isAfter(weekEndDate)
+        }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         (0 until MAX_VISIBLE_EVENT_LANES).forEach { lineIndex ->
-            weekEvents.firstOrNull { event -> event.lineIndex == lineIndex }
+            weekEvents
+                .firstOrNull { event -> event.lineIndex == lineIndex }
                 ?.let { event ->
                     CalendarWeekEventLane(
                         event = event,
@@ -34,9 +36,10 @@ internal fun CalendarWeekEventLanes(
                 }
         }
 
-        val hiddenEventCount = weekEvents.count { event ->
-            event.lineIndex >= MAX_VISIBLE_EVENT_LANES
-        }
+        val hiddenEventCount =
+            weekEvents.count { event ->
+                event.lineIndex >= MAX_VISIBLE_EVENT_LANES
+            }
         if (hiddenEventCount > 0) {
             CalendarEventOverflowBadge(hiddenEventCount)
         }
@@ -51,12 +54,14 @@ private fun CalendarWeekEventLane(
 ) {
     val segmentStartDate = maxOf(event.startDate, weekStartDate)
     val segmentEndDate = minOf(event.endDate, weekEndDate)
-    val leadingDayCount = java.time.temporal.ChronoUnit.DAYS
-        .between(weekStartDate, segmentStartDate)
-        .toInt()
-    val spanDayCount = java.time.temporal.ChronoUnit.DAYS
-        .between(segmentStartDate, segmentEndDate)
-        .toInt() + 1
+    val leadingDayCount =
+        java.time.temporal.ChronoUnit.DAYS
+            .between(weekStartDate, segmentStartDate)
+            .toInt()
+    val spanDayCount =
+        java.time.temporal.ChronoUnit.DAYS
+            .between(segmentStartDate, segmentEndDate)
+            .toInt() + 1
     val trailingDayCount = DAYS_PER_WEEK - leadingDayCount - spanDayCount
 
     Row(modifier = Modifier.fillMaxWidth()) {

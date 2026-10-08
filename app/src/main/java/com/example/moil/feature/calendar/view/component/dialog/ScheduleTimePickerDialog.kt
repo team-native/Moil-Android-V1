@@ -1,5 +1,16 @@
 package com.example.moil.feature.calendar.view
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -11,24 +22,13 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
 import com.example.moil.R
 import com.example.moil.core.component.ApplyDialogWindowBackgroundBlur
 import com.example.moil.ui.theme.MoilTimePickerDimension
@@ -126,9 +126,10 @@ private fun ScheduleTimeSelector(
 @Composable
 private fun TimeSeparator() {
     Box(
-        modifier = Modifier
-            .width(MoilTimePickerDimension.SeparatorWidth)
-            .height(MoilTimePickerDimension.TimeValueHeight),
+        modifier =
+            Modifier
+                .width(MoilTimePickerDimension.SeparatorWidth)
+                .height(MoilTimePickerDimension.TimeValueHeight),
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -147,36 +148,38 @@ private fun ScrollableTimeValue(
     onScrollStep: (Int) -> Unit,
 ) {
     var scrollRemainder by remember { mutableStateOf(0f) }
-    val scrollThreshold = with(LocalDensity.current) {
-        MoilTimePickerDimension.ScrollStep.toPx()
-    }
-    val scrollState = rememberScrollableState { scrollDelta ->
-        scrollRemainder += scrollDelta
-
-        while (scrollRemainder >= scrollThreshold) {
-            onScrollStep(SCROLL_UP_STEP)
-            scrollRemainder -= scrollThreshold
+    val scrollThreshold =
+        with(LocalDensity.current) {
+            MoilTimePickerDimension.ScrollStep.toPx()
         }
+    val scrollState =
+        rememberScrollableState { scrollDelta ->
+            scrollRemainder += scrollDelta
 
-        while (scrollRemainder <= -scrollThreshold) {
-            onScrollStep(SCROLL_DOWN_STEP)
-            scrollRemainder += scrollThreshold
+            while (scrollRemainder >= scrollThreshold) {
+                onScrollStep(SCROLL_UP_STEP)
+                scrollRemainder -= scrollThreshold
+            }
+
+            while (scrollRemainder <= -scrollThreshold) {
+                onScrollStep(SCROLL_DOWN_STEP)
+                scrollRemainder += scrollThreshold
+            }
+
+            scrollDelta
         }
-
-        scrollDelta
-    }
 
     Box(
-        modifier = Modifier
-            .width(MoilTimePickerDimension.TimeValueWidth)
-            .height(MoilTimePickerDimension.TimeValueHeight)
-            .scrollable(
-                state = scrollState,
-                orientation = Orientation.Vertical,
-            )
-            .semantics {
-                this.contentDescription = contentDescription
-            },
+        modifier =
+            Modifier
+                .width(MoilTimePickerDimension.TimeValueWidth)
+                .height(MoilTimePickerDimension.TimeValueHeight)
+                .scrollable(
+                    state = scrollState,
+                    orientation = Orientation.Vertical,
+                ).semantics {
+                    this.contentDescription = contentDescription
+                },
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -194,12 +197,13 @@ private fun MeridiemSelector(
     onMeridiemSelected: (Boolean) -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .width(MoilTimePickerDimension.MeridiemWidth)
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = MaterialTheme.shapes.small,
-            ),
+        modifier =
+            Modifier
+                .width(MoilTimePickerDimension.MeridiemWidth)
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    shape = MaterialTheme.shapes.small,
+                ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         TextButton(
@@ -208,11 +212,12 @@ private fun MeridiemSelector(
         ) {
             Text(
                 text = stringResource(R.string.schedule_time_am_short),
-                color = if (isPm) {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                } else {
-                    MaterialTheme.colorScheme.primary
-                },
+                color =
+                    if (isPm) {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    } else {
+                        MaterialTheme.colorScheme.primary
+                    },
             )
         }
 
@@ -222,30 +227,33 @@ private fun MeridiemSelector(
         ) {
             Text(
                 text = stringResource(R.string.schedule_time_pm_short),
-                color = if (isPm) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
+                color =
+                    if (isPm) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
             )
         }
     }
 }
 
-private fun LocalTime.toTwelveHour(): Int = when (hour) {
-    MIDNIGHT_HOUR,
-    NOON_HOUR,
-    -> TWELVE_HOUR_CLOCK_MAX
+private fun LocalTime.toTwelveHour(): Int =
+    when (hour) {
+        MIDNIGHT_HOUR,
+        NOON_HOUR,
+        -> TWELVE_HOUR_CLOCK_MAX
 
-    else -> hour % NOON_HOUR
-}
+        else -> hour % NOON_HOUR
+    }
 
-private fun Int.toTwentyFourHour(isPm: Boolean): Int = when {
-    this == TWELVE_HOUR_CLOCK_MAX && !isPm -> MIDNIGHT_HOUR
-    this == TWELVE_HOUR_CLOCK_MAX && isPm -> NOON_HOUR
-    isPm -> this + NOON_HOUR
-    else -> this
-}
+private fun Int.toTwentyFourHour(isPm: Boolean): Int =
+    when {
+        this == TWELVE_HOUR_CLOCK_MAX && !isPm -> MIDNIGHT_HOUR
+        this == TWELVE_HOUR_CLOCK_MAX && isPm -> NOON_HOUR
+        isPm -> this + NOON_HOUR
+        else -> this
+    }
 
 private fun Int.cycleHour(step: Int): Int {
     val adjustedHour = this + step

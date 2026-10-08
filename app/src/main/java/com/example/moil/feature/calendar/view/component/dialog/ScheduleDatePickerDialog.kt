@@ -4,8 +4,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -22,22 +22,27 @@ internal fun ScheduleDatePickerDialog(
     onDateConfirmed: (LocalDate) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = selectedDate
-            .atStartOfDay()
-            .toInstant(ZoneOffset.UTC)
-            .toEpochMilli(),
-        selectableDates = object : SelectableDates {
-            override fun isSelectableDate(utcTimeMillis: Long): Boolean = minimumSelectableDate
-                ?.let { minimumDate ->
-                    !Instant.ofEpochMilli(utcTimeMillis)
-                        .atZone(ZoneOffset.UTC)
-                        .toLocalDate()
-                        .isBefore(minimumDate)
-                }
-                ?: true
-        },
-    )
+    val datePickerState =
+        rememberDatePickerState(
+            initialSelectedDateMillis =
+                selectedDate
+                    .atStartOfDay()
+                    .toInstant(ZoneOffset.UTC)
+                    .toEpochMilli(),
+            selectableDates =
+                object : SelectableDates {
+                    override fun isSelectableDate(utcTimeMillis: Long): Boolean =
+                        minimumSelectableDate
+                            ?.let { minimumDate ->
+                                !Instant
+                                    .ofEpochMilli(utcTimeMillis)
+                                    .atZone(ZoneOffset.UTC)
+                                    .toLocalDate()
+                                    .isBefore(minimumDate)
+                            }
+                            ?: true
+                },
+        )
 
     DatePickerDialog(
         onDismissRequest = onDismiss,

@@ -39,15 +39,14 @@ internal fun LoginScreenContent(
         containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = MoilAuthDimension.ScreenHorizontalPadding)
-                .navigationBarsPadding()
-                ,
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(horizontal = MoilAuthDimension.ScreenHorizontalPadding)
+                    .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-
             // weight(1f)로 위쪽 남는 공간을 모두 차지해 아래 콘텐츠를 화면 하단으로 밀착시킵니다.
             Spacer(modifier = Modifier.weight(1f))
 

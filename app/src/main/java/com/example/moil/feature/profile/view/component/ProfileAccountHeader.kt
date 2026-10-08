@@ -31,10 +31,11 @@ internal fun ProfileAccountHeader(
         Image(
             painter = painterResource(profileAvatarRes),
             contentDescription = stringResource(R.string.profile_edit_avatar_content_description),
-            modifier = Modifier
-                .size(MoilProfileDimension.AvatarSize)
-                .clip(CircleShape)
-                .clickable(onClick = onProfileImageClick),
+            modifier =
+                Modifier
+                    .size(MoilProfileDimension.AvatarSize)
+                    .clip(CircleShape)
+                    .clickable(onClick = onProfileImageClick),
             contentScale = ContentScale.Crop,
         )
 

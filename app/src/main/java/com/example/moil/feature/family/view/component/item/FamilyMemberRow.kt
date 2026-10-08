@@ -41,10 +41,11 @@ internal fun FamilyMemberRow(
     contentSpacing: Dp = MoilMemberDimension.ListItemContentSpacing,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = horizontalPadding)
-            .height(rowHeight),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = horizontalPadding)
+                .height(rowHeight),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         MoilRemoteAvatar(
@@ -70,10 +71,11 @@ internal fun FamilyMemberRow(
         }
 
         Spacer(
-            modifier = Modifier
-                .size(MoilMemberDimension.GroupColorIndicatorSize)
-                .clip(CircleShape)
-                .background(memberPresenceColor(profileColor)),
+            modifier =
+                Modifier
+                    .size(MoilMemberDimension.GroupColorIndicatorSize)
+                    .clip(CircleShape)
+                    .background(memberPresenceColor(profileColor)),
         )
     }
 }

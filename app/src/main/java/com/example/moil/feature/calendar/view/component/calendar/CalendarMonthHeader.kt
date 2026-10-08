@@ -27,16 +27,18 @@ internal fun CalendarMonthHeader(
 ) {
     val labelAlpha = if (isCalendarContentDimmed) 0.3f else 1f
     val isDarkTheme = LocalMoilIsDarkTheme.current
-    val previousMonthDrawableRes = if (isDarkTheme) {
-        R.drawable.calendar_previous_dark
-    } else {
-        R.drawable.common_chevron_previous
-    }
-    val nextMonthDrawableRes = if (isDarkTheme) {
-        R.drawable.calendar_next_dark
-    } else {
-        R.drawable.common_chevron_next
-    }
+    val previousMonthDrawableRes =
+        if (isDarkTheme) {
+            R.drawable.calendar_previous_dark
+        } else {
+            R.drawable.common_chevron_previous
+        }
+    val nextMonthDrawableRes =
+        if (isDarkTheme) {
+            R.drawable.calendar_next_dark
+        } else {
+            R.drawable.common_chevron_next
+        }
 
     Row(
         modifier = modifier.fillMaxWidth(),

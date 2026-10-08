@@ -16,9 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.moil.ui.theme.LocalMoilExtraColors
 import com.example.moil.ui.theme.MoilOverlayDimension
 import com.example.moil.ui.theme.MoilRadius
-import com.example.moil.ui.theme.LocalMoilExtraColors
 
 @Composable
 fun MoilOverlayDialog(
@@ -27,9 +27,10 @@ fun MoilOverlayDialog(
 ) {
     Dialog(
         onDismissRequest = onDismissRequest,
-        properties = DialogProperties(
-            usePlatformDefaultWidth = false,
-        ),
+        properties =
+            DialogProperties(
+                usePlatformDefaultWidth = false,
+            ),
     ) {
         val dismissInteractionSource = remember { MutableInteractionSource() }
         val consumeInteractionSource = remember { MutableInteractionSource() }
@@ -40,25 +41,27 @@ fun MoilOverlayDialog(
         )
 
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable(
-                    interactionSource = dismissInteractionSource,
-                    indication = null,
-                    onClick = onDismissRequest,
-                ),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .clickable(
+                        interactionSource = dismissInteractionSource,
+                        indication = null,
+                        onClick = onDismissRequest,
+                    ),
             contentAlignment = Alignment.Center,
         ) {
             Surface(
-                modifier = Modifier
-                    .widthIn(max = MoilOverlayDimension.DialogMaxWidth)
-                    .fillMaxWidth()
-                    .padding(horizontal = MoilOverlayDimension.DialogHorizontalPadding)
-                    .clickable(
-                        interactionSource = consumeInteractionSource,
-                        indication = null,
-                        onClick = {},
-                    ),
+                modifier =
+                    Modifier
+                        .widthIn(max = MoilOverlayDimension.DialogMaxWidth)
+                        .fillMaxWidth()
+                        .padding(horizontal = MoilOverlayDimension.DialogHorizontalPadding)
+                        .clickable(
+                            interactionSource = consumeInteractionSource,
+                            indication = null,
+                            onClick = {},
+                        ),
                 shape = RoundedCornerShape(MoilRadius.Dialog),
                 color = LocalMoilExtraColors.current.overlaySurface,
                 content = content,

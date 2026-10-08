@@ -31,26 +31,25 @@ internal fun ScheduleInfoRow(
 ) {
     Column {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(
-                    if (showDivider) {
-                        MoilScheduleSheet.FormRowHeight - 1.dp
-                    } else {
-                        MoilScheduleSheet.FormRowHeight
-                    },
-                )
-                .then(
-                    if (onClick != null) {
-                        Modifier.clickable(
-                            role = Role.Button,
-                            onClick = onClick,
-                        )
-                    } else {
-                        Modifier
-                    },
-                )
-                .padding(horizontal = MoilScheduleSheet.HorizontalPadding),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(
+                        if (showDivider) {
+                            MoilScheduleSheet.FormRowHeight - 1.dp
+                        } else {
+                            MoilScheduleSheet.FormRowHeight
+                        },
+                    ).then(
+                        if (onClick != null) {
+                            Modifier.clickable(
+                                role = Role.Button,
+                                onClick = onClick,
+                            )
+                        } else {
+                            Modifier
+                        },
+                    ).padding(horizontal = MoilScheduleSheet.HorizontalPadding),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(

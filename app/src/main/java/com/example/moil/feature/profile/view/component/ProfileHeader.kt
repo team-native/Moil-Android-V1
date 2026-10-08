@@ -24,9 +24,10 @@ internal fun ProfileHeader() {
         Image(
             painter = painterResource(R.drawable.family_avatar_member_green),
             contentDescription = stringResource(R.string.profile_name),
-            modifier = Modifier
-                .size(MoilProfileDimension.AvatarSize)
-                .clip(CircleShape),
+            modifier =
+                Modifier
+                    .size(MoilProfileDimension.AvatarSize)
+                    .clip(CircleShape),
             contentScale = ContentScale.Crop,
         )
 

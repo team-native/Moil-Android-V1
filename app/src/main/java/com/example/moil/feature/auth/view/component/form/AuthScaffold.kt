@@ -39,11 +39,12 @@ internal fun AuthScaffold(
 ) {
     Scaffold(containerColor = MaterialTheme.colorScheme.background) { innerPadding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = MoilAuthDimension.ScreenHorizontalPadding)
-                .navigationBarsPadding(),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(horizontal = MoilAuthDimension.ScreenHorizontalPadding)
+                    .navigationBarsPadding(),
         ) {
             Spacer(modifier = Modifier.height(52.dp))
 
@@ -51,9 +52,10 @@ internal fun AuthScaffold(
                 // Keep the title at the header's absolute center regardless of the back button.
                 Text(
                     text = title,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.Center),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.Center),
                     color = MaterialTheme.colorScheme.onBackground,
                     style = MaterialTheme.typography.displaySmall,
                     textAlign = TextAlign.Center,
@@ -61,20 +63,22 @@ internal fun AuthScaffold(
 
                 if (canNavigateBack) {
                     Box(
-                        modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .size(MoilAuthDimension.BackButtonSize),
+                        modifier =
+                            Modifier
+                                .align(Alignment.CenterStart)
+                                .size(MoilAuthDimension.BackButtonSize),
                         contentAlignment = Alignment.Center,
                     ) {
                         Image(
                             painter = painterResource(R.drawable.common_chevron_back),
                             contentDescription = stringResource(R.string.auth_back),
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clickable(
-                                    role = Role.Button,
-                                    onClick = onBackClick,
-                                ),
+                            modifier =
+                                Modifier
+                                    .fillMaxSize()
+                                    .clickable(
+                                        role = Role.Button,
+                                        onClick = onBackClick,
+                                    ),
                         )
                     }
                 }
@@ -83,9 +87,10 @@ internal fun AuthScaffold(
             Spacer(modifier = Modifier.height(24.dp))
 
             Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState()),
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
             ) {
                 content()
             }

@@ -23,11 +23,13 @@ class ImageApiServiceContractTest {
     @Before
     fun setUp() {
         mockWebServer.start()
-        imageApiService = Retrofit.Builder()
-            .baseUrl(mockWebServer.url("/"))
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-            .build()
-            .create(ImageApiService::class.java)
+        imageApiService =
+            Retrofit
+                .Builder()
+                .baseUrl(mockWebServer.url("/"))
+                .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+                .build()
+                .create(ImageApiService::class.java)
     }
 
     @After
@@ -36,27 +38,40 @@ class ImageApiServiceContractTest {
     }
 
     @Test
-    fun `프로필 이미지 업로드는 image multipart field를 사용한다`() = runBlocking {
-        mockWebServer.enqueue(
-            MockResponse.Builder()
-                .code(200)
-                .body("{\"success\":true,\"status\":0,\"message\":\"ok\",\"data\":{\"imagePath\":\"/image/avatar\"}}")
-                .build(),
-        )
+    fun `프로필 이미지 업로드는 image multipart field를 사용한다`() =
+        runBlocking {
+            mockWebServer.enqueue(
+                MockResponse
+                    .Builder()
+                    .code(200)
+                    .body(
+                        "{\"success\":true,\"status\":0,\"message\":\"ok\",\"data\":{\"imagePath\":\"/image/avatar\"}}",
+                    ).build(),
+            )
 
-        imageApiService.uploadProfileImage(
-            MultipartBody.Part.createFormData(
-                "image",
-                "avatar.jpg",
-                "image-bytes".toRequestBody("image/jpeg".toMediaType()),
-            ),
-        )
+            imageApiService.uploadProfileImage(
+                MultipartBody.Part.createFormData(
+                    "image",
+                    "avatar.jpg",
+                    "image-bytes".toRequestBody("image/jpeg".toMediaType()),
+                ),
+            )
 
-        val request = mockWebServer.takeRequest()
-        assertEquals("POST", request.method)
-        assertEquals("/image-upload", request.target)
-        assertTrue(request.headers["Content-Type"].orEmpty().startsWith("multipart/form-data"))
-        assertTrue(request.body?.utf8().orEmpty().contains("name=\"image\""))
-        assertTrue(request.body?.utf8().orEmpty().contains("filename=\"avatar.jpg\""))
-    }
+            val request = mockWebServer.takeRequest()
+            assertEquals("POST", request.method)
+            assertEquals("/image-upload", request.target)
+            assertTrue(request.headers["Content-Type"].orEmpty().startsWith("multipart/form-data"))
+            assertTrue(
+                request.body
+                    ?.utf8()
+                    .orEmpty()
+                    .contains("name=\"image\""),
+            )
+            assertTrue(
+                request.body
+                    ?.utf8()
+                    .orEmpty()
+                    .contains("filename=\"avatar.jpg\""),
+            )
+        }
 }

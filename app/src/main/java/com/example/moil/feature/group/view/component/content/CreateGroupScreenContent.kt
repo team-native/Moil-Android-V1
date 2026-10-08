@@ -23,10 +23,11 @@ internal fun CreateGroupScreenContent(
     onEvent: (CreateGroupScreenEvent) -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .padding(horizontal = MoilGroupCreateDimension.ScreenHorizontalPadding),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .padding(horizontal = MoilGroupCreateDimension.ScreenHorizontalPadding),
         verticalArrangement = Arrangement.Top,
     ) {
         CreateGroupHeader(

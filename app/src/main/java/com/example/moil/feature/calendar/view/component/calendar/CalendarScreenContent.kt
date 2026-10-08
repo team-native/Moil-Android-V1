@@ -36,10 +36,11 @@ internal fun CalendarScreenContent(
         CalendarContent(
             uiState = uiState,
             onEvent = onEvent,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = MoilSpacing.ScreenHorizontal),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(horizontal = MoilSpacing.ScreenHorizontal),
         )
     }
 }

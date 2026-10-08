@@ -24,13 +24,14 @@ fun MoilSearchButton(
     modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier
-            .size(MoilComponentSize.TopBarItem)
-            .clip(CircleShape)
-            .clickable(
-                role = Role.Button,
-                onClick = onClick,
-            ),
+        modifier =
+            modifier
+                .size(MoilComponentSize.TopBarItem)
+                .clip(CircleShape)
+                .clickable(
+                    role = Role.Button,
+                    onClick = onClick,
+                ),
         contentAlignment = Alignment.Center,
     ) {
         Image(

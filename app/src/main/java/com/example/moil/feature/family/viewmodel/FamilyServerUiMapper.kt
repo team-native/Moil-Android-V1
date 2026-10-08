@@ -10,44 +10,51 @@ import com.example.moil.feature.group.module.domain.model.GroupSummary
 internal fun List<GroupSummary>.toFamilyGroups(
     selectedGroupId: Long?,
     selectedGroupMembers: List<GroupMember>,
-): List<GroupUiModel> = map { group ->
-    group.toFamilyGroup(
-        members = if (group.id == selectedGroupId) selectedGroupMembers else emptyList(),
+): List<GroupUiModel> =
+    map { group ->
+        group.toFamilyGroup(
+            members = if (group.id == selectedGroupId) selectedGroupMembers else emptyList(),
+        )
+    }
+
+internal fun GroupRole.toFamilyMemberRole(): GroupMemberRole =
+    when (this) {
+        GroupRole.Owner,
+        GroupRole.Admin,
+        -> GroupMemberRole.Administrator
+
+        GroupRole.Member,
+        GroupRole.Unknown,
+        -> GroupMemberRole.Member
+    }
+
+private fun GroupSummary.toFamilyGroup(members: List<GroupMember>): GroupUiModel =
+    GroupUiModel(
+        id = id.toString(),
+        name = name,
+        inviteCode = inviteCode.orEmpty(),
+        profileColor = myColor,
+        profileImagePath = myImagePath,
+        members = members.map(GroupMember::toFamilyMember),
     )
-}
 
-internal fun GroupRole.toFamilyMemberRole(): GroupMemberRole = when (this) {
-    GroupRole.Owner,
-    GroupRole.Admin,
-    -> GroupMemberRole.Administrator
-    GroupRole.Member,
-    GroupRole.Unknown,
-    -> GroupMemberRole.Member
-}
+private fun GroupMember.toFamilyMember(): FamilyMemberUiModel =
+    FamilyMemberUiModel(
+        id = userId,
+        roleRes = role.toFamilyRoleRes(),
+        name = nickname,
+        profileColor = color,
+        profileImagePath = imagePath,
+        isCurrentUser = isMe == true,
+    )
 
-private fun GroupSummary.toFamilyGroup(members: List<GroupMember>): GroupUiModel = GroupUiModel(
-    id = id.toString(),
-    name = name,
-    inviteCode = inviteCode.orEmpty(),
-    profileColor = myColor,
-    profileImagePath = myImagePath,
-    members = members.map(GroupMember::toFamilyMember),
-)
+private fun GroupRole.toFamilyRoleRes(): Int =
+    when (this) {
+        GroupRole.Owner,
+        GroupRole.Admin,
+        -> R.string.family_member_administrator
 
-private fun GroupMember.toFamilyMember(): FamilyMemberUiModel = FamilyMemberUiModel(
-    id = userId,
-    roleRes = role.toFamilyRoleRes(),
-    name = nickname,
-    profileColor = color,
-    profileImagePath = imagePath,
-    isCurrentUser = isMe == true,
-)
-
-private fun GroupRole.toFamilyRoleRes(): Int = when (this) {
-    GroupRole.Owner,
-    GroupRole.Admin,
-    -> R.string.family_member_administrator
-    GroupRole.Member,
-    GroupRole.Unknown,
-    -> R.string.family_member_role
-}
+        GroupRole.Member,
+        GroupRole.Unknown,
+        -> R.string.family_member_role
+    }

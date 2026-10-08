@@ -13,9 +13,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.moil.R
 import com.example.moil.core.component.MoilPrimaryButton
-import com.example.moil.ui.theme.MoilGroupCreateDimension
-import com.example.moil.ui.theme.MoilTheme
-import com.example.moil.ui.theme.LocalMoilExtraTypography
 import com.example.moil.feature.group.module.domain.model.GroupColor
 import com.example.moil.feature.group.viewmodel.JoinGroupScreenEvent
 import com.example.moil.feature.group.viewmodel.JoinGroupStep
@@ -23,6 +20,9 @@ import com.example.moil.feature.group.viewmodel.JoinGroupUiState
 import com.example.moil.feature.group.viewmodel.JoinGroupUsedProfileUiModel
 import com.example.moil.feature.group.viewmodel.avatarResourceForGroupColor
 import com.example.moil.feature.group.viewmodel.groupColorForAvatar
+import com.example.moil.ui.theme.LocalMoilExtraTypography
+import com.example.moil.ui.theme.MoilGroupCreateDimension
+import com.example.moil.ui.theme.MoilTheme
 
 @Composable
 internal fun JoinGroupProfileSetupContent(
@@ -30,10 +30,11 @@ internal fun JoinGroupProfileSetupContent(
     onEvent: (JoinGroupScreenEvent) -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .padding(horizontal = MoilGroupCreateDimension.ScreenHorizontalPadding),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .padding(horizontal = MoilGroupCreateDimension.ScreenHorizontalPadding),
     ) {
         GroupPageHeader(
             titleRes = R.string.group_join_profile_setup_title,
@@ -65,13 +66,14 @@ internal fun JoinGroupProfileSetupContent(
 
         ProfileAvatarSelector(
             labelRes = R.string.group_join_profile_color_label,
-            selectedProfileAvatarRes = uiState.selectedProfileColor
-                ?.let(::avatarResourceForGroupColor)
-                ?: if (uiState.selectedProfileImageUri == null) {
-                    R.drawable.family_avatar_mine
-                } else {
-                    null
-                },
+            selectedProfileAvatarRes =
+                uiState.selectedProfileColor
+                    ?.let(::avatarResourceForGroupColor)
+                    ?: if (uiState.selectedProfileImageUri == null) {
+                        R.drawable.family_avatar_mine
+                    } else {
+                        null
+                    },
             selectedProfileImageUri = uiState.selectedProfileImageUri,
             onProfileAvatarSelected = { avatarRes ->
                 onEvent(JoinGroupScreenEvent.ProfileColorSelected(groupColorForAvatar(avatarRes)))
@@ -87,11 +89,13 @@ internal fun JoinGroupProfileSetupContent(
         MoilPrimaryButton(
             text = stringResource(R.string.group_join_complete_action),
             onClick = { onEvent(JoinGroupScreenEvent.JoinGroupConfirmed) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(MoilGroupCreateDimension.BottomButtonHeight),
-            enabled = uiState.profileName.isNotBlank() &&
-                (uiState.selectedProfileColor != null || uiState.selectedProfileImageUri != null),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(MoilGroupCreateDimension.BottomButtonHeight),
+            enabled =
+                uiState.profileName.isNotBlank() &&
+                    (uiState.selectedProfileColor != null || uiState.selectedProfileImageUri != null),
         )
 
         Spacer(modifier = Modifier.height(MoilGroupCreateDimension.BottomButtonPadding))
@@ -103,21 +107,24 @@ internal fun JoinGroupProfileSetupContent(
 private fun JoinGroupProfileSetupContentPreview() {
     MoilTheme(darkTheme = false) {
         JoinGroupProfileSetupContent(
-            uiState = JoinGroupUiState(
-                step = JoinGroupStep.ProfileSetup,
-                usedProfiles = listOf(
-                    JoinGroupUsedProfileUiModel(
-                        nickname = "모일",
-                        color = GroupColor.Red,
-                    ),
+            uiState =
+                JoinGroupUiState(
+                    step = JoinGroupStep.ProfileSetup,
+                    usedProfiles =
+                        listOf(
+                            JoinGroupUsedProfileUiModel(
+                                nickname = "모일",
+                                color = GroupColor.Red,
+                            ),
+                        ),
+                    availableProfileColors =
+                        listOf(
+                            GroupColor.Sky,
+                            GroupColor.Green,
+                            GroupColor.Yellow,
+                        ),
+                    selectedProfileColor = GroupColor.Sky,
                 ),
-                availableProfileColors = listOf(
-                    GroupColor.Sky,
-                    GroupColor.Green,
-                    GroupColor.Yellow,
-                ),
-                selectedProfileColor = GroupColor.Sky,
-            ),
             onEvent = {},
         )
     }

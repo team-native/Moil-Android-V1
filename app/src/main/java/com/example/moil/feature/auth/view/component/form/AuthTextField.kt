@@ -10,9 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -44,43 +44,47 @@ internal fun AuthTextField(
 ) {
     val fieldShape = RoundedCornerShape(MoilAuthDimension.FieldCornerRadius)
     var isPasswordVisible by rememberSaveable(isPassword) { mutableStateOf(false) }
-    val visualTransformation = if (isPassword && !isPasswordVisible) {
-        PasswordVisualTransformation()
-    } else {
-        VisualTransformation.None
-    }
+    val visualTransformation =
+        if (isPassword && !isPasswordVisible) {
+            PasswordVisualTransformation()
+        } else {
+            VisualTransformation.None
+        }
 
     BasicTextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = modifier
-            .fillMaxWidth()
-            .height(MoilAuthDimension.FieldHeight)
-            .clip(fieldShape)
-            .background(MaterialTheme.colorScheme.surface)
-            .then(
-                if (isError) {
-                    Modifier.border(
-                        width = MoilAuthDimension.ErrorBorderWidth,
-                        color = MaterialTheme.colorScheme.error,
-                        shape = fieldShape,
-                    )
-                } else {
-                    Modifier
-                },
-            ),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(MoilAuthDimension.FieldHeight)
+                .clip(fieldShape)
+                .background(MaterialTheme.colorScheme.surface)
+                .then(
+                    if (isError) {
+                        Modifier.border(
+                            width = MoilAuthDimension.ErrorBorderWidth,
+                            color = MaterialTheme.colorScheme.error,
+                            shape = fieldShape,
+                        )
+                    } else {
+                        Modifier
+                    },
+                ),
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         singleLine = true,
-        textStyle = MaterialTheme.typography.bodyMedium.copy(
-            color = MaterialTheme.colorScheme.onSurface,
-        ),
+        textStyle =
+            MaterialTheme.typography.bodyMedium.copy(
+                color = MaterialTheme.colorScheme.onSurface,
+            ),
         visualTransformation = visualTransformation,
         decorationBox = { innerTextField ->
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 16.dp, end = if (isPassword) 4.dp else 16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(start = 16.dp, end = if (isPassword) 4.dp else 16.dp),
                 contentAlignment = Alignment.CenterStart,
             ) {
                 if (value.isEmpty()) {
@@ -97,12 +101,18 @@ internal fun AuthTextField(
                         modifier = Modifier.align(Alignment.CenterEnd),
                     ) {
                         Icon(
-                            painter = painterResource(
-                                if (isPasswordVisible) R.drawable.auth_visibility else R.drawable.auth_visibility_off,
-                            ),
-                            contentDescription = stringResource(
-                                if (isPasswordVisible) R.string.auth_hide_password else R.string.auth_show_password,
-                            ),
+                            painter =
+                                painterResource(
+                                    if (isPasswordVisible) {
+                                        R.drawable.auth_visibility
+                                    } else {
+                                        R.drawable.auth_visibility_off
+                                    },
+                                ),
+                            contentDescription =
+                                stringResource(
+                                    if (isPasswordVisible) R.string.auth_hide_password else R.string.auth_show_password,
+                                ),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }

@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 enum class VerificationStepDto {
     @SerialName("SIGNUP")
     SignUp,
+
     @SerialName("RESET")
     Reset,
 }

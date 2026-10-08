@@ -32,19 +32,21 @@ fun MoilEmptyJoinedGroupContent(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = MoilCalendarEmptyGroupDimension.HorizontalPadding),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(horizontal = MoilCalendarEmptyGroupDimension.HorizontalPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
         Image(
             painter = painterResource(R.drawable.calendar_empty_group_mascot),
             contentDescription = null,
-            modifier = Modifier.size(
-                width = MoilCalendarEmptyGroupDimension.MascotWidth,
-                height = MoilCalendarEmptyGroupDimension.MascotHeight,
-            ),
+            modifier =
+                Modifier.size(
+                    width = MoilCalendarEmptyGroupDimension.MascotWidth,
+                    height = MoilCalendarEmptyGroupDimension.MascotHeight,
+                ),
         )
 
         Spacer(modifier = Modifier.height(MoilCalendarEmptyGroupDimension.MascotTitleSpacing))
@@ -68,18 +70,20 @@ fun MoilEmptyJoinedGroupContent(
         MoilPrimaryButton(
             text = stringResource(R.string.calendar_empty_group_join),
             onClick = onJoinGroupClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(MoilCalendarEmptyGroupDimension.ActionHeight),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(MoilCalendarEmptyGroupDimension.ActionHeight),
         )
 
         Spacer(modifier = Modifier.height(MoilCalendarEmptyGroupDimension.ActionSpacing))
 
         OutlinedButton(
             onClick = onCreateGroupClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(MoilCalendarEmptyGroupDimension.ActionHeight),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(MoilCalendarEmptyGroupDimension.ActionHeight),
             shape = RoundedCornerShape(MoilRadius.Button),
         ) {
             Text(text = stringResource(R.string.calendar_empty_group_create))

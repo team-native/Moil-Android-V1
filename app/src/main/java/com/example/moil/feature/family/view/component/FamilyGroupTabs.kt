@@ -33,10 +33,11 @@ internal fun FamilyGroupTabs(
             val isSelected = group.id == selectedGroupId
 
             Surface(
-                modifier = Modifier
-                    .defaultMinSize(minWidth = MoilMemberDimension.GroupTabMinWidth)
-                    .height(MoilMemberDimension.GroupTabHeight)
-                    .clickable { onGroupClick(group.id) },
+                modifier =
+                    Modifier
+                        .defaultMinSize(minWidth = MoilMemberDimension.GroupTabMinWidth)
+                        .height(MoilMemberDimension.GroupTabHeight)
+                        .clickable { onGroupClick(group.id) },
                 shape = RoundedCornerShape(percent = 50),
                 color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
             ) {
@@ -46,7 +47,12 @@ internal fun FamilyGroupTabs(
                 ) {
                     Text(
                         text = group.name,
-                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                        color =
+                            if (isSelected) {
+                                MaterialTheme.colorScheme.onPrimary
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            },
                         style = MaterialTheme.typography.labelLarge,
                     )
                 }

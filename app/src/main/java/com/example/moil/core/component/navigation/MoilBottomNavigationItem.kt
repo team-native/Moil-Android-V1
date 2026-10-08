@@ -30,15 +30,15 @@ internal fun MoilBottomNavigationItem(
     Image(
         painter = painterResource(iconRes),
         contentDescription = null,
-        modifier = Modifier
-            .size(48.dp)
-            .clip(RoundedCornerShape(MoilRadius.Event))
-            .clickable(
-                role = Role.Tab,
-                onClick = onClick,
-            )
-            .semantics { contentDescription = label }
-            .padding(12.dp),
+        modifier =
+            Modifier
+                .size(48.dp)
+                .clip(RoundedCornerShape(MoilRadius.Event))
+                .clickable(
+                    role = Role.Tab,
+                    onClick = onClick,
+                ).semantics { contentDescription = label }
+                .padding(12.dp),
         contentScale = ContentScale.Fit,
     )
 }

@@ -3,8 +3,6 @@ package com.example.moil.feature.group.view
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +10,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -47,19 +47,21 @@ internal fun ProfileAvatarSelector(
         )
 
         Row(
-            modifier = Modifier
-                .padding(top = MoilGroupCreateDimension.HeaderTitleSpacing)
-                .horizontalScroll(rememberScrollState()),
+            modifier =
+                Modifier
+                    .padding(top = MoilGroupCreateDimension.HeaderTitleSpacing)
+                    .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(MoilGroupCreateDimension.ColorOptionSpacing),
         ) {
             avatarResources.forEachIndexed { index, avatarRes ->
                 ProfileAvatarOption(
                     avatarRes = avatarRes,
                     isSelected = selectedProfileAvatarRes == avatarRes,
-                    contentDescription = stringResource(
-                        R.string.group_profile_avatar_option,
-                        index + 1,
-                    ),
+                    contentDescription =
+                        stringResource(
+                            R.string.group_profile_avatar_option,
+                            index + 1,
+                        ),
                     onClick = { onProfileAvatarSelected(avatarRes) },
                 )
             }
@@ -83,36 +85,36 @@ private fun ProfileAvatarOption(
     onClick: () -> Unit,
 ) {
     Box(
-        modifier = Modifier
-            .size(MoilGroupCreateDimension.ProfileAvatarTouchTargetSize)
-            .then(
-                if (isSelected) {
-                    Modifier
-                        .border(
-                            width = MoilGroupCreateDimension.SelectedProfileAvatarOuterBorder,
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = CircleShape,
-                        )
-                        .padding(MoilGroupCreateDimension.SelectedProfileAvatarInnerGap)
-                        .border(
-                            width = MoilGroupCreateDimension.SelectedProfileAvatarInnerGap,
-                            color = MaterialTheme.colorScheme.background,
-                            shape = CircleShape,
-                        )
-                } else {
-                    Modifier
-                },
-            )
-            .selectable(selected = isSelected, role = Role.RadioButton, onClick = onClick)
-            .semantics { this.contentDescription = contentDescription },
+        modifier =
+            Modifier
+                .size(MoilGroupCreateDimension.ProfileAvatarTouchTargetSize)
+                .then(
+                    if (isSelected) {
+                        Modifier
+                            .border(
+                                width = MoilGroupCreateDimension.SelectedProfileAvatarOuterBorder,
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = CircleShape,
+                            ).padding(MoilGroupCreateDimension.SelectedProfileAvatarInnerGap)
+                            .border(
+                                width = MoilGroupCreateDimension.SelectedProfileAvatarInnerGap,
+                                color = MaterialTheme.colorScheme.background,
+                                shape = CircleShape,
+                            )
+                    } else {
+                        Modifier
+                    },
+                ).selectable(selected = isSelected, role = Role.RadioButton, onClick = onClick)
+                .semantics { this.contentDescription = contentDescription },
         contentAlignment = Alignment.Center,
     ) {
         Image(
             painter = painterResource(avatarRes),
             contentDescription = null,
-            modifier = Modifier
-                .size(MoilGroupCreateDimension.ProfileAvatarImageSize)
-                .clip(CircleShape),
+            modifier =
+                Modifier
+                    .size(MoilGroupCreateDimension.ProfileAvatarImageSize)
+                    .clip(CircleShape),
         )
     }
 }
@@ -125,25 +127,24 @@ private fun AddProfileAvatarOption(
     val addProfileAvatarContentDescription = stringResource(R.string.group_profile_avatar_add)
 
     Box(
-        modifier = Modifier
-            .size(MoilGroupCreateDimension.ProfileAvatarTouchTargetSize)
-            .then(
-                if (selectedProfileImageUri != null) {
-                    Modifier.border(
-                        width = MoilGroupCreateDimension.SelectedProfileAvatarOuterBorder,
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = CircleShape,
-                    )
-                } else {
-                    Modifier
-                },
-            )
-            .selectable(
-                selected = selectedProfileImageUri != null,
-                role = Role.RadioButton,
-                onClick = onClick,
-            )
-            .semantics { this.contentDescription = addProfileAvatarContentDescription },
+        modifier =
+            Modifier
+                .size(MoilGroupCreateDimension.ProfileAvatarTouchTargetSize)
+                .then(
+                    if (selectedProfileImageUri != null) {
+                        Modifier.border(
+                            width = MoilGroupCreateDimension.SelectedProfileAvatarOuterBorder,
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = CircleShape,
+                        )
+                    } else {
+                        Modifier
+                    },
+                ).selectable(
+                    selected = selectedProfileImageUri != null,
+                    role = Role.RadioButton,
+                    onClick = onClick,
+                ).semantics { this.contentDescription = addProfileAvatarContentDescription },
         contentAlignment = Alignment.Center,
     ) {
         if (selectedProfileImageUri == null) {
@@ -156,21 +157,23 @@ private fun AddProfileAvatarOption(
             AsyncImage(
                 model = selectedProfileImageUri,
                 contentDescription = null,
-                modifier = Modifier
-                    .size(MoilGroupCreateDimension.ProfileAvatarImageSize)
-                    .clip(CircleShape),
+                modifier =
+                    Modifier
+                        .size(MoilGroupCreateDimension.ProfileAvatarImageSize)
+                        .clip(CircleShape),
                 contentScale = ContentScale.Crop,
             )
         }
     }
 }
 
-internal val profileAvatarResources = listOf(
-    R.drawable.family_avatar_sibling,
-    R.drawable.family_avatar_dad,
-    R.drawable.family_avatar_member_blue,
-    R.drawable.family_avatar_member_green,
-    R.drawable.family_avatar_member_teal,
-    R.drawable.family_avatar_mine,
-    R.drawable.family_avatar_mom,
-).reversed()
+internal val profileAvatarResources =
+    listOf(
+        R.drawable.family_avatar_sibling,
+        R.drawable.family_avatar_dad,
+        R.drawable.family_avatar_member_blue,
+        R.drawable.family_avatar_member_green,
+        R.drawable.family_avatar_member_teal,
+        R.drawable.family_avatar_mine,
+        R.drawable.family_avatar_mom,
+    ).reversed()

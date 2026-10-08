@@ -17,7 +17,9 @@ import com.example.moil.R
 import com.example.moil.ui.theme.MoilProfileEditDimension
 
 @Composable
-internal fun ProfileEditAvatarPreview(@DrawableRes avatarRes: Int) {
+internal fun ProfileEditAvatarPreview(
+    @DrawableRes avatarRes: Int,
+) {
     Box(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center,
@@ -25,9 +27,10 @@ internal fun ProfileEditAvatarPreview(@DrawableRes avatarRes: Int) {
         Image(
             painter = painterResource(avatarRes),
             contentDescription = stringResource(R.string.profile_edit_avatar_preview),
-            modifier = Modifier
-                .size(MoilProfileEditDimension.AvatarSize)
-                .clip(CircleShape),
+            modifier =
+                Modifier
+                    .size(MoilProfileEditDimension.AvatarSize)
+                    .clip(CircleShape),
             contentScale = ContentScale.Crop,
         )
     }

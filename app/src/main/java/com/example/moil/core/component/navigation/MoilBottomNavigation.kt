@@ -72,29 +72,30 @@ fun MoilBottomNavigation(
     Surface(color = MaterialTheme.colorScheme.background) {
         Box {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        top = MoilSpacing.BottomNavigationTop,
-                        bottom = MoilSpacing.BottomNavigationBottom,
-                    )
-                    .navigationBarsPadding(),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            top = MoilSpacing.BottomNavigationTop,
+                            bottom = MoilSpacing.BottomNavigationBottom,
+                        ).navigationBarsPadding(),
                 horizontalArrangement = Arrangement.SpaceAround,
             ) {
                 MoilNavigationDestination.entries
                     .filter { destination -> destination.isBottomNavigationItem }
                     .forEach { destination ->
-                    val isSelected = destination == selectedDestination
-                    MoilBottomNavigationItem(
-                        iconRes = if (isSelected) {
-                            destination.selectedIconRes
-                        } else {
-                            destination.unselectedIconRes
-                        },
-                        labelRes = destination.labelRes,
-                        onClick = { onDestinationClick(destination) },
-                    )
-                }
+                        val isSelected = destination == selectedDestination
+                        MoilBottomNavigationItem(
+                            iconRes =
+                                if (isSelected) {
+                                    destination.selectedIconRes
+                                } else {
+                                    destination.unselectedIconRes
+                                },
+                            labelRes = destination.labelRes,
+                            onClick = { onDestinationClick(destination) },
+                        )
+                    }
             }
 
             HorizontalDivider(
